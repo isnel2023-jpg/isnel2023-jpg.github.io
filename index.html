@@ -3,25 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Isnel Garcia — Automatización con IA para negocios de Miami</title>
-<meta name="description" content="Instalo sistemas de IA bilingües que responden a tus clientes en segundos, agendan citas solos y hacen seguimiento a cada lead. Miami, FL. Diagnóstico gratis de 15 minutos.">
+<title>Isnel Garcia — Tu negocio no nos quiere. Nos necesita.</title>
+<meta name="description" content="Sistemas de IA bilingües que responden, agendan y venden por tu negocio 24/7. Cuéntanos qué te duele y lo automatizamos. Miami, FL.">
 <meta property="og:title" content="Isnel Garcia — Automatización con IA · Miami">
-<meta property="og:description" content="Tu negocio responde, agenda y vende. Aunque tú estés durmiendo.">
+<meta property="og:description" content="Tu negocio no nos quiere. Nos necesita. Sistemas que responden, agendan y venden mientras duermes.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0A1310">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230A1310'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%232FBF8F' stroke-width='4'/%3E%3Ctext x='50' y='64' font-family='Helvetica,Arial' font-size='40' font-weight='700' fill='%232FBF8F' text-anchor='middle'%3Eia%3C/text%3E%3C/svg%3E">
 <style>
   :root {
-    --bg: #0A1310;
-    --bg-raise: #101D18;
-    --bg-deep: #071009;
-    --ink: #E9F2ED;
-    --muted: #93A69C;
-    --faint: #5F736A;
-    --line: #1E2F28;
-    --accent: #2FBF8F;
-    --accent-deep: #17805C;
-    --accent-glow: rgba(47,191,143,0.14);
+    --bg: #0A1310; --bg-raise: #101D18; --bg-deep: #071009;
+    --ink: #E9F2ED; --muted: #93A69C; --faint: #5F736A; --line: #1E2F28;
+    --accent: #2FBF8F; --accent-deep: #17805C; --accent-glow: rgba(47,191,143,0.14);
     --max: 1120px;
   }
   * { box-sizing: border-box; margin: 0; }
@@ -30,147 +23,129 @@
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
-  body {
-    background: var(--bg); color: var(--ink);
-    font-family: "Helvetica Neue", -apple-system, "Segoe UI", Arial, sans-serif;
-    line-height: 1.55; font-size: 17px;
-  }
-  .mono {
-    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--accent); font-weight: 600;
-  }
+  body { background: var(--bg); color: var(--ink); font-family: "Helvetica Neue", -apple-system, "Segoe UI", Arial, sans-serif; line-height: 1.55; font-size: 17px; overflow-x: hidden; }
+  ::selection { background: var(--accent); color: #06110C; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
-  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-  nav {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(10,19,16,0.85); backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
-  }
+  nav { position: sticky; top: 0; z-index: 50; background: rgba(10,19,16,0.82); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
   nav .wrap { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; padding-bottom: 14px; }
   .logo { font-weight: 700; letter-spacing: -0.02em; font-size: 1.05rem; color: var(--ink); text-decoration: none; }
   .logo span { color: var(--accent); }
+  .navlinks { display: flex; gap: 24px; align-items: center; }
+  .navlinks > a:not(.btn) { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color .15s; }
+  .navlinks > a:not(.btn):hover { color: var(--accent); }
+  @media (max-width: 720px) { .navlinks > a:not(.btn) { display: none; } }
 
-  .btn {
-    display: inline-block; padding: 13px 24px; border-radius: 5px;
-    text-decoration: none; font-weight: 700; font-size: 0.95rem;
-    background: var(--accent); color: #06110C; border: 1px solid var(--accent);
-    transition: transform .15s, box-shadow .15s;
-  }
-  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
+  .btn { display: inline-block; padding: 14px 26px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #06110C; border: 1px solid var(--accent); cursor: pointer; transition: transform .15s, box-shadow .15s; font-family: inherit; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
   .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
   .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
   .btn.small { padding: 9px 16px; font-size: 0.85rem; }
+  .btn.big { padding: 18px 34px; font-size: 1.05rem; }
 
-  .hero { padding: 96px 0 72px; position: relative; overflow: hidden; }
-  .hero::before {
-    content: ""; position: absolute; top: -220px; right: -160px; width: 560px; height: 560px;
-    background: radial-gradient(circle, var(--accent-glow), transparent 65%);
-    pointer-events: none;
-  }
-  .status {
-    display: inline-flex; align-items: center; gap: 9px;
-    border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px;
-    font-size: 0.8rem; color: var(--muted); margin-bottom: 26px; background: var(--bg-raise);
-  }
+  /* ===== HERO ===== */
+  .hero { position: relative; padding: 90px 0 60px; overflow: hidden; }
+  #particles { position: absolute; inset: 0; z-index: 0; opacity: 0.55; }
+  .hero .wrap { position: relative; z-index: 2; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 6.5fr) minmax(0, 4.5fr); gap: 56px; align-items: center; }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+  .status { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px; font-size: 0.8rem; color: var(--muted); margin-bottom: 26px; background: rgba(16,29,24,0.8); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 2.2s infinite; }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(47,191,143,0.5); }
-    50% { box-shadow: 0 0 0 7px rgba(47,191,143,0); }
-  }
-  h1 {
-    font-size: clamp(2.5rem, 6.4vw, 4.4rem); line-height: 1.02;
-    letter-spacing: -0.04em; font-weight: 700; max-width: 13em; text-wrap: balance;
-  }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(47,191,143,0.5); } 50% { box-shadow: 0 0 0 8px rgba(47,191,143,0); } }
+  h1 { font-size: clamp(2.4rem, 6vw, 4.1rem); line-height: 1.03; letter-spacing: -0.04em; font-weight: 700; text-wrap: balance; }
+  h1 .strike { color: var(--faint); position: relative; white-space: nowrap; }
+  h1 .strike::after { content: ""; position: absolute; left: 0; right: 0; top: 54%; height: 4px; background: var(--accent); transform: scaleX(0); transform-origin: left; animation: tachar 0.7s 1.1s ease forwards; }
+  @keyframes tachar { to { transform: scaleX(1); } }
   h1 em { font-style: normal; color: var(--accent); }
-  .lede { font-size: 1.2rem; color: var(--muted); max-width: 33em; margin: 26px 0 34px; }
+  .hero-line { opacity: 0; transform: translateY(24px); animation: subir .7s ease forwards; }
+  .hero-line:nth-child(2) { animation-delay: .15s; }
+  .hero-line:nth-child(3) { animation-delay: .3s; }
+  @keyframes subir { to { opacity: 1; transform: none; } }
+  .lede { font-size: 1.18rem; color: var(--muted); max-width: 30em; margin: 26px 0 14px; }
+  .rotador { font-size: 1.18rem; color: var(--ink); margin-bottom: 32px; min-height: 1.7em; }
+  .rotador b { color: var(--accent); border-bottom: 2px solid var(--accent-deep); }
   .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
   .cta-note { font-size: 0.82rem; color: var(--faint); margin-top: 14px; }
-  .cred { margin-top: 52px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; gap: 36px; flex-wrap: wrap; }
-  .cred div { font-size: 0.88rem; color: var(--muted); max-width: 15em; }
-  .cred strong { color: var(--ink); display: block; margin-bottom: 2px; }
+
+  /* ===== CHAT DEMO ===== */
+  .phone { background: var(--bg-deep); border: 1px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: 0 24px 70px rgba(0,0,0,0.5), 0 0 0 1px rgba(47,191,143,0.06); max-width: 400px; margin-left: auto; }
+  @media (max-width: 900px) { .phone { margin: 0 auto; } }
+  .phone-top { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+  .phone-ava { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #06110C; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
+  .phone-top small { display: block; color: var(--accent); font-size: 0.7rem; }
+  .phone-top strong { font-size: 0.9rem; }
+  .phone-hora { margin-left: auto; font-family: ui-monospace, Menlo, monospace; font-size: 0.72rem; color: var(--faint); }
+  .chat { display: flex; flex-direction: column; gap: 9px; min-height: 330px; }
+  .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.4; opacity: 0; transform: translateY(10px) scale(.97); transition: opacity .35s ease, transform .35s ease; }
+  .msg.visible { opacity: 1; transform: none; }
+  .msg.cliente { align-self: flex-start; background: var(--bg-raise); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .msg.ia { align-self: flex-end; background: var(--accent-deep); color: #EAFBF4; border-bottom-right-radius: 4px; }
+  .msg.sistema { align-self: center; background: transparent; color: var(--faint); font-size: 0.74rem; font-family: ui-monospace, Menlo, monospace; text-align: center; }
+  .typing { display: inline-flex; gap: 4px; align-items: center; }
+  .typing i { width: 6px; height: 6px; border-radius: 50%; background: #EAFBF4; opacity: .5; animation: tp 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: .18s; } .typing i:nth-child(3) { animation-delay: .36s; }
+  @keyframes tp { 0%,100% { transform: translateY(0); opacity:.4 } 50% { transform: translateY(-4px); opacity:1 } }
+
+  /* ===== MARQUEE ===== */
+  .cinta { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-deep); overflow: hidden; padding: 14px 0; }
+  .cinta-inner { display: flex; gap: 48px; white-space: nowrap; width: max-content; animation: rodar 30s linear infinite; }
+  @keyframes rodar { to { transform: translateX(-50%); } }
+  .cinta span { font-family: ui-monospace, Menlo, monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .cinta b { color: var(--accent); }
 
   section { padding: 84px 0; border-top: 1px solid var(--line); }
-  h2 {
-    font-size: clamp(1.7rem, 3.6vw, 2.5rem); letter-spacing: -0.03em;
-    margin: 12px 0 14px; text-wrap: balance; max-width: 20em; font-weight: 700;
-  }
+  h2 { font-size: clamp(1.7rem, 3.6vw, 2.5rem); letter-spacing: -0.03em; margin: 12px 0 14px; text-wrap: balance; max-width: 21em; font-weight: 700; }
   .sub { color: var(--muted); max-width: 40em; margin-bottom: 44px; }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
 
-  .stats { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-  .stat { background: var(--bg-raise); padding: 30px 26px; }
-  .stat .n { font-size: 2.6rem; font-weight: 700; letter-spacing: -0.03em; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stats { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .stat { background: var(--bg-raise); padding: 30px 26px; position: relative; overflow: hidden; }
+  .stat::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; background: linear-gradient(90deg, var(--accent), transparent 70%); opacity: .5; }
+  .stat .n { font-size: 2.7rem; font-weight: 700; letter-spacing: -0.03em; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
   .stat p { font-size: 0.88rem; color: var(--muted); margin-top: 8px; }
   .stat .src { display: block; margin-top: 10px; font-size: 0.7rem; color: var(--faint); }
 
   .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-  .card {
-    background: var(--bg-raise); border: 1px solid var(--line); border-radius: 8px;
-    padding: 28px; transition: border-color .2s;
-  }
-  .card:hover { border-color: var(--accent-deep); }
+  .card { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 10px; padding: 28px; transition: border-color .2s, transform .2s, box-shadow .2s; position: relative; overflow: hidden; }
+  .card:hover { border-color: var(--accent-deep); transform: translateY(-4px); box-shadow: 0 14px 38px rgba(0,0,0,0.4); }
   .card h3 { font-size: 1.08rem; letter-spacing: -0.01em; margin-bottom: 10px; }
   .card p { font-size: 0.92rem; color: var(--muted); }
   .card .tag { display: block; margin-bottom: 12px; }
+  .todo-nota { margin-top: 28px; padding: 22px 26px; border: 1px dashed var(--accent-deep); border-radius: 10px; color: var(--ink); font-size: 1rem; background: rgba(47,191,143,0.05); }
+  .todo-nota b { color: var(--accent); }
 
-  .plans { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: stretch; }
-  .plan { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 10px; padding: 34px 30px; display: flex; flex-direction: column; gap: 16px; }
-  .plan.featured { border-color: var(--accent); background: linear-gradient(180deg, rgba(47,191,143,0.08), var(--bg-raise) 40%); position: relative; }
-  .plan.featured::after {
-    content: "El más pedido"; position: absolute; top: -12px; left: 28px;
-    background: var(--accent); color: #06110C; font-size: 0.7rem; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px;
-  }
-  .plan h3 { font-size: 1.15rem; }
-  .price { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-  .price small { font-size: 0.85rem; font-weight: 400; color: var(--faint); letter-spacing: 0; display: block; margin-top: 2px; }
-  .plan ul { list-style: none; padding: 0; display: grid; gap: 10px; font-size: 0.92rem; color: var(--muted); }
-  .plan li { padding-left: 22px; position: relative; }
-  .plan li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
-  .plan .btn { margin-top: auto; text-align: center; }
-
-  .steps { counter-reset: paso; display: grid; gap: 0; }
+  .steps { counter-reset: paso; }
   .step { display: grid; grid-template-columns: 84px 1fr; gap: 22px; padding: 26px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
   .step:last-child { border-bottom: none; }
-  .step::before {
-    counter-increment: paso; content: "0" counter(paso);
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    font-size: 1.6rem; font-weight: 700; color: var(--accent);
-  }
+  .step::before { counter-increment: paso; content: "0" counter(paso); font-family: ui-monospace, Menlo, monospace; font-size: 1.6rem; font-weight: 700; color: var(--accent); }
   .step h3 { font-size: 1.08rem; margin-bottom: 5px; }
   .step p { color: var(--muted); font-size: 0.95rem; max-width: 44em; }
+  @media (max-width: 640px) { .step { grid-template-columns: 56px 1fr; gap: 14px; } }
 
-  .faq dt { font-weight: 700; margin-top: 26px; font-size: 1.02rem; }
-  .faq dd { margin: 8px 0 0; color: var(--muted); max-width: 46em; }
+  /* ===== FORMULARIO ===== */
+  .form-shell { display: grid; grid-template-columns: minmax(0,5fr) minmax(0,6fr); gap: 48px; align-items: start; }
+  @media (max-width: 860px) { .form-shell { grid-template-columns: 1fr; } }
+  form { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 14px; padding: 32px; display: grid; gap: 18px; }
+  label { font-size: 0.85rem; font-weight: 700; display: grid; gap: 8px; }
+  input, textarea { background: var(--bg-deep); border: 1px solid var(--line); border-radius: 8px; padding: 13px 15px; color: var(--ink); font-family: inherit; font-size: 0.95rem; width: 100%; transition: border-color .15s; }
+  input:hover, textarea:hover { border-color: var(--accent-deep); }
+  textarea { resize: vertical; min-height: 90px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; font-size: 0.85rem; color: var(--muted); cursor: pointer; user-select: none; transition: all .15s; background: var(--bg-deep); }
+  .chip:hover { border-color: var(--accent-deep); color: var(--ink); }
+  .chip.on { background: var(--accent); color: #06110C; border-color: var(--accent); font-weight: 700; }
+  .form-nota { font-size: 0.78rem; color: var(--faint); }
 
-  .final { text-align: left; padding: 100px 0; }
-  .final h2 { max-width: 16em; }
-
+  .final { padding: 100px 0; }
   footer { border-top: 1px solid var(--line); padding: 40px 0 60px; background: var(--bg-deep); }
   footer .wrap { display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; align-items: flex-start; }
   footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
   footer .col { display: grid; gap: 6px; font-size: 0.9rem; color: var(--muted); }
   footer .tiny { font-size: 0.75rem; color: var(--faint); max-width: 30em; }
-
-  ::selection { background: var(--accent); color: #06110C; }
-  .navlinks { display: flex; gap: 24px; align-items: center; }
-  .navlinks > a:not(.btn) { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color .15s; }
-  .navlinks > a:not(.btn):hover { color: var(--accent); }
-  @media (max-width: 720px) { .navlinks > a:not(.btn) { display: none; } }
-  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
-  .reveal.in { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
-  .plan { transition: border-color .2s, transform .2s, box-shadow .2s; }
-  .plan:hover { transform: translateY(-4px); box-shadow: 0 14px 38px rgba(0,0,0,0.4); border-color: var(--accent-deep); }
-  .stat { position: relative; overflow: hidden; }
-  .stat::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; background: linear-gradient(90deg, var(--accent), transparent 70%); opacity: .5; }
-
-  @media (max-width: 640px) {
-    .hero { padding: 64px 0 52px; }
-    section { padding: 60px 0; }
-    .step { grid-template-columns: 56px 1fr; gap: 14px; }
-  }
 </style>
 </head>
 <body>
@@ -179,209 +154,138 @@
   <div class="wrap">
     <a class="logo" href="#top">isnel garcia<span>.</span>ia</a>
     <div class="navlinks">
-      <a href="#servicios">Servicios</a>
-      <a href="#precios">Precios</a>
-      <a href="#proceso">Cómo trabajo</a>
-      <a class="btn small" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Diagnóstico gratis</a>
+      <a href="#capacidades">Qué automatizamos</a>
+      <a href="#proceso">Cómo trabajamos</a>
+      <a class="btn small" href="#hablemos">Cuéntame qué necesitas</a>
     </div>
   </div>
 </nav>
 
 <header class="hero" id="top">
+  <canvas id="particles" aria-hidden="true"></canvas>
   <div class="wrap">
-    <div class="status"><span class="dot"></span> Sistemas activos 24/7 · Miami, FL · Español &amp; English</div>
-    <h1>Mientras tú duermes, tu negocio <em>responde, agenda y vende</em>.</h1>
-    <p class="lede">Instalo sistemas de inteligencia artificial bilingües que contestan a tus clientes en segundos — por WhatsApp, SMS y web —, agendan citas solos y persiguen cada lead hasta que compra o dice que no. Tú solo entras a cerrar.</p>
-    <div class="cta-row">
-      <a class="btn" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Hablemos por WhatsApp</a>
-      <a class="btn ghost" href="mailto:isnel2023@gmail.com">isnel2023@gmail.com</a>
-    </div>
-    <p class="cta-note">Diagnóstico gratis de 15 minutos. Sales de la llamada sabiendo exactamente qué automatizar — trabajes conmigo o no.</p>
-    <div class="cred">
-      <div><strong>Sistemas reales en producción</strong>Opero la infraestructura de IA y contenido de Mostro Media, empresa de medios en EE. UU.</div>
-      <div><strong>Bilingüe de verdad</strong>Tu asistente atiende en español e inglés, como tus clientes en Miami.</div>
-      <div><strong>Sin permanencia</strong>Mes a mes. Si no te produce, lo cancelas — así de simple.</div>
+    <div class="hero-grid">
+      <div>
+        <div class="status hero-line"><span class="dot"></span> Sistemas activos ahora mismo · Miami, FL · ES &amp; EN</div>
+        <h1>
+          <span class="hero-line" style="display:block">Tu negocio no <span class="strike">nos quiere</span>.</span>
+          <span class="hero-line" style="display:block"><em>Nos necesita.</em></span>
+        </h1>
+        <p class="lede hero-line">Cada minuto que tu negocio tarda en responder, alguien le compra a tu competencia. Nosotros instalamos sistemas de IA bilingües que responden, agendan y venden por ti — de día, de noche, los domingos.</p>
+        <p class="rotador" aria-live="off">Ahora mismo, tu negocio está perdiendo <b id="rotaword">llamadas</b></p>
+        <div class="cta-row">
+          <a class="btn big" href="#hablemos">Cuéntame qué necesitas →</a>
+        </div>
+        <p class="cta-note">Sin formularios eternos. Nos cuentas tu dolor, te decimos exactamente cómo lo matamos.</p>
+      </div>
+
+      <div class="phone" aria-label="Demostración: la IA atendiendo un cliente de madrugada">
+        <div class="phone-top">
+          <div class="phone-ava">IA</div>
+          <div><strong>Asistente del negocio</strong><small>● en línea — siempre</small></div>
+          <span class="phone-hora">11:47 PM</span>
+        </div>
+        <div class="chat" id="chat"></div>
+      </div>
     </div>
   </div>
 </header>
 
+<div class="cinta" aria-hidden="true">
+  <div class="cinta-inner" id="cinta">
+    <span>RESPONDE EN <b>SEGUNDOS</b></span><span>ATIENDE <b>24/7</b></span><span>ESPAÑOL <b>&amp;</b> ENGLISH</span><span>AGENDA <b>SOLO</b></span><span>SEGUIMIENTO <b>AUTOMÁTICO</b></span><span>CERO LLAMADAS <b>PERDIDAS</b></span><span>MIAMI <b>· FL</b></span>
+  </div>
+</div>
+
 <section>
   <div class="wrap">
-    <div class="mono">La matemática del problema</div>
-    <h2>Cada hora sin responder tiene precio — y lo estás pagando tú</h2>
-    <p class="sub">Estos números no son míos: son de estudios de la industria en EE. UU. Aplican a tu negocio hoy.</p>
+    <div class="mono">Por qué "necesita" y no "quiere"</div>
+    <h2>Esto no es un lujo. Es la fuga de dinero más grande que tienes</h2>
+    <p class="sub">No son opiniones nuestras — son los números medidos de la industria en EE. UU. Míralos subir: así crece lo que pierdes.</p>
     <div class="stats">
-      <div class="stat">
-        <div class="n">40%</div>
-        <p>de las llamadas a negocios pequeños llegan fuera del horario 9–5. Nadie las contesta.</p>
-        <span class="src">CallRail · 18M de llamadas analizadas</span>
-      </div>
-      <div class="stat">
-        <div class="n">×21</div>
-        <p>más probabilidad de convertir un lead si le respondes en menos de 5 minutos (vs. 30 min).</p>
-        <span class="src">Oldroyd / InsideSales, estudio de 100K+ llamadas</span>
-      </div>
-      <div class="stat">
-        <div class="n">47%</div>
-        <p>de las consultas online a negocios inmobiliarios jamás reciben respuesta. Ninguna.</p>
-        <span class="src">DelPrete 2024 · secret shopping en 25+ brokerages</span>
-      </div>
-      <div class="stat">
-        <div class="n">78%</div>
-        <p>de los clientes le compra al primer proveedor que le responde. No al mejor. Al primero.</p>
-        <span class="src">Lead Connect / industria</span>
-      </div>
+      <div class="stat"><div class="n" data-count="40" data-suffix="%">0%</div><p>de las llamadas a negocios pequeños llegan fuera del horario 9–5. Nadie las contesta.</p><span class="src">CallRail · 18M de llamadas</span></div>
+      <div class="stat"><div class="n" data-count="21" data-prefix="×">×0</div><p>más probabilidad de convertir un lead si respondes en menos de 5 minutos.</p><span class="src">Oldroyd / InsideSales · 100K+ llamadas</span></div>
+      <div class="stat"><div class="n" data-count="47" data-suffix="%">0%</div><p>de las consultas online jamás reciben respuesta. Ninguna. Nunca.</p><span class="src">DelPrete 2024 · secret shopping</span></div>
+      <div class="stat"><div class="n" data-count="78" data-suffix="%">0%</div><p>de los clientes le compra al primero que responde. No al mejor. Al primero.</p><span class="src">Lead Connect · industria</span></div>
     </div>
   </div>
 </section>
 
-<section id="servicios">
+<section id="capacidades">
   <div class="wrap">
-    <div class="mono">Qué instalo</div>
-    <h2>Si un proceso de tu empresa se repite, se puede automatizar</h2>
-    <p class="sub">Empiezo por donde más dinero se te escapa — la atención al cliente — y desde ahí automatizo lo que tu operación necesite.</p>
+    <div class="mono">Qué automatizamos</div>
+    <h2>Lo que tu negocio necesite. Literalmente.</h2>
+    <p class="sub">Estos son los sistemas que más instalamos — pero no somos un menú fijo: somos el equipo técnico que tu operación no tiene.</p>
     <div class="grid">
-      <div class="card">
-        <span class="mono tag">El más vendido</span>
-        <h3>Recepcionista IA bilingüe</h3>
-        <p>Contesta WhatsApp, SMS y el chat de tu web en segundos, con tus precios y tu tono. Detecta el idioma del cliente y responde en español o inglés. Te avisa cuando alguien está listo para comprar.</p>
-      </div>
-      <div class="card">
-        <span class="mono tag">Llamadas perdidas</span>
-        <h3>Missed-call text-back</h3>
-        <p>Cada llamada que no alcanzas a contestar recibe un texto automático al instante: "vimos tu llamada, ¿en qué te ayudamos?". El cliente que iba a llamar al siguiente de Google, se queda contigo.</p>
-      </div>
-      <div class="card">
-        <span class="mono tag">Agenda llena</span>
-        <h3>Agendamiento automático</h3>
-        <p>El sistema agenda la cita directo en tu calendario, confirma al cliente y le recuerda antes — los recordatorios reducen las inasistencias que te vacían la agenda.</p>
-      </div>
-      <div class="card">
-        <span class="mono tag">Nadie se escapa</span>
-        <h3>Seguimiento de leads</h3>
-        <p>El que preguntó y no compró recibe seguimiento automático a los 2, 5 y 9 días — escrito con IA, en tono humano. Ahí vive la mitad de tus ventas perdidas.</p>
-      </div>
-      <div class="card">
-        <span class="mono tag">Tu lista produce</span>
-        <h3>Email marketing con IA</h3>
-        <p>Campañas y secuencias que se escriben, se segmentan y se envían solas: bienvenida, clientes dormidos, promociones. Tú apruebas, el sistema ejecuta.</p>
-      </div>
-      <div class="card">
-        <span class="mono tag">Operación completa</span>
-        <h3>Optimización de procesos</h3>
-        <p>Facturación, cotizaciones, reportes, onboarding, inventario, integraciones entre tus sistemas. Analizo cómo trabaja tu equipo y convierto horas de trabajo manual en minutos.</p>
-      </div>
+      <div class="card"><span class="mono tag">Atención</span><h3>Recepcionista IA bilingüe</h3><p>Contesta WhatsApp, SMS y tu web en segundos, con tus precios y tu tono. Detecta el idioma solo. Te avisa cuando hay alguien listo para comprar.</p></div>
+      <div class="card"><span class="mono tag">Llamadas</span><h3>Ninguna llamada perdida</h3><p>Cada llamada que no alcanzas recibe un texto al instante: "vimos tu llamada, ¿en qué te ayudamos?". El cliente ya no marca al siguiente de Google.</p></div>
+      <div class="card"><span class="mono tag">Agenda</span><h3>Citas que se agendan solas</h3><p>El sistema agenda directo en tu calendario, confirma y recuerda. Las sillas vacías por citas olvidadas se acaban.</p></div>
+      <div class="card"><span class="mono tag">Ventas</span><h3>Seguimiento implacable</h3><p>El que preguntó y no compró recibe seguimiento automático los días 2, 5 y 9 — en tono humano. Ahí vive la mitad de tus ventas perdidas.</p></div>
+      <div class="card"><span class="mono tag">Marketing</span><h3>Email marketing con IA</h3><p>Campañas que se escriben, se segmentan y se envían solas: bienvenida, clientes dormidos, promociones. Tu lista vuelve a producir.</p></div>
+      <div class="card"><span class="mono tag">Operación</span><h3>Procesos internos</h3><p>Facturación, cotizaciones, reportes, onboarding, inventario, integraciones. Horas de trabajo manual convertidas en minutos.</p></div>
     </div>
-  </div>
-</section>
-
-<section id="precios">
-  <div class="wrap">
-    <div class="mono">Paquetes · precios de lanzamiento</div>
-    <h2>Inversión que se paga con las ventas que hoy se te escapan</h2>
-    <p class="sub">Referencia: las agencias en EE. UU. cobran setups de $1,000–$5,000 y retainers de $500–$3,000 al mes por esto mismo — sin hablarte en tu idioma. Y para mis <strong style="color:var(--accent)">primeros 3 clientes en Miami</strong>: 50% de descuento en la instalación, a cambio de tu testimonio.</p>
-    <div class="plans">
-      <div class="plan">
-        <h3>Arranque</h3>
-        <div class="price">$497 <small>instalación única + $197/mes</small></div>
-        <ul>
-          <li>Missed-call text-back: cada llamada perdida recibe un texto al instante</li>
-          <li>Bot de preguntas frecuentes en WhatsApp (precios, horarios, ubicación)</li>
-          <li>Bilingüe español/inglés</li>
-          <li>Perfecto para probar sin arriesgar</li>
-        </ul>
-        <a class="btn ghost" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20me%20interesa%20el%20paquete%20Arranque">Probar con este</a>
-      </div>
-      <div class="plan">
-        <h3>Recepcionista IA</h3>
-        <div class="price">$997 <small>instalación única + $297/mes</small></div>
-        <ul>
-          <li>Asistente bilingüe en WhatsApp, SMS y web</li>
-          <li>Missed-call text-back incluido</li>
-          <li>Responde precios, horarios y FAQ al instante</li>
-          <li>Alertas de leads calientes a tu celular</li>
-        </ul>
-        <a class="btn ghost" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20me%20interesa%20el%20Recepcionista%20IA">Empezar con este</a>
-      </div>
-      <div class="plan featured">
-        <h3>Sistema de Ventas Completo</h3>
-        <div class="price">$1,997 <small>instalación única + $497/mes</small></div>
-        <ul>
-          <li>Todo lo del Recepcionista IA</li>
-          <li>Agendamiento automático con recordatorios</li>
-          <li>Seguimiento automático de leads (días 2, 5 y 9)</li>
-          <li>Reporte semanal: cuántos escribieron, cuántos compraron</li>
-          <li>Ajustes ilimitados el primer mes</li>
-        </ul>
-        <a class="btn" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20el%20Sistema%20de%20Ventas%20Completo">Quiero este</a>
-      </div>
-      <div class="plan">
-        <h3>A la medida</h3>
-        <div class="price">Cotización <small>según alcance del proyecto</small></div>
-        <ul>
-          <li>Email marketing con IA</li>
-          <li>Optimización de procesos internos</li>
-          <li>Integraciones con tu CRM / POS / software</li>
-          <li>Multi-sede y flujos especiales</li>
-        </ul>
-        <a class="btn ghost" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20necesito%20algo%20a%20la%20medida">Cotizar mi caso</a>
-      </div>
-    </div>
+    <div class="todo-nota reveal">¿Lo tuyo no está en la lista? Mejor. <b>Si un proceso de tu empresa se repite, se puede automatizar</b> — cuéntanos el tuyo y te decimos cómo, gratis, en 15 minutos.</div>
   </div>
 </section>
 
 <section id="proceso">
   <div class="wrap">
-    <div class="mono">Cómo trabajo</div>
-    <h2>De diagnóstico a sistema funcionando en dos semanas</h2>
+    <div class="mono">Cómo trabajamos</div>
+    <h2>De "me duele" a sistema funcionando en dos semanas</h2>
     <div class="steps">
-      <div class="step">
-        <div>
-          <h3>Diagnóstico gratis · 15 minutos</h3>
-          <p>Me cuentas cómo atiendes hoy a tus clientes. Te digo exactamente qué se puede automatizar, cuánto te cuesta no hacerlo, y si tu caso no lo amerita, también te lo digo.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div>
-          <h3>Demo con tu negocio real</h3>
-          <p>Te muestro el sistema funcionando con tus datos: tus precios, tus servicios, tus horarios. Lo ves respondiendo como si fuera tu mejor empleado — antes de pagar un dólar del proyecto.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div>
-          <h3>Instalación, prueba y entrega</h3>
-          <p>Instalo, pruebo con casos reales y te entrego funcionando en 7–14 días. Capacito a tu equipo y el primer mes incluye ajustes ilimitados: si algo no responde bien, lo corrijo hasta que lo haga.</p>
-        </div>
-      </div>
+      <div class="step"><div><h3>Nos cuentas qué te duele · 15 min · gratis</h3><p>Sin compromiso y sin carreta técnica. Sales de la llamada sabiendo exactamente qué se puede automatizar en TU negocio y cuánto te cuesta cada mes no hacerlo.</p></div></div>
+      <div class="step"><div><h3>Te lo mostramos funcionando con TUS datos</h3><p>Tu carta, tus precios, tus horarios, tu tono. Ves el sistema respondiendo como tu mejor empleado antes de invertir un dólar en el proyecto.</p></div></div>
+      <div class="step"><div><h3>Instalamos, probamos y entregamos</h3><p>En 7–14 días está trabajando. Capacitamos a tu equipo y el primer mes tiene ajustes ilimitados: si algo no responde bien, lo corregimos hasta que lo haga.</p></div></div>
     </div>
   </div>
 </section>
 
-<section>
+<section id="hablemos">
   <div class="wrap">
-    <div class="mono">Preguntas frecuentes</div>
-    <h2>Lo que todo el mundo pregunta primero</h2>
-    <dl class="faq">
-      <dt>¿El asistente va a sonar robótico con mis clientes?</dt>
-      <dd>No. Lo entreno con tu forma de hablar y tus respuestas reales, en español e inglés. Y cuando la conversación necesita un humano, te la pasa con todo el contexto — el cliente nunca queda botado con una máquina.</dd>
-      <dt>¿Necesito saber de tecnología?</dt>
-      <dd>Cero. Tú sigues usando tu teléfono y tu WhatsApp como siempre. Yo me encargo de todo lo técnico, y el soporte conmigo es en tu idioma.</dd>
-      <dt>¿Qué pasa si no funciona para mi negocio?</dt>
-      <dd>El primer mes incluye ajustes ilimitados y no hay contrato de permanencia: si el sistema no te está produciendo, lo cancelas y ya. Yo solo gano si tú sigues ganando.</dd>
-      <dt>¿En cuánto tiempo veo resultados?</dt>
-      <dd>El primer día: el asistente responde al instante desde que se enciende. Las citas confirmadas y los seguimientos automáticos se sienten en la primera semana.</dd>
-    </dl>
+    <div class="form-shell">
+      <div>
+        <div class="mono">El siguiente paso</div>
+        <h2>Cuéntanos qué te está doliendo</h2>
+        <p class="sub">30 segundos. Nos llega directo al WhatsApp y te respondemos hoy mismo con un plan concreto para tu caso — no con un PDF genérico.</p>
+        <p class="sub" style="margin-bottom:0"><strong style="color:var(--ink)">Isnel Garcia</strong> · Miami, FL<br>Opero sistemas de IA para una empresa de medios de EE. UU. Esto no es teoría: es lo que hago todos los días.</p>
+      </div>
+      <form id="formulario">
+        <label>Tu nombre
+          <input type="text" id="f-nombre" placeholder="Ej: Carlos Pérez" autocomplete="name">
+        </label>
+        <label>Tu negocio
+          <input type="text" id="f-negocio" placeholder="Ej: Clínica dental en Kendall">
+        </label>
+        <div>
+          <label style="margin-bottom:10px">¿Qué te está doliendo? (toca los que apliquen)</label>
+          <div class="chips" id="chips">
+            <span class="chip" tabindex="0">📞 Llamadas perdidas</span>
+            <span class="chip" tabindex="0">💬 WhatsApp saturado</span>
+            <span class="chip" tabindex="0">📅 Citas a mano</span>
+            <span class="chip" tabindex="0">🥶 Leads sin seguimiento</span>
+            <span class="chip" tabindex="0">📧 Email marketing</span>
+            <span class="chip" tabindex="0">⚙️ Procesos manuales</span>
+            <span class="chip" tabindex="0">🤷 Otra cosa</span>
+          </div>
+        </div>
+        <label>Cuéntanos más (opcional)
+          <textarea id="f-detalle" placeholder="Ej: se me pierden los mensajes de Instagram los fines de semana…"></textarea>
+        </label>
+        <button type="submit" class="btn big">Enviar por WhatsApp →</button>
+        <p class="form-nota">Se abre tu WhatsApp con el mensaje ya escrito — tú solo le das enviar. Sin bases de datos raras, sin spam.</p>
+      </form>
+    </div>
   </div>
 </section>
 
 <section class="final">
   <div class="wrap">
-    <div class="mono">El siguiente paso es tuyo</div>
-    <h2>15 minutos. Gratis. Sales sabiendo exactamente qué automatizar.</h2>
-    <p class="sub">Y si tu negocio todavía no lo necesita, te lo digo de frente y quedamos como amigos.</p>
+    <div class="mono">La verdad incómoda</div>
+    <h2>Tu competencia no es mejor que tú. Solo responde más rápido.</h2>
+    <p class="sub">Y eso, desde hoy, tiene arreglo.</p>
     <div class="cta-row">
-      <a class="btn" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Agendar mi diagnóstico gratis</a>
-      <a class="btn ghost" href="tel:+13468231378">Llámame: (346) 823-1378</a>
+      <a class="btn big" href="#hablemos">Cuéntame qué necesitas →</a>
+      <a class="btn ghost" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20hablar%20de%20mi%20negocio">WhatsApp directo</a>
     </div>
   </div>
 </section>
@@ -400,16 +304,132 @@
 
 <script>
 (function () {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!('IntersectionObserver' in window)) return;
-  var els = document.querySelectorAll('section .card, section .plan, section .stat, .step, section h2');
-  els.forEach(function (e) { e.classList.add('reveal'); });
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-    });
-  }, { threshold: 0.15 });
-  els.forEach(function (e) { io.observe(e); });
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Cinta: duplicar contenido para loop infinito */
+  var cinta = document.getElementById('cinta');
+  cinta.innerHTML += cinta.innerHTML;
+
+  /* Partículas del hero */
+  var cv = document.getElementById('particles');
+  if (!reduce && cv && cv.getContext) {
+    var ctx = cv.getContext('2d'), W, H, pts = [];
+    function medir() { W = cv.width = cv.offsetWidth; H = cv.height = cv.offsetHeight; }
+    medir(); window.addEventListener('resize', medir);
+    var N = Math.min(70, Math.floor(W / 18));
+    for (var i = 0; i < N; i++) pts.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.35, vy: (Math.random()-.5)*.35 });
+    (function tick() {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i];
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+        ctx.fillStyle = 'rgba(47,191,143,0.7)';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7); ctx.fill();
+        for (var j = i + 1; j < pts.length; j++) {
+          var q = pts[j], dx = p.x - q.x, dy = p.y - q.y, d = dx*dx + dy*dy;
+          if (d < 12000) {
+            ctx.strokeStyle = 'rgba(47,191,143,' + (0.18 * (1 - d / 12000)) + ')';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  /* Palabras rotando */
+  var palabras = ['llamadas.', 'citas.', 'clientes.', 'ventas.', 'dinero.'];
+  var rw = document.getElementById('rotaword'), wi = 0;
+  if (!reduce) setInterval(function () {
+    wi = (wi + 1) % palabras.length;
+    rw.style.opacity = 0;
+    setTimeout(function () { rw.textContent = palabras[wi]; rw.style.opacity = 1; }, 220);
+  }, 2200);
+  rw.style.transition = 'opacity .22s';
+
+  /* Chat demo en loop */
+  var guion = [
+    { tipo: 'cliente', texto: 'Hola! ¿Tienen cita disponible para mañana? 🙏', espera: 900 },
+    { tipo: 'ia', texto: '¡Hola! 😊 Claro que sí. Tengo 10:30 a.m. o 3:00 p.m. ¿Cuál te sirve más?', espera: 1500, escribe: true },
+    { tipo: 'cliente', texto: 'La de 10:30 está perfecta', espera: 1300 },
+    { tipo: 'ia', texto: 'Listo ✅ Quedaste para mañana a las 10:30 a.m. Te llega la confirmación por aquí. ¿Te ayudo con algo más?', espera: 1600, escribe: true },
+    { tipo: 'cliente', texto: 'No, muchas gracias!! 🙌', espera: 1200 },
+    { tipo: 'ia', texto: '¡Con gusto! Te esperamos mañana. 💚', espera: 1400, escribe: true },
+    { tipo: 'sistema', texto: '— El dueño estaba durmiendo. La venta se cerró igual. —', espera: 3200 }
+  ];
+  var chat = document.getElementById('chat');
+  function burbuja(tipo, html) {
+    var d = document.createElement('div');
+    d.className = 'msg ' + tipo; d.innerHTML = html;
+    chat.appendChild(d);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ d.classList.add('visible'); }); });
+    return d;
+  }
+  function correr(i) {
+    if (i >= guion.length) { setTimeout(function(){ chat.innerHTML=''; correr(0); }, 1200); return; }
+    var m = guion[i];
+    if (m.escribe && !reduce) {
+      var t = burbuja('ia', '<span class="typing"><i></i><i></i><i></i></span>');
+      setTimeout(function () { t.innerHTML = m.texto; setTimeout(function(){ correr(i+1); }, m.espera); }, 900);
+    } else {
+      burbuja(m.tipo, m.texto);
+      setTimeout(function(){ correr(i+1); }, reduce ? 400 : m.espera);
+    }
+  }
+  correr(0);
+
+  /* Reveal + contadores al hacer scroll */
+  if ('IntersectionObserver' in window) {
+    var els = document.querySelectorAll('.card, .stat, .step, section h2, .todo-nota, form');
+    if (!reduce) els.forEach(function (e) { e.classList.add('reveal'); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        var n = en.target.querySelector ? en.target.querySelector('.n[data-count]') : null;
+        if (n && !n.dataset.hecho) {
+          n.dataset.hecho = 1;
+          var fin = +n.dataset.count, pre = n.dataset.prefix || '', suf = n.dataset.suffix || '';
+          if (reduce) { n.textContent = pre + fin + suf; }
+          else {
+            var t0 = null;
+            (function paso(ts) {
+              if (!t0) t0 = ts;
+              var p = Math.min((ts - t0) / 1200, 1);
+              n.textContent = pre + Math.round(fin * (1 - Math.pow(1 - p, 3))) + suf;
+              if (p < 1) requestAnimationFrame(paso);
+            })(performance.now());
+          }
+        }
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.2 });
+    els.forEach(function (e) { io.observe(e); });
+  }
+
+  /* Chips + formulario → WhatsApp */
+  var chips = document.querySelectorAll('.chip');
+  chips.forEach(function (c) {
+    function tog() { c.classList.toggle('on'); }
+    c.addEventListener('click', tog);
+    c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
+  });
+  document.getElementById('formulario').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nombre = document.getElementById('f-nombre').value.trim();
+    var negocio = document.getElementById('f-negocio').value.trim();
+    var detalle = document.getElementById('f-detalle').value.trim();
+    var dolores = Array.prototype.filter.call(chips, function (c) { return c.classList.contains('on'); })
+      .map(function (c) { return c.textContent.trim(); }).join(', ');
+    var msg = 'Hola Isnel! Soy ' + (nombre || '—') + ', de ' + (negocio || '—') + '.'
+      + (dolores ? '\nMe está doliendo: ' + dolores + '.' : '')
+      + (detalle ? '\nDetalle: ' + detalle : '')
+      + '\nQuiero saber cómo lo automatizamos.';
+    window.open('https://wa.me/13468231378?text=' + encodeURIComponent(msg), '_blank');
+  });
 })();
 </script>
 </body>
