@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isnel Garcia — Automatización con IA para negocios de Miami</title>
+<meta name="description" content="Instalo sistemas de IA bilingües que responden a tus clientes en segundos, agendan citas solos y hacen seguimiento a cada lead. Miami, FL. Diagnóstico gratis de 15 minutos.">
+<meta property="og:title" content="Isnel Garcia — Automatización con IA · Miami">
+<meta property="og:description" content="Tu negocio responde, agenda y vende. Aunque tú estés durmiendo.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #0A1310;
+    --bg-raise: #101D18;
+    --bg-deep: #071009;
+    --ink: #E9F2ED;
+    --muted: #93A69C;
+    --faint: #5F736A;
+    --line: #1E2F28;
+    --accent: #2FBF8F;
+    --accent-deep: #17805C;
+    --accent-glow: rgba(47,191,143,0.14);
+    --max: 1120px;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Helvetica Neue", -apple-system, "Segoe UI", Arial, sans-serif;
+    line-height: 1.55; font-size: 17px;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600;
+  }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,19,16,0.85); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; padding-bottom: 14px; }
+  .logo { font-weight: 700; letter-spacing: -0.02em; font-size: 1.05rem; color: var(--ink); text-decoration: none; }
+  .logo span { color: var(--accent); }
+
+  .btn {
+    display: inline-block; padding: 13px 24px; border-radius: 5px;
+    text-decoration: none; font-weight: 700; font-size: 0.95rem;
+    background: var(--accent); color: #06110C; border: 1px solid var(--accent);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.small { padding: 9px 16px; font-size: 0.85rem; }
+
+  .hero { padding: 96px 0 72px; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; top: -220px; right: -160px; width: 560px; height: 560px;
+    background: radial-gradient(circle, var(--accent-glow), transparent 65%);
+    pointer-events: none;
+  }
+  .status {
+    display: inline-flex; align-items: center; gap: 9px;
+    border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px;
+    font-size: 0.8rem; color: var(--muted); margin-bottom: 26px; background: var(--bg-raise);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 2.2s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(47,191,143,0.5); }
+    50% { box-shadow: 0 0 0 7px rgba(47,191,143,0); }
+  }
+  h1 {
+    font-size: clamp(2.5rem, 6.4vw, 4.4rem); line-height: 1.02;
+    letter-spacing: -0.04em; font-weight: 700; max-width: 13em; text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { font-size: 1.2rem; color: var(--muted); max-width: 33em; margin: 26px 0 34px; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .cta-note { font-size: 0.82rem; color: var(--faint); margin-top: 14px; }
+  .cred { margin-top: 52px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; gap: 36px; flex-wrap: wrap; }
+  .cred div { font-size: 0.88rem; color: var(--muted); max-width: 15em; }
+  .cred strong { color: var(--ink); display: block; margin-bottom: 2px; }
+
+  section { padding: 84px 0; border-top: 1px solid var(--line); }
+  h2 {
+    font-size: clamp(1.7rem, 3.6vw, 2.5rem); letter-spacing: -0.03em;
+    margin: 12px 0 14px; text-wrap: balance; max-width: 20em; font-weight: 700;
+  }
+  .sub { color: var(--muted); max-width: 40em; margin-bottom: 44px; }
+
+  .stats { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .stat { background: var(--bg-raise); padding: 30px 26px; }
+  .stat .n { font-size: 2.6rem; font-weight: 700; letter-spacing: -0.03em; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat p { font-size: 0.88rem; color: var(--muted); margin-top: 8px; }
+  .stat .src { display: block; margin-top: 10px; font-size: 0.7rem; color: var(--faint); }
+
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .card {
+    background: var(--bg-raise); border: 1px solid var(--line); border-radius: 8px;
+    padding: 28px; transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--accent-deep); }
+  .card h3 { font-size: 1.08rem; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .card p { font-size: 0.92rem; color: var(--muted); }
+  .card .tag { display: block; margin-bottom: 12px; }
+
+  .plans { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: stretch; }
+  .plan { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 10px; padding: 34px 30px; display: flex; flex-direction: column; gap: 16px; }
+  .plan.featured { border-color: var(--accent); background: linear-gradient(180deg, rgba(47,191,143,0.08), var(--bg-raise) 40%); position: relative; }
+  .plan.featured::after {
+    content: "El más pedido"; position: absolute; top: -12px; left: 28px;
+    background: var(--accent); color: #06110C; font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px;
+  }
+  .plan h3 { font-size: 1.15rem; }
+  .price { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .price small { font-size: 0.85rem; font-weight: 400; color: var(--faint); letter-spacing: 0; display: block; margin-top: 2px; }
+  .plan ul { list-style: none; padding: 0; display: grid; gap: 10px; font-size: 0.92rem; color: var(--muted); }
+  .plan li { padding-left: 22px; position: relative; }
+  .plan li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+  .plan .btn { margin-top: auto; text-align: center; }
+
+  .steps { counter-reset: paso; display: grid; gap: 0; }
+  .step { display: grid; grid-template-columns: 84px 1fr; gap: 22px; padding: 26px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .step:last-child { border-bottom: none; }
+  .step::before {
+    counter-increment: paso; content: "0" counter(paso);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 1.6rem; font-weight: 700; color: var(--accent);
+  }
+  .step h3 { font-size: 1.08rem; margin-bottom: 5px; }
+  .step p { color: var(--muted); font-size: 0.95rem; max-width: 44em; }
+
+  .faq dt { font-weight: 700; margin-top: 26px; font-size: 1.02rem; }
+  .faq dd { margin: 8px 0 0; color: var(--muted); max-width: 46em; }
+
+  .final { text-align: left; padding: 100px 0; }
+  .final h2 { max-width: 16em; }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 60px; background: var(--bg-deep); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between; align-items: flex-start; }
+  footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  footer .col { display: grid; gap: 6px; font-size: 0.9rem; color: var(--muted); }
+  footer .tiny { font-size: 0.75rem; color: var(--faint); max-width: 30em; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 64px 0 52px; }
+    section { padding: 60px 0; }
+    .step { grid-template-columns: 56px 1fr; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top">isnel garcia<span>.</span>ia</a>
+    <a class="btn small" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Diagnóstico gratis</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="status"><span class="dot"></span> Sistemas activos 24/7 · Miami, FL · Español &amp; English</div>
+    <h1>Mientras tú duermes, tu negocio <em>responde, agenda y vende</em>.</h1>
+    <p class="lede">Instalo sistemas de inteligencia artificial bilingües que contestan a tus clientes en segundos — por WhatsApp, SMS y web —, agendan citas solos y persiguen cada lead hasta que compra o dice que no. Tú solo entras a cerrar.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Hablemos por WhatsApp</a>
+      <a class="btn ghost" href="mailto:isnel2023@gmail.com">isnel2023@gmail.com</a>
+    </div>
+    <p class="cta-note">Diagnóstico gratis de 15 minutos. Sales de la llamada sabiendo exactamente qué automatizar — trabajes conmigo o no.</p>
+    <div class="cred">
+      <div><strong>Sistemas reales en producción</strong>Opero la infraestructura de IA y contenido de Mostro Media, empresa de medios en EE. UU.</div>
+      <div><strong>Bilingüe de verdad</strong>Tu asistente atiende en español e inglés, como tus clientes en Miami.</div>
+      <div><strong>Sin permanencia</strong>Mes a mes. Si no te produce, lo cancelas — así de simple.</div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="mono">La matemática del problema</div>
+    <h2>Cada hora sin responder tiene precio — y lo estás pagando tú</h2>
+    <p class="sub">Estos números no son míos: son de estudios de la industria en EE. UU. Aplican a tu negocio hoy.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="n">40%</div>
+        <p>de las llamadas a negocios pequeños llegan fuera del horario 9–5. Nadie las contesta.</p>
+        <span class="src">CallRail · 18M de llamadas analizadas</span>
+      </div>
+      <div class="stat">
+        <div class="n">×21</div>
+        <p>más probabilidad de convertir un lead si le respondes en menos de 5 minutos (vs. 30 min).</p>
+        <span class="src">Oldroyd / InsideSales, estudio de 100K+ llamadas</span>
+      </div>
+      <div class="stat">
+        <div class="n">47%</div>
+        <p>de las consultas online a negocios inmobiliarios jamás reciben respuesta. Ninguna.</p>
+        <span class="src">DelPrete 2024 · secret shopping en 25+ brokerages</span>
+      </div>
+      <div class="stat">
+        <div class="n">78%</div>
+        <p>de los clientes le compra al primer proveedor que le responde. No al mejor. Al primero.</p>
+        <span class="src">Lead Connect / industria</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="mono">Qué instalo</div>
+    <h2>Si un proceso de tu empresa se repite, se puede automatizar</h2>
+    <p class="sub">Empiezo por donde más dinero se te escapa — la atención al cliente — y desde ahí automatizo lo que tu operación necesite.</p>
+    <div class="grid">
+      <div class="card">
+        <span class="mono tag">El más vendido</span>
+        <h3>Recepcionista IA bilingüe</h3>
+        <p>Contesta WhatsApp, SMS y el chat de tu web en segundos, con tus precios y tu tono. Detecta el idioma del cliente y responde en español o inglés. Te avisa cuando alguien está listo para comprar.</p>
+      </div>
+      <div class="card">
+        <span class="mono tag">Llamadas perdidas</span>
+        <h3>Missed-call text-back</h3>
+        <p>Cada llamada que no alcanzas a contestar recibe un texto automático al instante: "vimos tu llamada, ¿en qué te ayudamos?". El cliente que iba a llamar al siguiente de Google, se queda contigo.</p>
+      </div>
+      <div class="card">
+        <span class="mono tag">Agenda llena</span>
+        <h3>Agendamiento automático</h3>
+        <p>El sistema agenda la cita directo en tu calendario, confirma al cliente y le recuerda antes — los recordatorios reducen las inasistencias que te vacían la agenda.</p>
+      </div>
+      <div class="card">
+        <span class="mono tag">Nadie se escapa</span>
+        <h3>Seguimiento de leads</h3>
+        <p>El que preguntó y no compró recibe seguimiento automático a los 2, 5 y 9 días — escrito con IA, en tono humano. Ahí vive la mitad de tus ventas perdidas.</p>
+      </div>
+      <div class="card">
+        <span class="mono tag">Tu lista produce</span>
+        <h3>Email marketing con IA</h3>
+        <p>Campañas y secuencias que se escriben, se segmentan y se envían solas: bienvenida, clientes dormidos, promociones. Tú apruebas, el sistema ejecuta.</p>
+      </div>
+      <div class="card">
+        <span class="mono tag">Operación completa</span>
+        <h3>Optimización de procesos</h3>
+        <p>Facturación, cotizaciones, reportes, onboarding, inventario, integraciones entre tus sistemas. Analizo cómo trabaja tu equipo y convierto horas de trabajo manual en minutos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="mono">Paquetes · precios de lanzamiento</div>
+    <h2>Inversión que se paga con las ventas que hoy se te escapan</h2>
+    <p class="sub">Referencia: las agencias en EE. UU. cobran setups de $1,000–$5,000 y retainers de $500–$3,000 al mes por esto mismo — sin hablarte en tu idioma.</p>
+    <div class="plans">
+      <div class="plan">
+        <h3>Recepcionista IA</h3>
+        <div class="price">$997 <small>instalación única + $297/mes</small></div>
+        <ul>
+          <li>Asistente bilingüe en WhatsApp, SMS y web</li>
+          <li>Missed-call text-back incluido</li>
+          <li>Responde precios, horarios y FAQ al instante</li>
+          <li>Alertas de leads calientes a tu celular</li>
+        </ul>
+        <a class="btn ghost" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20me%20interesa%20el%20Recepcionista%20IA">Empezar con este</a>
+      </div>
+      <div class="plan featured">
+        <h3>Sistema de Ventas Completo</h3>
+        <div class="price">$1,997 <small>instalación única + $497/mes</small></div>
+        <ul>
+          <li>Todo lo del Recepcionista IA</li>
+          <li>Agendamiento automático con recordatorios</li>
+          <li>Seguimiento automático de leads (días 2, 5 y 9)</li>
+          <li>Reporte semanal: cuántos escribieron, cuántos compraron</li>
+          <li>Ajustes ilimitados el primer mes</li>
+        </ul>
+        <a class="btn" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20el%20Sistema%20de%20Ventas%20Completo">Quiero este</a>
+      </div>
+      <div class="plan">
+        <h3>A la medida</h3>
+        <div class="price">Cotización <small>según alcance del proyecto</small></div>
+        <ul>
+          <li>Email marketing con IA</li>
+          <li>Optimización de procesos internos</li>
+          <li>Integraciones con tu CRM / POS / software</li>
+          <li>Multi-sede y flujos especiales</li>
+        </ul>
+        <a class="btn ghost" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20necesito%20algo%20a%20la%20medida">Cotizar mi caso</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="mono">Cómo trabajo</div>
+    <h2>De diagnóstico a sistema funcionando en dos semanas</h2>
+    <div class="steps">
+      <div class="step">
+        <div>
+          <h3>Diagnóstico gratis · 15 minutos</h3>
+          <p>Me cuentas cómo atiendes hoy a tus clientes. Te digo exactamente qué se puede automatizar, cuánto te cuesta no hacerlo, y si tu caso no lo amerita, también te lo digo.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Demo con tu negocio real</h3>
+          <p>Te muestro el sistema funcionando con tus datos: tus precios, tus servicios, tus horarios. Lo ves respondiendo como si fuera tu mejor empleado — antes de pagar un dólar del proyecto.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Instalación, prueba y entrega</h3>
+          <p>Instalo, pruebo con casos reales y te entrego funcionando en 7–14 días. Capacito a tu equipo y el primer mes incluye ajustes ilimitados: si algo no responde bien, lo corrijo hasta que lo haga.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="mono">Preguntas frecuentes</div>
+    <h2>Lo que todo el mundo pregunta primero</h2>
+    <dl class="faq">
+      <dt>¿El asistente va a sonar robótico con mis clientes?</dt>
+      <dd>No. Lo entreno con tu forma de hablar y tus respuestas reales, en español e inglés. Y cuando la conversación necesita un humano, te la pasa con todo el contexto — el cliente nunca queda botado con una máquina.</dd>
+      <dt>¿Necesito saber de tecnología?</dt>
+      <dd>Cero. Tú sigues usando tu teléfono y tu WhatsApp como siempre. Yo me encargo de todo lo técnico, y el soporte conmigo es en tu idioma.</dd>
+      <dt>¿Qué pasa si no funciona para mi negocio?</dt>
+      <dd>El primer mes incluye ajustes ilimitados y no hay contrato de permanencia: si el sistema no te está produciendo, lo cancelas y ya. Yo solo gano si tú sigues ganando.</dd>
+      <dt>¿En cuánto tiempo veo resultados?</dt>
+      <dd>El primer día: el asistente responde al instante desde que se enciende. Las citas confirmadas y los seguimientos automáticos se sienten en la primera semana.</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <div class="mono">El siguiente paso es tuyo</div>
+    <h2>15 minutos. Gratis. Sales sabiendo exactamente qué automatizar.</h2>
+    <p class="sub">Y si tu negocio todavía no lo necesita, te lo digo de frente y quedamos como amigos.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Agendar mi diagnóstico gratis</a>
+      <a class="btn ghost" href="tel:+13468231378">Llámame: (346) 823-1378</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="col">
+      <strong style="color:var(--ink)">Isnel Garcia</strong>
+      <a href="https://wa.me/13468231378">WhatsApp: +1 (346) 823-1378</a>
+      <a href="mailto:isnel2023@gmail.com">isnel2023@gmail.com</a>
+      <span>Miami, Florida</span>
+    </div>
+    <p class="tiny">Automatización con IA para negocios del sur de Florida. Atención en español e inglés. © 2026 Isnel Garcia.</p>
+  </div>
+</footer>
+
+</body>
+</html>
