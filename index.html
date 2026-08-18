@@ -8,6 +8,8 @@
 <meta property="og:title" content="Isnel Garcia — Automatización con IA · Miami">
 <meta property="og:description" content="Tu negocio responde, agenda y vende. Aunque tú estés durmiendo.">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0A1310">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230A1310'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%232FBF8F' stroke-width='4'/%3E%3Ctext x='50' y='64' font-family='Helvetica,Arial' font-size='40' font-weight='700' fill='%232FBF8F' text-anchor='middle'%3Eia%3C/text%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0A1310;
@@ -151,6 +153,19 @@
   footer .col { display: grid; gap: 6px; font-size: 0.9rem; color: var(--muted); }
   footer .tiny { font-size: 0.75rem; color: var(--faint); max-width: 30em; }
 
+  ::selection { background: var(--accent); color: #06110C; }
+  .navlinks { display: flex; gap: 24px; align-items: center; }
+  .navlinks > a:not(.btn) { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color .15s; }
+  .navlinks > a:not(.btn):hover { color: var(--accent); }
+  @media (max-width: 720px) { .navlinks > a:not(.btn) { display: none; } }
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+  .plan { transition: border-color .2s, transform .2s, box-shadow .2s; }
+  .plan:hover { transform: translateY(-4px); box-shadow: 0 14px 38px rgba(0,0,0,0.4); border-color: var(--accent-deep); }
+  .stat { position: relative; overflow: hidden; }
+  .stat::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; background: linear-gradient(90deg, var(--accent), transparent 70%); opacity: .5; }
+
   @media (max-width: 640px) {
     .hero { padding: 64px 0 52px; }
     section { padding: 60px 0; }
@@ -163,7 +178,12 @@
 <nav>
   <div class="wrap">
     <a class="logo" href="#top">isnel garcia<span>.</span>ia</a>
-    <a class="btn small" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Diagnóstico gratis</a>
+    <div class="navlinks">
+      <a href="#servicios">Servicios</a>
+      <a href="#precios">Precios</a>
+      <a href="#proceso">Cómo trabajo</a>
+      <a class="btn small" href="https://wa.me/13468231378?text=Hola%20Isnel%2C%20quiero%20mi%20diagn%C3%B3stico%20gratis">Diagnóstico gratis</a>
+    </div>
   </div>
 </nav>
 
@@ -215,7 +235,7 @@
   </div>
 </section>
 
-<section>
+<section id="servicios">
   <div class="wrap">
     <div class="mono">Qué instalo</div>
     <h2>Si un proceso de tu empresa se repite, se puede automatizar</h2>
@@ -255,7 +275,7 @@
   </div>
 </section>
 
-<section>
+<section id="precios">
   <div class="wrap">
     <div class="mono">Paquetes · precios de lanzamiento</div>
     <h2>Inversión que se paga con las ventas que hoy se te escapan</h2>
@@ -310,7 +330,7 @@
   </div>
 </section>
 
-<section>
+<section id="proceso">
   <div class="wrap">
     <div class="mono">Cómo trabajo</div>
     <h2>De diagnóstico a sistema funcionando en dos semanas</h2>
@@ -378,5 +398,19 @@
   </div>
 </footer>
 
+<script>
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+  var els = document.querySelectorAll('section .card, section .plan, section .stat, .step, section h2');
+  els.forEach(function (e) { e.classList.add('reveal'); });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.15 });
+  els.forEach(function (e) { io.observe(e); });
+})();
+</script>
 </body>
 </html>
