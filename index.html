@@ -38,9 +38,6 @@
   .atmos::after { content:""; position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(3,3,4,.6) 100%); }
   @keyframes grano { 0%{transform:translate(0,0)} 25%{transform:translate(-2%,2%)} 50%{transform:translate(2%,-2%)} 75%{transform:translate(-2%,-1%)} 100%{transform:translate(0,0)} }
 
-  /* ESCENARIO 3D: el robo-león que se arma y se desarma con el scroll */
-  #stage { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0; transition:opacity .9s ease; }
-  #stage.on { opacity:1; }
   main, .cinta, footer, nav, .hero .wrap { position:relative; z-index:2; }
 
   /* SCROLL-DRIVEN: barra de progreso dorada */
@@ -171,8 +168,7 @@
   /* FUNDADOR */
   .fundador { position:relative; text-align:center; max-width:820px; margin:0 auto; padding:20px 0; }
   .fundador .marca-agua { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(420px,80vw); opacity:.06; pointer-events:none; }
-  .fundador blockquote { position:relative; font-family:Didot,"Bodoni 72",Georgia,serif; font-size:clamp(1.5rem,3.2vw,2.4rem); line-height:1.35; font-style:italic; color:var(--marfil); }
-  .fundador blockquote::before { content:"“"; display:block; font-size:4rem; line-height:.5; color:var(--oro); margin-bottom:18px; font-style:normal; }
+  .fundador blockquote { position:relative; font-family:Didot,"Bodoni 72",Georgia,serif; font-size:clamp(1.4rem,3vw,2.2rem); line-height:1.4; font-style:italic; color:var(--marfil); margin-top:26px; }
   .fundador .quien { position:relative; margin-top:34px; color:var(--humo); font-size:.95rem; }
   .fundador .quien b { color:var(--oro2); display:block; font-size:1.1rem; margin-bottom:6px; letter-spacing:.22em; }
 
@@ -200,7 +196,6 @@
 <body>
 <div class="progreso" id="progreso" aria-hidden="true"></div>
 <div class="atmos" aria-hidden="true"></div>
-<div id="stage" aria-hidden="true"></div>
 
 <nav id="nav">
   <div class="wrap">
@@ -326,11 +321,11 @@
     <div class="fundador">
       <img class="marca-agua" src="assets/logo-emblema-1x1-web.jpg" alt="" aria-hidden="true">
       <div class="mono reveal">Quién está detrás</div>
-      <blockquote class="reveal">No vendo teoría. Los sistemas que instalo en tu negocio son los mismos que opero todos los días para una empresa de medios en Estados Unidos — y los mismos que hacen crecer el mío.</blockquote>
+      <blockquote class="reveal">No te voy a vender promesas: la demostración es gratis y con los datos reales de tu negocio. Si viéndolo funcionar no te convence, no me debes ni las gracias.</blockquote>
       <div class="quien reveal">
         <b>ISNEL GARCIA</b>
         Fundador · Lion Systems Group LLC · Miami, FL<br>
-        Operador de sistemas de IA en producción real. Bilingüe. Obsesionado con una sola métrica: cuántos clientes deja de perder tu negocio.
+        Empresa nueva, con hambre — y tecnología probada. Instalo y opero sistemas de automatización con IA todos los días, y tengo una sola obsesión: que tu negocio no pierda ni un cliente más.
       </div>
     </div>
   </div>
@@ -486,141 +481,5 @@
 })();
 </script>
 
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script>
-/* ============ ROBO-LEÓN 3D — se arma, viaja y se desarma con tu scroll ============ */
-(function () {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (typeof THREE === 'undefined') return;
-  var cont = document.getElementById('stage');
-  if (!cont) return;
-
-  var W = innerWidth, H = innerHeight;
-  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
-  renderer.setSize(W, H);
-  cont.appendChild(renderer.domElement);
-
-  var scene = new THREE.Scene();
-  var cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
-  cam.position.set(0, 0.4, 9);
-
-  scene.add(new THREE.AmbientLight(0x3a3428, 1.2));
-  var key = new THREE.PointLight(0xF0D48A, 220, 60); key.position.set(5, 6, 6); scene.add(key);
-  var rim = new THREE.PointLight(0xD6B25E, 120, 50); rim.position.set(-6, -2, 4); scene.add(rim);
-  var top = new THREE.DirectionalLight(0xfff2d0, 1.1); top.position.set(0, 8, 2); scene.add(top);
-
-  var ORO = new THREE.MeshStandardMaterial({ color: 0xC9A24E, metalness: 0.9, roughness: 0.32 });
-  var ORO2 = new THREE.MeshStandardMaterial({ color: 0xF0D48A, metalness: 0.85, roughness: 0.25 });
-  var NEGRO = new THREE.MeshStandardMaterial({ color: 0x141416, metalness: 0.6, roughness: 0.5 });
-  var OJO = new THREE.MeshStandardMaterial({ color: 0xFFC24A, emissive: 0xFFA500, emissiveIntensity: 2.2 });
-
-  var leon = new THREE.Group();
-  scene.add(leon);
-  var partes = [];
-  function parte(geo, mat, x, y, z, rx, ry, rz) {
-    var m = new THREE.Mesh(geo, mat);
-    m.position.set(x, y, z); m.rotation.set(rx || 0, ry || 0, rz || 0);
-    leon.add(m);
-    var dir = m.position.clone(); if (dir.length() < 0.01) dir.set(0, 1, 0);
-    dir.normalize();
-    partes.push({ m: m, home: m.position.clone(), rot: m.rotation.clone(),
-      dir: dir, spin: new THREE.Vector3((Math.random()-.5), (Math.random()-.5), (Math.random()-.5)).multiplyScalar(2.2),
-      scatter: m.position.clone().add(dir.clone().multiplyScalar(7 + Math.random()*5)).add(new THREE.Vector3((Math.random()-.5)*6,(Math.random()-.5)*6,(Math.random()-.5)*4)) });
-    return m;
-  }
-
-  /* cuerpo robot */
-  parte(new THREE.BoxGeometry(2.3, 1.15, 1.05), ORO, 0, 0, 0);
-  parte(new THREE.BoxGeometry(1.15, 1.3, 1.15), ORO2, 0.95, 0.18, 0);           /* pecho */
-  /* cabeza */
-  parte(new THREE.BoxGeometry(0.95, 0.85, 0.85), ORO, 1.75, 0.85, 0);
-  parte(new THREE.BoxGeometry(0.5, 0.34, 0.45), ORO2, 2.35, 0.68, 0);           /* hocico */
-  parte(new THREE.BoxGeometry(0.46, 0.12, 0.4), NEGRO, 2.35, 0.48, 0);          /* mandíbula */
-  parte(new THREE.ConeGeometry(0.16, 0.34, 4), ORO2, 1.62, 1.42, 0.28);         /* orejas */
-  parte(new THREE.ConeGeometry(0.16, 0.34, 4), ORO2, 1.62, 1.42, -0.28);
-  parte(new THREE.BoxGeometry(0.12, 0.12, 0.1), OJO, 2.14, 0.98, 0.26);         /* ojos */
-  parte(new THREE.BoxGeometry(0.12, 0.12, 0.1), OJO, 2.14, 0.98, -0.26);
-  /* melena: corona de púas */
-  for (var i = 0; i < 12; i++) {
-    var a = (i / 12) * Math.PI * 2;
-    var px = 1.55 + Math.cos(a) * 0.05;
-    parte(new THREE.ConeGeometry(0.2, 0.75, 5), ORO2, px, 0.85 + Math.sin(a) * 0.75, Math.cos(a) * 0.75,
-      Math.atan2(Math.cos(a), 0) * 0 + (a + Math.PI/2) * 0, 0, -(a + Math.PI / 2));
-  }
-  /* patas */
-  [[0.85,1],[0.85,-1],[-0.85,1],[-0.85,-1]].forEach(function (p) {
-    parte(new THREE.BoxGeometry(0.32, 0.7, 0.3), ORO, p[0], -0.85, p[1]*0.35);
-    parte(new THREE.BoxGeometry(0.26, 0.5, 0.26), NEGRO, p[0], -1.4, p[1]*0.35);
-  });
-  /* cola */
-  parte(new THREE.BoxGeometry(0.6, 0.14, 0.14), ORO, -1.4, 0.35, 0, 0, 0, 0.5);
-  parte(new THREE.BoxGeometry(0.5, 0.12, 0.12), ORO, -1.85, 0.62, 0, 0, 0, 0.9);
-  parte(new THREE.ConeGeometry(0.14, 0.3, 5), ORO2, -2.1, 0.9, 0, 0, 0, 2.2);
-
-  /* polvo dorado */
-  var pg = new THREE.BufferGeometry(), pn = 320, pp = new Float32Array(pn * 3);
-  for (var j = 0; j < pn * 3; j++) pp[j] = (Math.random() - 0.5) * 22;
-  pg.setAttribute('position', new THREE.BufferAttribute(pp, 3));
-  var dust = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xD6B25E, size: 0.035, transparent: true, opacity: 0.55 }));
-  scene.add(dust);
-
-  var esc = Math.min(1, W / 1150) * (W < 700 ? 0.62 : 1);
-  leon.scale.setScalar(esc);
-
-  /* actos por progreso de scroll:
-     0.00-0.08 oculto (hero video manda) · 0.08-0.22 ARMADO · 0.22-0.40 pasea
-     0.40-0.58 DESPIECE · 0.58-0.72 rearme + rugido · 0.72-1 idle final */
-  function seg(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
-  function ease(t) { return 1 - Math.pow(1 - t, 3); }
-  var pT = 0, pS = 0;
-  addEventListener('scroll', function () {
-    var h = document.documentElement;
-    pT = h.scrollTop / (h.scrollHeight - h.clientHeight);
-  }, { passive: true });
-  addEventListener('resize', function () {
-    W = innerWidth; H = innerHeight;
-    renderer.setSize(W, H); cam.aspect = W / H; cam.updateProjectionMatrix();
-  });
-
-  var t0 = performance.now();
-  (function frame(now) {
-    var t = (now - t0) / 1000;
-    pS += (pT - pS) * 0.07;
-    var p = pS;
-
-    cont.classList.toggle('on', p > 0.06);
-
-    var arma = ease(seg(p, 0.08, 0.22));
-    var boom = seg(p, 0.40, 0.58);
-    var explota = Math.sin(Math.min(boom, 1) * Math.PI) * ease(seg(p, 0.38, 0.46));
-    var rearme = ease(seg(p, 0.58, 0.70));
-    var monta = arma * (1 - explota);
-
-    partes.forEach(function (q, idx) {
-      var desde = q.scatter, hasta = q.home;
-      q.m.position.lerpVectors(desde, hasta, Math.min(1, monta + rearme * (1 - monta)));
-      if (explota > 0.01) {
-        q.m.position.copy(q.home).add(q.dir.clone().multiplyScalar(explota * (2.2 + (idx % 5) * 0.5)));
-        q.m.rotation.set(q.rot.x + q.spin.x * explota * 2, q.rot.y + q.spin.y * explota * 2, q.rot.z + q.spin.z * explota * 2);
-      } else {
-        q.m.rotation.set(q.rot.x, q.rot.y, q.rot.z);
-      }
-    });
-
-    /* trayectoria del león por la página */
-    var lado =  (p < 0.22) ? 2.6 : (p < 0.40) ? -2.6 : (p < 0.58) ? 2.2 : (p < 0.72) ? -2.4 : 0;
-    leon.position.x += ((lado * esc) - leon.position.x) * 0.04;
-    leon.position.y = Math.sin(t * 1.2) * 0.08 - 0.2;
-    leon.rotation.y += ((p * 4.5 + (p > 0.72 ? Math.sin(t * 0.5) * 0.2 : 0)) - leon.rotation.y) * 0.05;
-    var rugido = 1 + Math.sin(Math.min(seg(p, 0.66, 0.72), 1) * Math.PI) * 0.12;
-    leon.scale.setScalar(esc * (0.9 + arma * 0.1) * rugido);
-
-    dust.rotation.y = t * 0.02; dust.position.y = Math.sin(t * 0.3) * 0.4;
-    renderer.render(scene, cam);
-    requestAnimationFrame(frame);
-  })(t0);
-})();
-</script>
 </body>
 </html>
