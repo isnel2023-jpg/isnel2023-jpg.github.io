@@ -97,10 +97,11 @@
 
   /* CINTA */
   .cinta { border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); background:var(--panel); overflow:hidden; padding:16px 0; }
-  .cinta-inner { display:flex; gap:56px; white-space:nowrap; width:max-content; animation:rodar 34s linear infinite; }
+  .cinta-inner { display:flex; align-items:center; gap:34px; white-space:nowrap; width:max-content; animation:rodar 44s linear infinite; }
   @keyframes rodar { to { transform:translateX(-50%); } }
-  .cinta span { font-family:ui-monospace,Menlo,monospace; font-size:.76rem; letter-spacing:.18em; text-transform:uppercase; color:var(--humo); }
-  .cinta b { color:var(--oro2); font-weight:600; }
+  .cinta span { font-family:ui-monospace,Menlo,monospace; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--sombra); }
+  .cinta b { color:var(--oro); font-weight:600; }
+  .cinta .sep { color:rgba(214,178,94,.35); font-size:.5rem; letter-spacing:0; }
 
   section { padding:110px 0; position:relative; }
   .sec-line { border-top:1px solid var(--linea); }
@@ -235,7 +236,7 @@
 
 <div class="cinta" aria-hidden="true">
   <div class="cinta-inner" id="cinta">
-    <span>Responde en <b>segundos</b></span><span>Atiende <b>24/7</b></span><span>Español <b>&amp;</b> English</span><span>Agenda <b>sola</b></span><span>Seguimiento <b>implacable</b></span><span>Cero llamadas <b>perdidas</b></span><span>Lion Systems Group <b>· Miami</b></span>
+    <span>Respuesta en <b>segundos</b></span><span class="sep">◆</span><span>Disponibilidad <b>24/7</b></span><span class="sep">◆</span><span>Atención en <b>español e inglés</b></span><span class="sep">◆</span><span>Agendamiento <b>automático</b></span><span class="sep">◆</span><span>Seguimiento <b>continuo</b></span><span class="sep">◆</span><span>Cero llamadas <b>perdidas</b></span><span class="sep">◆</span><span>Lion Systems Group <b>· Miami, FL</b></span><span class="sep">◆</span>
   </div>
 </div>
 
