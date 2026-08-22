@@ -204,7 +204,8 @@
   #lanza.oculto { opacity:0; pointer-events:none; transform:scale(.85); transition:.3s; }
   @media (max-width:520px){ #lanza .globo { display:none; } }
 
-  #chatbox { position:fixed; right:24px; bottom:24px; z-index:301; width:min(392px,calc(100vw - 28px)); height:min(544px,calc(100svh - 36px)); max-height:calc(100svh - 36px);
+  #chatbox { position:fixed; right:24px; bottom:24px; z-index:301; width:min(392px,calc(100vw - 28px));
+    height:auto; max-height:min(560px,calc(100vh - 36px)); justify-content:flex-start;
     background:linear-gradient(180deg,rgba(16,16,19,.97),rgba(8,8,9,.99)); backdrop-filter:blur(20px);
     border:1px solid rgba(214,178,94,.3); border-radius:18px; box-shadow:0 40px 110px rgba(0,0,0,.7), 0 0 0 1px rgba(214,178,94,.06), 0 0 90px rgba(214,178,94,.07);
     display:flex; flex-direction:column; overflow:hidden; opacity:0; transform:translateY(24px) scale(.97); pointer-events:none; transition:opacity .32s var(--ez,ease), transform .32s cubic-bezier(.2,.8,.3,1); }
@@ -217,9 +218,8 @@
   .cb-top small { color:#3ED598; font-size:.67rem; letter-spacing:.04em; }
   .cb-x { background:none; border:none; color:var(--sombra); font-size:1.5rem; cursor:pointer; line-height:1; padding:4px 6px; border-radius:6px; transition:color .15s; }
   .cb-x:hover { color:var(--oro2); }
-  .cb-msgs { flex:1 1 auto; min-height:0; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:rgba(214,178,94,.3) transparent; }
-  /* ancla la conversación abajo: sin huecos vacíos cuando hay pocos mensajes */
-  .cb-msgs::before { content:""; margin-top:auto; }
+  /* crece con la conversación; al llegar al tope del panel, hace scroll interno */
+  .cb-msgs { flex:0 1 auto; min-height:0; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:rgba(214,178,94,.3) transparent; }
   .cb-msgs::-webkit-scrollbar { width:5px; }
   .cb-msgs::-webkit-scrollbar-thumb { background:rgba(214,178,94,.3); border-radius:4px; }
   .cb-b { max-width:88%; padding:11px 14px; border-radius:15px; font-size:.87rem; line-height:1.48; animation:entra .35s cubic-bezier(.2,.8,.3,1) both; word-break:break-word; }
