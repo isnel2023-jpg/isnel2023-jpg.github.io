@@ -721,14 +721,14 @@
   }
   function guarda() {
     if (!CRM_ENDPOINT) return;
-    try {
-      fetch(CRM_ENDPOINT, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
-        body: JSON.stringify({
-          fecha: new Date().toISOString(), nombre: L.nombre, negocio: L.negocio,
-          rubro: L.rubro, contacto: L.contacto, dolor: L.dolor,
-          notas: L.notas.join(' | '), origen: 'chatbox web'
-        }) });
-    } catch (e) {}
+    var d = { nombre:L.nombre, negocio:L.negocio, rubro:L.rubro, contacto:L.contacto,
+              dolor:L.dolor, notas:L.notas.join(' | '), origen:'chatbox web' };
+    /* GET con parámetros: el método que Apps Script sirve sin fricción de CORS */
+    var q = Object.keys(d).map(function (k) {
+      return encodeURIComponent(k) + '=' + encodeURIComponent((d[k] || '').toString().slice(0, 400));
+    }).join('&');
+    try { fetch(CRM_ENDPOINT + '?' + q, { method:'GET', mode:'no-cors', cache:'no-store' }); }
+    catch (e) { try { new Image().src = CRM_ENDPOINT + '?' + q; } catch (e2) {} }
   }
 
   /* ---------- interacción ---------- */
