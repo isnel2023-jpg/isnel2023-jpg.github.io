@@ -190,6 +190,56 @@
   .chip.on { background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#171204; border-color:var(--oro); font-weight:700; }
   .form-nota { font-size:.76rem; color:var(--sombra); }
 
+  /* ===== CHATBOX LION AI ===== */
+  #lanza { position:fixed; right:24px; bottom:24px; z-index:300; display:flex; align-items:center; gap:12px; cursor:pointer; background:none; border:none; padding:0; }
+  #lanza .globo { background:var(--panel); border:1px solid rgba(214,178,94,.35); color:var(--marfil); font-size:.82rem; padding:11px 16px; border-radius:999px; box-shadow:0 14px 40px rgba(0,0,0,.5); white-space:nowrap; animation:asoma .5s 2.2s both; }
+  #lanza .globo b { color:var(--oro2); }
+  @keyframes asoma { from { opacity:0; transform:translateX(14px); } }
+  #lanza .disco { width:62px; height:62px; border-radius:50%; overflow:hidden; border:1.5px solid var(--oro); position:relative; box-shadow:0 12px 40px rgba(214,178,94,.28), 0 8px 30px rgba(0,0,0,.6); transition:transform .25s; flex:none; }
+  #lanza:hover .disco { transform:scale(1.06); }
+  #lanza .disco img { width:100%; height:100%; object-fit:cover; }
+  #lanza .vivo { position:absolute; right:3px; bottom:3px; width:13px; height:13px; border-radius:50%; background:#3ED598; border:2px solid var(--negro); }
+  #lanza .vivo::after { content:""; position:absolute; inset:-4px; border-radius:50%; border:1px solid #3ED598; animation:onda 2s infinite; }
+  @keyframes onda { 0%{transform:scale(.8);opacity:.9} 100%{transform:scale(1.9);opacity:0} }
+  #lanza.oculto { opacity:0; pointer-events:none; transform:scale(.85); transition:.3s; }
+  @media (max-width:520px){ #lanza .globo { display:none; } }
+
+  #chatbox { position:fixed; right:24px; bottom:24px; z-index:301; width:min(390px,calc(100vw - 32px)); height:min(600px,calc(100svh - 48px));
+    background:linear-gradient(180deg,rgba(16,16,19,.97),rgba(8,8,9,.99)); backdrop-filter:blur(20px);
+    border:1px solid rgba(214,178,94,.3); border-radius:18px; box-shadow:0 40px 110px rgba(0,0,0,.7), 0 0 0 1px rgba(214,178,94,.06), 0 0 90px rgba(214,178,94,.07);
+    display:flex; flex-direction:column; overflow:hidden; opacity:0; transform:translateY(24px) scale(.97); pointer-events:none; transition:opacity .32s var(--ez,ease), transform .32s cubic-bezier(.2,.8,.3,1); }
+  #chatbox.abierto { opacity:1; transform:none; pointer-events:auto; }
+  .cb-top { display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid rgba(214,178,94,.14); background:linear-gradient(180deg,rgba(214,178,94,.07),transparent); flex:none; }
+  .cb-top .av { width:40px; height:40px; border-radius:50%; overflow:hidden; border:1px solid var(--oro); flex:none; }
+  .cb-top .av img { width:100%; height:100%; object-fit:cover; }
+  .cb-top .quien { flex:1; min-width:0; }
+  .cb-top strong { display:block; font-family:Didot,"Bodoni 72",Georgia,serif; font-size:1.02rem; letter-spacing:.05em; }
+  .cb-top small { color:#3ED598; font-size:.7rem; letter-spacing:.05em; }
+  .cb-x { background:none; border:none; color:var(--sombra); font-size:1.5rem; cursor:pointer; line-height:1; padding:4px 6px; border-radius:6px; transition:color .15s; }
+  .cb-x:hover { color:var(--oro2); }
+  .cb-msgs { flex:1; overflow-y:auto; padding:20px 18px; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; scrollbar-color:rgba(214,178,94,.3) transparent; }
+  .cb-msgs::-webkit-scrollbar { width:5px; }
+  .cb-msgs::-webkit-scrollbar-thumb { background:rgba(214,178,94,.3); border-radius:4px; }
+  .cb-b { max-width:86%; padding:12px 15px; border-radius:15px; font-size:.9rem; line-height:1.5; animation:entra .35s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes entra { from { opacity:0; transform:translateY(10px) scale(.97); } }
+  .cb-b.bot { align-self:flex-start; background:var(--panel2); border:1px solid rgba(255,255,255,.06); border-bottom-left-radius:5px; color:var(--marfil); }
+  .cb-b.yo { align-self:flex-end; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#161104; border-bottom-right-radius:5px; font-weight:500; }
+  .cb-b.dato { align-self:flex-start; background:rgba(214,178,94,.08); border:1px solid rgba(214,178,94,.25); border-radius:12px; color:var(--oro2); font-size:.84rem; max-width:92%; }
+  .cb-esc { align-self:flex-start; display:inline-flex; gap:5px; padding:14px 16px; background:var(--panel2); border:1px solid rgba(255,255,255,.06); border-radius:15px; border-bottom-left-radius:5px; }
+  .cb-esc i { width:6px; height:6px; border-radius:50%; background:var(--oro); animation:tp2 1s infinite; }
+  .cb-esc i:nth-child(2){animation-delay:.16s} .cb-esc i:nth-child(3){animation-delay:.32s}
+  @keyframes tp2 { 50%{transform:translateY(-5px);opacity:1} 0%,100%{opacity:.45} }
+  .cb-chips { display:flex; flex-wrap:wrap; gap:8px; padding:0 18px 12px; flex:none; }
+  .cb-chip { background:transparent; border:1px solid rgba(214,178,94,.35); color:var(--oro2); font-family:inherit; font-size:.82rem; padding:9px 14px; border-radius:999px; cursor:pointer; transition:all .18s; animation:entra .3s both; }
+  .cb-chip:hover { background:rgba(214,178,94,.14); border-color:var(--oro2); transform:translateY(-1px); }
+  .cb-abajo { border-top:1px solid rgba(255,255,255,.06); padding:12px 14px; display:flex; gap:10px; align-items:center; flex:none; background:rgba(7,7,8,.6); }
+  .cb-abajo input { flex:1; background:var(--negro); border:1px solid var(--linea); border-radius:999px; padding:12px 16px; color:var(--marfil); font-family:inherit; font-size:.9rem; }
+  .cb-abajo input:focus { border-color:rgba(214,178,94,.5); outline:none; }
+  .cb-enviar { width:42px; height:42px; border-radius:50%; border:none; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#161104; font-size:1.1rem; cursor:pointer; flex:none; transition:transform .15s; display:grid; place-items:center; }
+  .cb-enviar:hover { transform:scale(1.07); }
+  .cb-pie { text-align:center; font-size:.62rem; color:var(--sombra); padding:0 0 10px; font-family:ui-monospace,Menlo,monospace; letter-spacing:.12em; flex:none; }
+  .cb-cta { display:block; text-align:center; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#161104; font-weight:700; text-decoration:none; padding:13px; border-radius:10px; margin-top:4px; font-size:.9rem; animation:entra .35s both; }
+
   footer { border-top:1px solid var(--linea); padding:48px 0 64px; background:var(--panel); }
   footer .wrap { display:flex; flex-wrap:wrap; gap:30px; justify-content:space-between; align-items:flex-start; }
   footer a { color:var(--oro2); text-decoration:none; font-weight:600; }
@@ -483,6 +533,228 @@
       + '\nQuiero saber cómo lo automatizamos con Lion AI.';
     window.open('https://wa.me/13468231378?text=' + encodeURIComponent(msg), '_blank');
   });
+})();
+</script>
+
+<button id="lanza" aria-label="Abrir el asistente de Lion AI">
+  <span class="globo">¿Hablamos? <b>Respondo al instante</b></span>
+  <span class="disco"><img src="assets/logo-emblema-1x1-web.jpg" alt=""><span class="vivo"></span></span>
+</button>
+
+<section id="chatbox" role="dialog" aria-label="Asistente Lion AI" aria-modal="false">
+  <div class="cb-top">
+    <div class="av"><img src="assets/logo-emblema-1x1-web.jpg" alt=""></div>
+    <div class="quien"><strong>Asistente Lion AI</strong><small>● En línea · responde 24/7</small></div>
+    <button class="cb-x" id="cb-cerrar" aria-label="Cerrar">×</button>
+  </div>
+  <div class="cb-msgs" id="cb-msgs"></div>
+  <div class="cb-chips" id="cb-chips"></div>
+  <form class="cb-abajo" id="cb-form">
+    <input id="cb-input" type="text" placeholder="Escribe tu respuesta…" autocomplete="off" aria-label="Tu mensaje">
+    <button class="cb-enviar" type="submit" aria-label="Enviar">↑</button>
+  </form>
+  <div class="cb-pie">Asistente de Lion Systems Group · Miami</div>
+</section>
+
+<script>
+/* ===== ASISTENTE LION AI — el mismo tipo de sistema que instalamos ===== */
+(function () {
+  var CRM_ENDPOINT = '';                 /* ← pega aquí la URL de tu Apps Script cuando la tengas */
+  var WA = '13468231378';
+
+  var lanza = document.getElementById('lanza'), caja = document.getElementById('chatbox');
+  var msgs = document.getElementById('cb-msgs'), chips = document.getElementById('cb-chips');
+  var form = document.getElementById('cb-form'), input = document.getElementById('cb-input');
+  if (!lanza || !caja) return;
+
+  var L = { rubro:'', dolor:'', nombre:'', contacto:'', negocio:'', notas:[] };
+  var paso = 0, cerrado = false;
+
+  var NICHOS = {
+    dental:   { k:['dental','dentista','odont','clinica dental','ortodon'], t:'clínica dental',
+                d:'La ADA reporta que las citas perdidas son la razón #1 de huecos en la agenda — y un solo no-show diario cuesta entre $20,000 y $70,000 al año.' },
+    estetica: { k:['spa','estetic','estétic','botox','belleza','medspa','med spa','cosmet'], t:'centro de estética',
+                d:'La visita promedio en un med spa es de $527 (AmSpa 2024). Dos consultas frías por semana son más de $4,000 al mes yéndose a la competencia.' },
+    inmob:    { k:['inmobil','realtor','bienes raices','bienes raíces','propiedad','real estate'], t:'inmobiliaria',
+                d:'Un estudio de 2024 encontró que el 47% de las consultas online a agentes jamás recibe respuesta. Y una sola comisión en Miami son $10,000 o más.' },
+    resto:    { k:['restaurant','comida','cocina','catering','panader','cafe','café','food'], t:'restaurante',
+                d:'El 71% de las llamadas a un restaurante son de dinero: reservas, pedidos y catering. En hora pico, hasta la mitad se pierden sin contestar.' },
+    hogar:    { k:['aire','hvac','plomer','plumb','remodel','techo','roof','construc','contratista','electric'], t:'empresa de servicios',
+                d:'ServiceTitan midió en más de 3,000 negocios del gremio que los equipos pequeños solo logran agendar el 24% de sus llamadas.' },
+    fitness:  { k:['gym','gimnasio','fitness','pilates','yoga','entrena','crossfit'], t:'gimnasio',
+                d:'El que pide su clase de prueba de noche y no recibe respuesta hasta el otro día, ya perdió el impulso — y con él, una membresía anual.' },
+    academia: { k:['academia','escuela','clase','tutor','curso','music','idioma','school'], t:'academia',
+                d:'Cada familia que pregunta y no recibe respuesta el mismo día se matricula en otro lado — y una matrícula son cientos de dólares al mes durante años.' },
+    ecom:     { k:['tienda','ecommerce','e-commerce','shopify','online','venta online','producto'], t:'tienda online',
+                d:'Cerca del 70% de los carritos se abandonan. Recuperarlos por WhatsApp convierte entre 5% y 15% — el email no llega ni al 2%.' },
+    otro:     { k:[], t:'negocio',
+                d:'El 40% de las llamadas a negocios pequeños entra fuera del horario de oficina (CallRail, 18 millones de llamadas) — y el 78% de los clientes le compra al primero que responde.' }
+  };
+
+  function detecta(txt) {
+    var t = (txt || '').toLowerCase();
+    for (var k in NICHOS) { for (var i = 0; i < NICHOS[k].k.length; i++) { if (t.indexOf(NICHOS[k].k[i]) !== -1) return k; } }
+    return null;
+  }
+  function abajo() { msgs.scrollTop = msgs.scrollHeight; }
+  function burbuja(txt, clase) {
+    var d = document.createElement('div');
+    d.className = 'cb-b ' + (clase || 'bot'); d.innerHTML = txt;
+    msgs.appendChild(d); abajo(); return d;
+  }
+  function escribiendo(ms, luego) {
+    var e = document.createElement('div');
+    e.className = 'cb-esc'; e.innerHTML = '<i></i><i></i><i></i>';
+    msgs.appendChild(e); abajo();
+    setTimeout(function () { e.remove(); luego(); }, ms);
+  }
+  function bot(txt, clase, ms, luego) {
+    escribiendo(ms || (600 + Math.min(txt.length * 12, 1100)), function () {
+      burbuja(txt, clase); if (luego) luego();
+    });
+  }
+  function opciones(lista, fn) {
+    chips.innerHTML = '';
+    lista.forEach(function (o, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'cb-chip'; b.textContent = o;
+      b.style.animationDelay = (i * 0.05) + 's';
+      b.onclick = function () { chips.innerHTML = ''; burbuja(o, 'yo'); fn(o); };
+      chips.appendChild(b);
+    });
+  }
+
+  /* ---------- guion ---------- */
+  function arranca() {
+    if (msgs.children.length) return;
+    bot('Hola 👋 Soy el asistente de <b>Lion AI</b>. Yo soy un ejemplo de lo que instalamos: respondo al instante, a cualquier hora.', 'bot', 700, function () {
+      bot('Para decirte algo útil y no genérico: <b>¿en qué rubro está tu negocio?</b>', 'bot', 900, function () {
+        opciones(['🦷 Salud / dental', '💆 Estética', '🏠 Inmobiliaria', '🍽️ Restaurante', '🔧 Servicios del hogar', '💪 Gimnasio', '📚 Academia', '🛍️ Tienda online', 'Otro'], rubroElegido);
+      });
+    });
+  }
+  function rubroElegido(txt) {
+    var k = detecta(txt) || 'otro';
+    L.rubro = NICHOS[k].t; L.notas.push('Rubro: ' + txt);
+    bot('Perfecto. Con ' + (k === 'otro' ? 'tu tipo de negocio' : 'las ' + L.rubro + 's') + ' vemos siempre el mismo patrón:', 'bot', 700, function () {
+      bot(NICHOS[k].d, 'dato', 900, function () {
+        bot('¿Y hoy cómo atienden a los clientes que escriben o llaman?', 'bot', 800, function () {
+          opciones(['Yo mismo, cuando puedo', 'Alguien del equipo', 'Solo en horario de oficina', 'Se nos pierden mensajes'], dolorElegido);
+        });
+      });
+    });
+  }
+  function dolorElegido(txt) {
+    L.dolor = txt; L.notas.push('Atención actual: ' + txt);
+    bot('Gracias, eso me dice mucho. Ahí es exactamente donde entra el sistema: <b>responde en segundos las 24 horas</b>, agenda la cita en tu calendario y le hace seguimiento al que preguntó y no compró.', 'bot', 1000, function () {
+      bot('Lo mejor es que lo veas funcionando con los datos reales de tu negocio — la demostración es gratis y dura 15 minutos.', 'bot', 900, function () {
+        bot('¿Cómo te llamas?', 'bot', 600, function () { paso = 1; input.placeholder = 'Tu nombre…'; input.focus(); });
+      });
+    });
+  }
+  function libre(txt) {
+    if (paso === 1) {
+      L.nombre = txt; paso = 2;
+      bot('Un gusto, ' + txt.split(' ')[0] + '. ¿Cómo se llama tu negocio?', 'bot', 700, function () {
+        input.placeholder = 'Nombre del negocio…';
+      });
+      return;
+    }
+    if (paso === 2) {
+      L.negocio = txt; paso = 3;
+      bot('Anotado. Por último, <b>¿a qué número de WhatsApp o correo te contactamos</b> para coordinar la demostración?', 'bot', 800, function () {
+        input.placeholder = 'WhatsApp o correo…';
+      });
+      return;
+    }
+    if (paso === 3) {
+      L.contacto = txt; paso = 4;
+      cierra();
+      return;
+    }
+    /* fuera del guion: intenta entender por palabras clave */
+    var k = detecta(txt);
+    if (k) { rubroElegido(txt); return; }
+    var t = txt.toLowerCase();
+    if (/precio|costo|cuanto|cuánto|vale|tarifa/.test(t)) {
+      bot('El precio depende de lo que tu operación necesite — por eso primero hacemos la demostración gratuita: sales sabiendo qué se puede automatizar y cuánto te cuesta hoy no hacerlo. ¿Te va bien si coordinamos esos 15 minutos?', 'bot', 900, function () {
+        opciones(['Sí, coordinemos', 'Antes tengo otra duda'], function (r) {
+          if (r.indexOf('Sí') === 0) { paso = 1; bot('Genial. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
+          else bot('Claro, dime — te leo.', 'bot', 500);
+        });
+      });
+      return;
+    }
+    if (/tiempo|cuanto tarda|demora|instalar|implement/.test(t)) {
+      bot('La instalación toma entre 7 y 14 días, y el primer mes incluye ajustes ilimitados. ¿Quieres que coordinemos la demostración para que lo veas con tus datos?', 'bot', 900, function () {
+        opciones(['Sí, coordinemos', 'Todavía no'], function (r) {
+          if (r.indexOf('Sí') === 0) { paso = 1; bot('Perfecto. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
+          else bot('Sin problema. Aquí estaré cuando quieras.', 'bot', 500);
+        });
+      });
+      return;
+    }
+    L.notas.push('Dijo: ' + txt);
+    bot('Te entiendo. Para darte una respuesta concreta a eso y no marearte con generalidades, lo mejor es que lo veas aplicado a tu caso en la demostración de 15 minutos. ¿Cómo te llamas?', 'bot', 900, function () {
+      paso = 1; input.placeholder = 'Tu nombre…'; input.focus();
+    });
+  }
+  function cierra() {
+    var resumen = 'Hola Isnel! Soy ' + (L.nombre || '—') + (L.negocio ? ', de ' + L.negocio : '') + '.'
+      + (L.rubro ? '\nRubro: ' + L.rubro + '.' : '')
+      + (L.dolor ? '\nHoy atendemos así: ' + L.dolor + '.' : '')
+      + (L.contacto ? '\nMi contacto: ' + L.contacto : '')
+      + '\nQuiero coordinar la demostración de 15 minutos.';
+    bot('Listo, ' + (L.nombre || '').split(' ')[0] + '. Ya tengo todo lo necesario ✅', 'bot', 800, function () {
+      bot('Toca el botón y te llevo directo al WhatsApp de Isnel con el resumen escrito — solo le das enviar y coordinamos la hora.', 'bot', 900, function () {
+        var a = document.createElement('a');
+        a.className = 'cb-cta'; a.target = '_blank'; a.rel = 'noopener';
+        a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(resumen);
+        a.textContent = 'Enviar y coordinar mi demostración →';
+        msgs.appendChild(a); abajo();
+        input.placeholder = 'Escribe si necesitas algo más…';
+        guarda();
+      });
+    });
+  }
+  function guarda() {
+    if (!CRM_ENDPOINT) return;
+    try {
+      fetch(CRM_ENDPOINT, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({
+          fecha: new Date().toISOString(), nombre: L.nombre, negocio: L.negocio,
+          rubro: L.rubro, contacto: L.contacto, dolor: L.dolor,
+          notas: L.notas.join(' | '), origen: 'chatbox web'
+        }) });
+    } catch (e) {}
+  }
+
+  /* ---------- interacción ---------- */
+  function abre() {
+    caja.classList.add('abierto'); lanza.classList.add('oculto');
+    arranca(); setTimeout(function(){ if (window.innerWidth > 560) input.focus(); }, 350);
+  }
+  function tapa() { caja.classList.remove('abierto'); lanza.classList.remove('oculto'); }
+  lanza.addEventListener('click', abre);
+  document.getElementById('cb-cerrar').addEventListener('click', tapa);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && caja.classList.contains('abierto')) tapa(); });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = input.value.trim(); if (!v) return;
+    burbuja(v, 'yo'); input.value = ''; chips.innerHTML = '';
+    setTimeout(function(){ libre(v); }, 220);
+  });
+
+  /* invitación discreta: si el visitante llega al final sin abrirlo */
+  var invitado = false;
+  addEventListener('scroll', function () {
+    if (invitado || cerrado) return;
+    var h = document.documentElement;
+    if (h.scrollTop / (h.scrollHeight - h.clientHeight) > 0.55) {
+      invitado = true;
+      lanza.querySelector('.globo').innerHTML = '¿Te muestro cómo funciona? <b>Pregúntame</b>';
+    }
+  }, { passive:true });
 })();
 </script>
 
