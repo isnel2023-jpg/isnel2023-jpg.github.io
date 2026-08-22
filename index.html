@@ -224,7 +224,7 @@
       <span class="linea-load d2" style="display:block">Tu negocio no <span class="tach">nos quiere</span>.</span>
       <span class="linea-load d3" style="display:block"><em>Nos necesita.</em></span>
     </h1>
-    <p class="lede linea-load d3">Instalamos sistemas de inteligencia artificial que responden a tus clientes en segundos, agendan citas solos y persiguen cada venta — de día, de noche y los domingos. Mientras tú diriges, el león caza.</p>
+    <p class="lede linea-load d3">Instalamos sistemas de inteligencia artificial que responden a tus clientes en segundos, agendan citas y persiguen cada venta — de día, de noche, sábados y domingos. Mientras tú diriges, el león caza.</p>
     <div class="cta-row linea-load d4">
       <a class="btn big" href="#hablemos">Cuéntanos qué necesitas →</a>
       <a class="btn ghost" href="#sistema">Ver el sistema en acción</a>
@@ -522,28 +522,50 @@
     var h = document.documentElement;
     var np = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
     vel = Math.min(1, Math.abs(np - prev) * 26); prev = np; pT = np;
+    manda = 0;                       /* el scroll retoma el mando */
   }, { passive: true });
+
+  /* EL ORBE SIGUE EL CURSOR: manda=1 mientras el mouse se mueve; al quedarse
+     quieto o al hacer scroll, el orbe regresa suavemente a su carril. */
+  var mx = 0, my = 0, manda = 0, mando = 0, quieto;
+  var ox = innerWidth * 0.78, oy = innerHeight * 0.14;
+  addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') return;
+    mx = e.clientX; my = e.clientY; manda = 1;
+    vel = Math.min(1, Math.max(vel, Math.hypot(e.movementX || 0, e.movementY || 0) / 26));
+    clearTimeout(quieto);
+    quieto = setTimeout(function () { manda = 0; }, 2600);
+  }, { passive: true });
+  addEventListener('pointerleave', function () { manda = 0; });
 
   var t0 = performance.now();
   (function frame(now) {
     var t = (now - t0) / 1000;
     pS += (pT - pS) * 0.09;
     vel *= 0.93;
-    cv.classList.toggle('on', pS > 0.015 || pT > 0.015);
+    cv.classList.toggle('on', pS > 0.015 || pT > 0.015 || manda === 1 || mando > 0.02);
 
-    /* el orbe: baja por el 78% del ancho, siguiendo el progreso del scroll */
-    var ox = W * (W < 700 ? 0.84 : 0.78) + Math.sin(t * 0.7) * 26;
-    var oy = H * 0.14 + pS * H * 0.72;
+    /* carril del scroll (reposo) */
+    var cx = W * (W < 700 ? 0.84 : 0.78) + Math.sin(t * 0.7) * 26;
+    var cy = H * 0.14 + pS * H * 0.72;
+
+    /* mezcla suave entre carril y cursor */
+    mando += ((manda ? 1 : 0) - mando) * 0.06;
+    var tx = cx + (mx - cx) * mando;
+    var ty = cy + (my - cy) * mando;
+    ox += (tx - ox) * 0.12;
+    oy += (ty - oy) * 0.12;
 
     ctx.clearRect(0, 0, W, H);
     ctx.globalCompositeOperation = 'lighter';
 
-    /* rastro vertical: la costura dorada por donde ya pasó */
-    var g0 = ctx.createLinearGradient(ox, H * 0.14, ox, oy);
+    /* rastro: la costura dorada por donde ya pasó (se atenúa al tomar el cursor) */
+    var op = (0.16 + vel * 0.2) * (1 - mando * 0.75);
+    var g0 = ctx.createLinearGradient(cx, H * 0.14, cx, cy);
     g0.addColorStop(0, 'rgba(214,178,94,0)');
-    g0.addColorStop(1, 'rgba(214,178,94,' + (0.16 + vel * 0.2) + ')');
+    g0.addColorStop(1, 'rgba(214,178,94,' + op + ')');
     ctx.strokeStyle = g0; ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.moveTo(ox, H * 0.14); ctx.lineTo(ox, oy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, H * 0.14); ctx.lineTo(cx, cy); ctx.stroke();
 
     /* nodos: deriva suave + encendido al paso del orbe */
     for (var i = 0; i < nodos.length; i++) {
