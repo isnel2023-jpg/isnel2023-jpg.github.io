@@ -572,7 +572,8 @@
   var form = document.getElementById('cb-form'), input = document.getElementById('cb-input');
   if (!lanza || !caja) return;
 
-  var L = { rubro:'', dolor:'', nombre:'', contacto:'', negocio:'', notas:[] };
+  var L = { rubro:'', dolor:'', nombre:'', contacto:'', negocio:'', notas:[],
+            rol:'', volumen:'', urgencia:'', score:0, nivel:'' };
   var paso = 0, cerrado = false;
 
   var NICHOS = {
@@ -651,9 +652,70 @@
   }
   function dolorElegido(txt) {
     L.dolor = txt; L.notas.push('Atención actual: ' + txt);
-    bot('Gracias, eso me dice mucho. Ahí es exactamente donde entra el sistema: <b>responde en segundos las 24 horas</b>, agenda la cita en tu calendario y le hace seguimiento al que preguntó y no compró.', 'bot', 1000, function () {
-      bot('Lo mejor es que lo veas funcionando con los datos reales de tu negocio — la demostración es gratis y dura 15 minutos.', 'bot', 900, function () {
-        bot('¿Cómo te llamas?', 'bot', 600, function () { paso = 1; input.placeholder = 'Tu nombre…'; input.focus(); });
+    if (/pierden/i.test(txt)) L.score += 2; else if (/oficina|mismo/i.test(txt)) L.score += 1;
+    bot('Gracias, eso me dice mucho. Ahí es justo donde entra el sistema: responde en segundos las 24 horas y le hace seguimiento a cada interesado.', 'bot', 950, function () {
+      bot('Para saber si te conviene de verdad — y no hacerte perder el tiempo: <b>¿cuántos clientes nuevos te contactan al mes, más o menos?</b>', 'bot', 950, function () {
+        opciones(['Menos de 20', 'Entre 20 y 50', 'Entre 50 y 200', 'Más de 200'], volumenElegido);
+      });
+    });
+  }
+  function volumenElegido(txt) {
+    L.volumen = txt; L.notas.push('Volumen: ' + txt);
+    if (/Más de 200/.test(txt)) L.score += 3;
+    else if (/50 y 200/.test(txt)) L.score += 3;
+    else if (/20 y 50/.test(txt)) L.score += 2;
+    else L.score += 0;
+    var msg = /Menos de 20/.test(txt)
+      ? 'Perfecto, gracias por la franqueza.'
+      : 'Con ese volumen la matemática es clarísima: aunque recuperes solo un puñado al mes, el sistema ya se pagó.';
+    bot(msg, 'bot', 800, function () {
+      bot('¿Y tú <b>tomas las decisiones</b> del negocio o hay alguien más que las aprueba?', 'bot', 900, function () {
+        opciones(['Soy el dueño', 'Soy socio o gerente', 'Consulto con otra persona', 'Solo estoy investigando'], rolElegido);
+      });
+    });
+  }
+  function rolElegido(txt) {
+    L.rol = txt; L.notas.push('Rol: ' + txt);
+    if (/dueño/i.test(txt)) L.score += 3;
+    else if (/socio|gerente/i.test(txt)) L.score += 2;
+    else if (/Consulto/i.test(txt)) L.score += 1;
+    bot('Entendido.', 'bot', 550, function () {
+      bot('Última cosa y te dejo tranquilo: <b>¿para cuándo te gustaría tenerlo funcionando?</b>', 'bot', 850, function () {
+        opciones(['Lo antes posible', 'Este mes', 'En unos meses', 'Solo estoy mirando'], urgenciaElegida);
+      });
+    });
+  }
+  function urgenciaElegida(txt) {
+    L.urgencia = txt; L.notas.push('Urgencia: ' + txt);
+    if (/antes posible/i.test(txt)) L.score += 3;
+    else if (/Este mes/i.test(txt)) L.score += 2;
+    else if (/unos meses/i.test(txt)) L.score += 1;
+
+    L.nivel = L.score >= 7 ? 'CALIENTE' : (L.score >= 4 ? 'TIBIO' : 'FRIO');
+
+    if (L.nivel === 'FRIO') { despedida(); return; }
+
+    var frase = L.nivel === 'CALIENTE'
+      ? 'Tu caso es de los que resolvemos rápido y bien. Vale la pena que lo veas funcionando <b>con los datos reales de tu negocio</b> — son 15 minutos y es gratis.'
+      : 'Con lo que me cuentas, creo que te sirve. Te propongo verlo funcionando con tus datos reales: 15 minutos, gratis, sin compromiso.';
+    bot(frase, 'bot', 1000, function () {
+      bot('¿Cómo te llamas?', 'bot', 600, function () { paso = 1; input.placeholder = 'Tu nombre…'; input.focus(); });
+    });
+  }
+  function despedida() {
+    bot('Te voy a ser honesto, que es como trabajamos: por lo que me cuentas, <b>hoy todavía no te conviene invertir en esto</b> — y prefiero decírtelo antes que venderte algo que no vas a aprovechar.', 'bot', 1100, function () {
+      bot('Lo que sí te sirve ahora mismo: responde siempre en menos de 5 minutos, aunque sea con un mensaje corto. Eso solo ya te sube las ventas, y es gratis.', 'bot', 1100, function () {
+        bot('Cuando el volumen te desborde o quieras dejar de perder los mensajes de la noche, aquí estaremos. ¿Te dejo el WhatsApp por si acaso?', 'bot', 950, function () {
+          opciones(['Sí, guárdame el contacto', 'Gracias, luego vuelvo'], function (r) {
+            if (/Sí/.test(r)) {
+              paso = 1; L.notas.push('Lead frío: pidió contacto igual');
+              bot('Claro. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); });
+            } else {
+              L.nombre = L.nombre || 'Visitante';
+              bot('Con gusto. Éxitos con tu negocio 🦁', 'bot', 600, guarda);
+            }
+          });
+        });
       });
     });
   }
@@ -707,15 +769,20 @@
   function cierra() {
     var resumen = 'Hola Isnel! Soy ' + (L.nombre || '—') + (L.negocio ? ', de ' + L.negocio : '') + '.'
       + (L.rubro ? '\nRubro: ' + L.rubro + '.' : '')
+      + (L.rol ? '\nEn el negocio: ' + L.rol + '.' : '')
+      + (L.volumen ? '\nClientes nuevos al mes: ' + L.volumen + '.' : '')
       + (L.dolor ? '\nHoy atendemos así: ' + L.dolor + '.' : '')
+      + (L.urgencia ? '\nQuiero tenerlo: ' + L.urgencia + '.' : '')
       + (L.contacto ? '\nMi contacto: ' + L.contacto : '')
-      + '\nQuiero coordinar la demostración de 15 minutos.';
+      + (L.nivel === 'FRIO' ? '\nPor ahora solo quiero dejar mi contacto.' : '\nQuiero coordinar la demostración de 15 minutos.');
     bot('Listo, ' + (L.nombre || '').split(' ')[0] + '. Ya tengo todo lo necesario ✅', 'bot', 800, function () {
-      bot('Toca el botón y te llevo directo al WhatsApp de Isnel con el resumen escrito — solo le das enviar y coordinamos la hora.', 'bot', 900, function () {
+      bot(L.nivel === 'FRIO'
+          ? 'Toca el botón y le dejas tu contacto a Isnel — te escribirá cuando sea el momento.'
+          : 'Toca el botón y te llevo directo al WhatsApp de Isnel con el resumen escrito — solo le das enviar y coordinamos la hora.', 'bot', 900, function () {
         var a = document.createElement('a');
         a.className = 'cb-cta'; a.target = '_blank'; a.rel = 'noopener';
         a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(resumen);
-        a.textContent = 'Enviar y coordinar mi demostración →';
+        a.textContent = L.nivel === 'FRIO' ? 'Dejar mi contacto →' : 'Enviar y coordinar mi demostración →';
         msgs.appendChild(a); abajo();
         input.placeholder = 'Escribe si necesitas algo más…';
         guarda();
@@ -724,8 +791,12 @@
   }
   function guarda() {
     if (!CRM_ENDPOINT) return;
+    var icono = L.nivel === 'CALIENTE' ? '🔥' : (L.nivel === 'TIBIO' ? '🟡' : '⚪');
     var d = { nombre:L.nombre, negocio:L.negocio, rubro:L.rubro, contacto:L.contacto,
-              dolor:L.dolor, notas:L.notas.join(' | '), origen:'chatbox web' };
+              dolor:L.dolor, origen:'chatbox web',
+              notas: icono + ' ' + (L.nivel || 'SIN CALIFICAR') + ' (' + L.score + '/10) · '
+                     + [L.rol, L.volumen, L.urgencia].filter(Boolean).join(' · ')
+                     + (L.notas.length ? ' · ' + L.notas.join(' | ') : '') };
     /* GET con parámetros: el método que Apps Script sirve sin fricción de CORS */
     var q = Object.keys(d).map(function (k) {
       return encodeURIComponent(k) + '=' + encodeURIComponent((d[k] || '').toString().slice(0, 400));
