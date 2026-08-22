@@ -38,6 +38,9 @@
   .atmos::after { content:""; position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(3,3,4,.6) 100%); }
   @keyframes grano { 0%{transform:translate(0,0)} 25%{transform:translate(-2%,2%)} 50%{transform:translate(2%,-2%)} 75%{transform:translate(-2%,-1%)} 100%{transform:translate(0,0)} }
 
+  /* EL PULSO DEL SISTEMA: red neuronal de fondo que se enciende al paso del orbe */
+  #pulso { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0; transition:opacity 1.2s ease; }
+  #pulso.on { opacity:1; }
   main, .cinta, footer, nav, .hero .wrap { position:relative; z-index:2; }
 
   /* SCROLL-DRIVEN: barra de progreso dorada */
@@ -195,6 +198,7 @@
 </head>
 <body>
 <div class="progreso" id="progreso" aria-hidden="true"></div>
+<canvas id="pulso" aria-hidden="true"></canvas>
 <div class="atmos" aria-hidden="true"></div>
 
 <nav id="nav">
@@ -478,6 +482,145 @@
       + '\nQuiero saber cómo lo automatizamos con Lion AI.';
     window.open('https://wa.me/13468231378?text=' + encodeURIComponent(msg), '_blank');
   });
+})();
+</script>
+
+<script>
+/* ===== EL PULSO DEL SISTEMA — orbe dorado que desciende con el scroll
+   encendiendo la red neuronal del fondo. Vive DETRÁS del contenido. ===== */
+(function () {
+  var cv = document.getElementById('pulso');
+  if (!cv || !cv.getContext) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var ctx = cv.getContext('2d'), W = 0, H = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+  var nodos = [], chispas = [], estela = [];
+
+  function medir() {
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    nodos = [];
+    var cols = W < 700 ? 4 : 7, filas = W < 700 ? 7 : 6;
+    for (var i = 0; i < cols; i++) {
+      for (var j = 0; j < filas; j++) {
+        nodos.push({
+          bx: (i + 0.5) / cols * W + (Math.random() - 0.5) * (W / cols) * 0.6,
+          by: (j + 0.5) / filas * H + (Math.random() - 0.5) * (H / filas) * 0.6,
+          x: 0, y: 0, f: Math.random() * 6.28, v: 0.25 + Math.random() * 0.5,
+          r: 8 + Math.random() * 16, luz: 0
+        });
+      }
+    }
+  }
+  medir();
+  addEventListener('resize', medir);
+
+  var pT = 0, pS = 0, vel = 0, prev = 0;
+  addEventListener('scroll', function () {
+    var h = document.documentElement;
+    var np = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+    vel = Math.min(1, Math.abs(np - prev) * 26); prev = np; pT = np;
+  }, { passive: true });
+
+  var t0 = performance.now();
+  (function frame(now) {
+    var t = (now - t0) / 1000;
+    pS += (pT - pS) * 0.09;
+    vel *= 0.93;
+    cv.classList.toggle('on', pS > 0.015 || pT > 0.015);
+
+    /* el orbe: baja por el 78% del ancho, siguiendo el progreso del scroll */
+    var ox = W * (W < 700 ? 0.84 : 0.78) + Math.sin(t * 0.7) * 26;
+    var oy = H * 0.14 + pS * H * 0.72;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    /* rastro vertical: la costura dorada por donde ya pasó */
+    var g0 = ctx.createLinearGradient(ox, H * 0.14, ox, oy);
+    g0.addColorStop(0, 'rgba(214,178,94,0)');
+    g0.addColorStop(1, 'rgba(214,178,94,' + (0.16 + vel * 0.2) + ')');
+    ctx.strokeStyle = g0; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(ox, H * 0.14); ctx.lineTo(ox, oy); ctx.stroke();
+
+    /* nodos: deriva suave + encendido al paso del orbe */
+    for (var i = 0; i < nodos.length; i++) {
+      var n = nodos[i];
+      n.x = n.bx + Math.cos(t * n.v + n.f) * n.r;
+      n.y = n.by + Math.sin(t * n.v * 0.8 + n.f) * n.r;
+      var d = Math.hypot(n.x - ox, n.y - oy);
+      var alcance = 240 + vel * 120;
+      if (d < alcance) n.luz = Math.max(n.luz, 1 - d / alcance);
+      n.luz *= 0.965;
+    }
+
+    /* conexiones */
+    for (var a = 0; a < nodos.length; a++) {
+      for (var b = a + 1; b < nodos.length; b++) {
+        var p = nodos[a], q = nodos[b];
+        var dx = p.x - q.x, dy = p.y - q.y, dd = dx * dx + dy * dy;
+        var lim = W < 700 ? 34000 : 46000;
+        if (dd > lim) continue;
+        var base = 0.05 * (1 - dd / lim);
+        var viva = Math.max(p.luz, q.luz);
+        ctx.strokeStyle = 'rgba(214,178,94,' + (base + viva * 0.5 * (1 - dd / lim)) + ')';
+        ctx.lineWidth = 0.6 + viva * 1.4;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+      }
+    }
+
+    /* puntos */
+    for (var k = 0; k < nodos.length; k++) {
+      var m = nodos[k];
+      var rr = 1.3 + m.luz * 3.4;
+      ctx.fillStyle = 'rgba(240,212,138,' + (0.18 + m.luz * 0.8) + ')';
+      ctx.beginPath(); ctx.arc(m.x, m.y, rr, 0, 6.2832); ctx.fill();
+      if (m.luz > 0.25) {
+        var gl = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 26 * m.luz);
+        gl.addColorStop(0, 'rgba(240,212,138,' + m.luz * 0.28 + ')');
+        gl.addColorStop(1, 'rgba(240,212,138,0)');
+        ctx.fillStyle = gl;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 26 * m.luz, 0, 6.2832); ctx.fill();
+      }
+    }
+
+    /* chispas que caen del orbe */
+    if (chispas.length < 90 && Math.random() < 0.55 + vel) {
+      chispas.push({ x: ox + (Math.random() - 0.5) * 14, y: oy + (Math.random() - 0.5) * 14,
+        vx: (Math.random() - 0.5) * 0.5, vy: 0.35 + Math.random() * 1.1, v: 1 });
+    }
+    for (var c = chispas.length - 1; c >= 0; c--) {
+      var s = chispas[c];
+      s.x += s.vx; s.y += s.vy; s.v -= 0.012;
+      if (s.v <= 0) { chispas.splice(c, 1); continue; }
+      ctx.fillStyle = 'rgba(240,212,138,' + s.v * 0.55 + ')';
+      ctx.beginPath(); ctx.arc(s.x, s.y, 1.1 * s.v, 0, 6.2832); ctx.fill();
+    }
+
+    /* el orbe */
+    var halo = 40 + vel * 60 + Math.sin(t * 2.4) * 5;
+    var g1 = ctx.createRadialGradient(ox, oy, 0, ox, oy, halo);
+    g1.addColorStop(0, 'rgba(255,240,200,.95)');
+    g1.addColorStop(0.14, 'rgba(240,212,138,.55)');
+    g1.addColorStop(0.45, 'rgba(214,178,94,.16)');
+    g1.addColorStop(1, 'rgba(214,178,94,0)');
+    ctx.fillStyle = g1;
+    ctx.beginPath(); ctx.arc(ox, oy, halo, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = 'rgba(255,248,226,.95)';
+    ctx.beginPath(); ctx.arc(ox, oy, 3.4 + vel * 2.6, 0, 6.2832); ctx.fill();
+
+    /* anillo de energía al moverse rápido */
+    if (vel > 0.06) {
+      ctx.strokeStyle = 'rgba(240,212,138,' + vel * 0.5 + ')';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(ox, oy, 16 + vel * 46, 0, 6.2832); ctx.stroke();
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    requestAnimationFrame(frame);
+  })(t0);
 })();
 </script>
 
