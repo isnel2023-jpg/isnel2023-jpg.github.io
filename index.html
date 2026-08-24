@@ -1,999 +1,113 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lion AI — Sistemas de inteligencia artificial que venden por tu negocio · Miami</title>
-<meta name="description" content="Lion Systems Group: asistentes de IA bilingües que responden en segundos, agendan citas y hacen seguimiento de cada cliente. 24/7. Miami, FL.">
-<meta property="og:title" content="Lion AI — Tu negocio no nos quiere. Nos necesita.">
-<meta property="og:description" content="Sistemas de IA que atienden, agendan y venden por ti. Miami · Español & English.">
-<meta property="og:image" content="https://lionsystemsgroup.com/assets/banner-hero-16x9-web.jpg">
+<title>Lion Systems Group LLC — Real Estate Investments &amp; AI Automation</title>
+<meta name="description" content="Lion Systems Group LLC: real estate investments in Duval County, Florida, and AI automation systems for businesses in South Florida.">
+<meta property="og:title" content="Lion Systems Group LLC">
+<meta property="og:description" content="Real estate investments · AI automation. Florida.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#070708">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23070708'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%23D6B25E' stroke-width='4'/%3E%3Ctext x='50' y='66' font-family='Georgia,serif' font-size='44' font-weight='700' fill='%23D6B25E' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
 <style>
   :root {
     --negro:#070708; --panel:#0E0E10; --panel2:#131316; --linea:#232326;
-    --oro:#D6B25E; --oro2:#F0D48A; --oro-dim:rgba(214,178,94,.14);
-    --marfil:#F3EDE2; --humo:#A8A296; --sombra:#6E6A60; --max:1180px;
+    --oro:#D6B25E; --oro2:#F0D48A; --marfil:#F3EDE2; --humo:#A8A296; --sombra:#6E6A60;
   }
   * { box-sizing:border-box; margin:0; }
-  html { scroll-behavior:smooth; }
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior:auto; }
-    *,*::before,*::after { animation:none !important; transition:none !important; }
-  }
-  body { background:var(--negro); color:var(--marfil); font-family:"Helvetica Neue",-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.55; font-size:17px; overflow-x:hidden; }
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} }
+  body { background:var(--negro); color:var(--marfil); font-family:"Helvetica Neue",-apple-system,"Segoe UI",Arial,sans-serif;
+         line-height:1.55; font-size:17px; min-height:100svh; display:flex; flex-direction:column; overflow-x:hidden; }
   ::selection { background:var(--oro); color:#141005; }
   .serif { font-family:Didot,"Bodoni 72","Playfair Display",Georgia,serif; font-weight:400; }
-  .mono { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.7rem; letter-spacing:.22em; text-transform:uppercase; color:var(--oro); font-weight:600; }
-  .wrap { max-width:var(--max); margin:0 auto; padding:0 24px; }
-  a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible { outline:2px solid var(--oro); outline-offset:3px; }
+  .mono { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; color:var(--oro); font-weight:600; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; width:100%; }
+  a:focus-visible { outline:2px solid var(--oro); outline-offset:4px; }
 
-  /* ATMÓSFERA: grano + viñeta (profundidad de cine) */
-  .atmos { position:fixed; inset:0; pointer-events:none; z-index:90; }
-  .atmos::before { content:""; position:absolute; inset:-50%; opacity:.5; mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
-    animation:grano 1.2s steps(4) infinite; }
-  .atmos::after { content:""; position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(3,3,4,.6) 100%); }
-  @keyframes grano { 0%{transform:translate(0,0)} 25%{transform:translate(-2%,2%)} 50%{transform:translate(2%,-2%)} 75%{transform:translate(-2%,-1%)} 100%{transform:translate(0,0)} }
+  .fondo { position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .fondo video { width:100%; height:100%; object-fit:cover; opacity:.22; }
+  .fondo::after { content:""; position:absolute; inset:0; background:radial-gradient(75% 60% at 50% 40%,transparent 30%,var(--negro) 100%),linear-gradient(180deg,rgba(7,7,8,.6),rgba(7,7,8,.9)); }
 
-  /* EL PULSO DEL SISTEMA: red neuronal de fondo que se enciende al paso del orbe */
-  #pulso { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0; transition:opacity 1.2s ease; }
-  #pulso.on { opacity:1; }
-  main, .cinta, footer, nav, .hero .wrap { position:relative; z-index:2; }
+  main { position:relative; z-index:2; flex:1; display:flex; flex-direction:column; justify-content:center; padding:72px 0 56px; }
+  .cab { text-align:center; margin-bottom:52px; animation:sube .8s ease both; }
+  .cab img { width:82px; height:82px; border-radius:50%; border:1px solid rgba(214,178,94,.5); margin-bottom:22px; }
+  .cab h1 { font-size:clamp(1.9rem,4.4vw,3.1rem); letter-spacing:.06em; line-height:1.1; }
+  .cab h1 span { color:var(--oro); }
+  .cab .sub { color:var(--humo); margin-top:14px; font-size:clamp(.95rem,1.4vw,1.08rem); }
+  .cab .llc { font-family:ui-monospace,Menlo,monospace; font-size:.64rem; letter-spacing:.26em; color:var(--sombra); margin-top:16px; text-transform:uppercase; }
+  @keyframes sube { from { opacity:0; transform:translateY(22px); } }
 
-  /* SCROLL-DRIVEN: barra de progreso dorada */
-  .progreso { position:fixed; top:0; left:0; right:0; height:3px; z-index:200; background:linear-gradient(90deg,var(--oro),var(--oro2)); transform-origin:left; transform:scaleX(0); box-shadow:0 0 12px rgba(214,178,94,.5); }
-  @supports (animation-timeline: scroll()) {
-    .progreso { animation: crecer linear both; animation-timeline: scroll(root); }
-    @keyframes crecer { to { transform:scaleX(1); } }
-    .hero video { animation: heroZoom linear both; animation-timeline: scroll(root); animation-range: 0 100vh; }
-    @keyframes heroZoom { to { transform:scale(1.18); opacity:.25; } }
-    .phone { animation: flotar linear both; animation-timeline: view(); animation-range: entry 0% cover 60%; }
-    .card, .stat, .fase { animation: flotarSuave linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
-    @keyframes flotar { from { transform:translateY(46px); } to { transform:translateY(-12px); } }
-    @keyframes flotarSuave { from { transform:translateY(30px); } to { transform:translateY(0); } }
-  }
-  @media (prefers-reduced-motion:reduce){ .progreso, .hero video, .fundador .foto img, .phone { animation:none !important; } }
+  .puertas { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+  .puerta { position:relative; display:flex; flex-direction:column; gap:14px; text-decoration:none; color:inherit;
+    background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid var(--linea); border-radius:14px;
+    padding:38px 34px 34px; overflow:hidden; transition:transform .28s, border-color .28s, box-shadow .28s;
+    animation:sube .8s .15s ease both; }
+  .puerta:nth-child(2) { animation-delay:.28s; }
+  .puerta::before { content:""; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--oro),transparent); opacity:0; transition:opacity .28s; }
+  .puerta:hover { transform:translateY(-6px); border-color:rgba(214,178,94,.45); box-shadow:0 28px 70px rgba(0,0,0,.55); }
+  .puerta:hover::before { opacity:1; }
+  .puerta h2 { font-family:Didot,"Bodoni 72",Georgia,serif; font-weight:400; font-size:1.72rem; letter-spacing:.04em; line-height:1.1; }
+  .puerta h2 b { color:var(--oro2); font-weight:400; }
+  .puerta p { color:var(--humo); font-size:.94rem; flex:1; }
+  .puerta .donde { font-family:ui-monospace,Menlo,monospace; font-size:.64rem; letter-spacing:.18em; text-transform:uppercase; color:var(--sombra); }
+  .puerta .ir { display:inline-flex; align-items:center; gap:8px; color:var(--oro2); font-weight:700; font-size:.9rem; margin-top:4px; }
+  .puerta .ir span { transition:transform .25s; }
+  .puerta:hover .ir span { transform:translateX(5px); }
 
-  nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(7,7,8,.72); backdrop-filter:blur(14px); border-bottom:1px solid rgba(35,35,38,.6); transition:background .3s; }
-  nav .wrap { display:flex; justify-content:space-between; align-items:center; padding-top:16px; padding-bottom:16px; }
-  .logo { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--marfil); }
-  .logo img { width:38px; height:38px; border-radius:50%; border:1px solid var(--linea); }
-  .logo b { font-family:Didot,"Bodoni 72",Georgia,serif; font-weight:400; font-size:1.15rem; letter-spacing:.14em; }
-  .logo b span { color:var(--oro); }
-  .navlinks { display:flex; gap:26px; align-items:center; }
-  .navlinks > a:not(.btn) { color:var(--humo); text-decoration:none; font-size:.85rem; font-weight:600; transition:color .15s; }
-  .navlinks > a:not(.btn):hover { color:var(--oro2); }
-  @media (max-width:820px) { .navlinks > a:not(.btn) { display:none; } }
-
-  .btn { display:inline-block; padding:15px 30px; border-radius:4px; text-decoration:none; font-weight:700; font-size:.93rem; letter-spacing:.04em; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#141005; border:none; cursor:pointer; font-family:inherit; transition:transform .15s, box-shadow .2s; }
-  .btn:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(214,178,94,.3); }
-  .btn.ghost { background:transparent; color:var(--oro2); border:1px solid rgba(214,178,94,.45); }
-  .btn.ghost:hover { border-color:var(--oro2); box-shadow:none; }
-  .btn.small { padding:10px 20px; font-size:.82rem; }
-  .btn.big { padding:19px 40px; font-size:1.02rem; }
-
-  /* HERO */
-  .hero { position:relative; min-height:100svh; display:flex; align-items:center; overflow:hidden; }
-  .hero video, .hero .vfallback { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; }
-  .hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(7,7,8,.75) 0%,rgba(7,7,8,.25) 45%,var(--negro) 96%),radial-gradient(90% 60% at 70% 40%,transparent 40%,rgba(7,7,8,.5) 100%); }
-  .hero .wrap { position:relative; z-index:2; padding-top:120px; padding-bottom:80px; }
-  .eyebrow { display:inline-flex; align-items:center; gap:10px; border:1px solid rgba(214,178,94,.35); border-radius:999px; padding:8px 18px; font-size:.78rem; color:var(--humo); background:rgba(7,7,8,.5); margin-bottom:28px; }
-  .eyebrow i { width:7px; height:7px; border-radius:50%; background:var(--oro2); box-shadow:0 0 12px var(--oro2); animation:puls 2.2s infinite; }
-  @keyframes puls { 50% { opacity:.4 } }
-  h1 { font-size:clamp(2.6rem,6.8vw,5.2rem); line-height:1.02; letter-spacing:.005em; max-width:12.5em; text-wrap:balance; }
-  h1 .tach { color:var(--sombra); position:relative; white-space:nowrap; }
-  h1 .tach::after { content:""; position:absolute; left:-2%; right:-2%; top:52%; height:3px; background:var(--oro); transform:scaleX(0); transform-origin:left; animation:tachar .8s 1s ease forwards; }
-  @keyframes tachar { to { transform:scaleX(1); } }
-  h1 em { font-style:italic; color:var(--oro2); }
-  .hero p.lede { font-size:clamp(1.02rem,1.8vw,1.3rem); color:var(--humo); max-width:34em; margin:28px 0 38px; }
-  .hero .linea-load { opacity:0; transform:translateY(26px); animation:subir .8s ease forwards; }
-  .hero .d1{animation-delay:.1s} .hero .d2{animation-delay:.25s} .hero .d3{animation-delay:.4s} .hero .d4{animation-delay:.55s}
-  @keyframes subir { to { opacity:1; transform:none; } }
-  .cta-row { display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
-  .scrollhint { position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:2; color:var(--sombra); font-size:.7rem; letter-spacing:.3em; text-transform:uppercase; animation:puls 2.6s infinite; }
-
-  /* CINTA */
-  .cinta { border-top:1px solid var(--linea); border-bottom:1px solid var(--linea); background:var(--panel); overflow:hidden; padding:16px 0; }
-  .cinta-inner { display:flex; align-items:center; gap:34px; white-space:nowrap; width:max-content; animation:rodar 44s linear infinite; }
-  @keyframes rodar { to { transform:translateX(-50%); } }
-  .cinta span { font-family:ui-monospace,Menlo,monospace; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--sombra); }
-  .cinta b { color:var(--oro); font-weight:600; }
-  .cinta .sep { color:rgba(214,178,94,.35); font-size:.5rem; letter-spacing:0; }
-
-  section { padding:110px 0; position:relative; }
-  .sec-line { border-top:1px solid var(--linea); }
-  h2 { font-size:clamp(1.9rem,4.2vw,3.2rem); letter-spacing:.01em; margin:14px 0 18px; text-wrap:balance; max-width:19em; line-height:1.1; }
-  h2 em { font-style:italic; color:var(--oro2); }
-  .sub { color:var(--humo); max-width:42em; margin-bottom:52px; font-size:1.05rem; }
-  .reveal { opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s ease; }
-  .reveal.in { opacity:1; transform:none; }
-  @media (prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none;} }
-
-  /* STATS */
-  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1px; background:var(--linea); border:1px solid var(--linea); }
-  .stat { background:var(--panel); padding:44px 30px; position:relative; overflow:hidden; }
-  .stat::before { content:""; position:absolute; inset:auto 0 0 0; height:2px; background:linear-gradient(90deg,var(--oro),transparent 75%); opacity:.6; }
-  .stat .n { font-family:Didot,"Bodoni 72",Georgia,serif; font-size:clamp(2.6rem,4.5vw,3.8rem); color:var(--oro2); line-height:1; font-variant-numeric:tabular-nums; }
-  .stat p { color:var(--humo); font-size:.9rem; margin-top:12px; max-width:20em; }
-  .stat small { display:block; margin-top:12px; color:var(--sombra); font-size:.68rem; font-family:ui-monospace,Menlo,monospace; }
-
-  /* CHAT DEMO */
-  .demo-grid { display:grid; grid-template-columns:minmax(0,5.5fr) minmax(0,4.5fr); gap:64px; align-items:center; }
-  @media (max-width:900px){ .demo-grid{grid-template-columns:1fr;} }
-  .phone { background:var(--panel); border:1px solid var(--linea); border-radius:26px; padding:20px; box-shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(214,178,94,.08), 0 0 80px rgba(214,178,94,.06); max-width:420px; }
-  .phone-top { display:flex; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--linea); margin-bottom:14px; }
-  .phone-ava { width:38px; height:38px; border-radius:50%; overflow:hidden; border:1px solid var(--oro); }
-  .phone-ava img { width:100%; height:100%; object-fit:cover; }
-  .phone-top strong { font-size:.92rem; }
-  .phone-top small { display:block; color:var(--oro2); font-size:.7rem; }
-  .phone-hora { margin-left:auto; font-family:ui-monospace,Menlo,monospace; font-size:.72rem; color:var(--sombra); }
-  .chat { display:flex; flex-direction:column; gap:10px; min-height:340px; }
-  .msg { max-width:86%; padding:11px 15px; border-radius:15px; font-size:.89rem; line-height:1.4; opacity:0; transform:translateY(10px) scale(.97); transition:opacity .35s, transform .35s; }
-  .msg.visible { opacity:1; transform:none; }
-  .msg.cliente { align-self:flex-start; background:var(--panel2); border:1px solid var(--linea); border-bottom-left-radius:5px; }
-  .msg.ia { align-self:flex-end; background:linear-gradient(180deg,rgba(214,178,94,.95),rgba(190,155,74,.95)); color:#171204; border-bottom-right-radius:5px; font-weight:500; }
-  .msg.sistema { align-self:center; background:transparent; color:var(--sombra); font-size:.73rem; font-family:ui-monospace,Menlo,monospace; text-align:center; }
-  .typing { display:inline-flex; gap:4px; align-items:center; }
-  .typing i { width:6px; height:6px; border-radius:50%; background:#171204; opacity:.5; animation:tp 1s infinite; }
-  .typing i:nth-child(2){animation-delay:.18s} .typing i:nth-child(3){animation-delay:.36s}
-  @keyframes tp { 50% { transform:translateY(-4px); opacity:1 } }
-
-  /* SERVICIOS */
-  .grid3 { display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
-  .card { background:linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid var(--linea); border-radius:10px; padding:34px 30px; position:relative; overflow:hidden; transition:transform .25s, border-color .25s, box-shadow .25s; }
-  .card::before { content:""; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(214,178,94,.6),transparent); opacity:0; transition:opacity .25s; }
-  .card:hover { transform:translateY(-6px); border-color:rgba(214,178,94,.4); box-shadow:0 24px 60px rgba(0,0,0,.5); }
-  .card:hover::before { opacity:1; }
-  .card .num { font-family:Didot,"Bodoni 72",Georgia,serif; color:var(--oro); font-size:1.1rem; letter-spacing:.1em; margin-bottom:16px; display:block; }
-  .card h3 { font-size:1.12rem; margin-bottom:10px; letter-spacing:.01em; }
-  .card p { color:var(--humo); font-size:.93rem; }
-
-  /* PROCESO */
-  .fases { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; counter-reset:fase; }
-  .fase { background:var(--panel); border:1px solid var(--linea); border-radius:10px; padding:38px 32px; position:relative; }
-  .fase::before { counter-increment:fase; content:"Fase 0" counter(fase); font-family:ui-monospace,Menlo,monospace; font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--oro); display:block; margin-bottom:18px; }
-  .fase h3 { font-family:Didot,"Bodoni 72",Georgia,serif; font-weight:400; font-size:1.5rem; margin-bottom:12px; }
-  .fase p { color:var(--humo); font-size:.94rem; }
-  .fase.destacada { border-color:rgba(214,178,94,.45); background:linear-gradient(180deg,rgba(214,178,94,.07),var(--panel) 55%); }
-
-  /* COMPARATIVA */
-  .tabla-shell { overflow-x:auto; border:1px solid var(--linea); border-radius:10px; }
-  table.comp { width:100%; border-collapse:collapse; min-width:640px; background:var(--panel); }
-  .comp th, .comp td { padding:18px 22px; text-align:left; border-bottom:1px solid var(--linea); font-size:.93rem; }
-  .comp th { font-family:Didot,"Bodoni 72",Georgia,serif; font-weight:400; font-size:1.05rem; letter-spacing:.03em; }
-  .comp th.lion { color:var(--oro2); }
-  .comp td { color:var(--humo); }
-  .comp td.lion { color:var(--marfil); background:rgba(214,178,94,.05); }
-  .comp tr:last-child td { border-bottom:none; }
-
-  /* FUNDADOR */
-  .fundador { position:relative; text-align:center; max-width:820px; margin:0 auto; padding:20px 0; }
-  .fundador .marca-agua { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(420px,80vw); opacity:.06; pointer-events:none; }
-  .fundador blockquote { position:relative; font-family:Didot,"Bodoni 72",Georgia,serif; font-size:clamp(1.4rem,3vw,2.2rem); line-height:1.4; font-style:italic; color:var(--marfil); margin-top:26px; }
-  .fundador .quien { position:relative; margin-top:34px; color:var(--humo); font-size:.95rem; }
-  .fundador .quien b { color:var(--oro2); display:block; font-size:1.1rem; margin-bottom:6px; letter-spacing:.22em; }
-
-  /* FORM */
-  .form-shell { display:grid; grid-template-columns:minmax(0,5fr) minmax(0,6fr); gap:56px; align-items:start; }
-  @media (max-width:860px){ .form-shell{grid-template-columns:1fr;} }
-  form { background:var(--panel); border:1px solid var(--linea); border-radius:14px; padding:36px; display:grid; gap:20px; box-shadow:0 30px 80px rgba(0,0,0,.45); }
-  label { font-size:.84rem; font-weight:700; display:grid; gap:9px; letter-spacing:.02em; }
-  input, textarea { background:var(--negro); border:1px solid var(--linea); border-radius:8px; padding:14px 16px; color:var(--marfil); font-family:inherit; font-size:.95rem; width:100%; transition:border-color .15s; }
-  input:hover, textarea:hover, input:focus, textarea:focus { border-color:rgba(214,178,94,.5); }
-  textarea { resize:vertical; min-height:92px; }
-  .chips { display:flex; flex-wrap:wrap; gap:10px; }
-  .chip { border:1px solid var(--linea); border-radius:999px; padding:10px 17px; font-size:.85rem; color:var(--humo); cursor:pointer; user-select:none; transition:all .15s; background:var(--negro); }
-  .chip:hover { border-color:rgba(214,178,94,.5); color:var(--marfil); }
-  .chip.on { background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#171204; border-color:var(--oro); font-weight:700; }
-  .form-nota { font-size:.76rem; color:var(--sombra); }
-
-  /* ===== CHATBOX LION AI ===== */
-  #lanza { position:fixed; right:24px; bottom:24px; z-index:300; display:flex; align-items:center; gap:12px; cursor:pointer; background:none; border:none; padding:0; }
-  #lanza .globo { background:var(--panel); border:1px solid rgba(214,178,94,.35); color:var(--marfil); font-size:.82rem; padding:11px 16px; border-radius:999px; box-shadow:0 14px 40px rgba(0,0,0,.5); white-space:nowrap; animation:asoma .5s 2.2s both; }
-  #lanza .globo b { color:var(--oro2); }
-  @keyframes asoma { from { opacity:0; transform:translateX(14px); } }
-  #lanza .disco { width:62px; height:62px; border-radius:50%; overflow:hidden; border:1.5px solid var(--oro); position:relative; box-shadow:0 12px 40px rgba(214,178,94,.28), 0 8px 30px rgba(0,0,0,.6); transition:transform .25s; flex:none; }
-  #lanza:hover .disco { transform:scale(1.06); }
-  #lanza .disco img { width:100%; height:100%; object-fit:cover; }
-  #lanza .vivo { position:absolute; right:3px; bottom:3px; width:13px; height:13px; border-radius:50%; background:#3ED598; border:2px solid var(--negro); }
-  #lanza .vivo::after { content:""; position:absolute; inset:-4px; border-radius:50%; border:1px solid #3ED598; animation:onda 2s infinite; }
-  @keyframes onda { 0%{transform:scale(.8);opacity:.9} 100%{transform:scale(1.9);opacity:0} }
-  #lanza.oculto { opacity:0; pointer-events:none; transform:scale(.85); transition:.3s; }
-  @media (max-width:520px){ #lanza .globo { display:none; } }
-
-  #chatbox { position:fixed; right:24px; bottom:24px; z-index:301; width:min(392px,calc(100vw - 28px));
-    padding:0; margin:0; border-top:none;   /* anula la regla global de section */
-    height:auto; max-height:min(560px,calc(100vh - 36px)); justify-content:flex-start;
-    background:linear-gradient(180deg,rgba(16,16,19,.97),rgba(8,8,9,.99)); backdrop-filter:blur(20px);
-    border:1px solid rgba(214,178,94,.3); border-radius:18px; box-shadow:0 40px 110px rgba(0,0,0,.7), 0 0 0 1px rgba(214,178,94,.06), 0 0 90px rgba(214,178,94,.07);
-    display:flex; flex-direction:column; overflow:hidden; opacity:0; transform:translateY(24px) scale(.97); pointer-events:none; transition:opacity .32s var(--ez,ease), transform .32s cubic-bezier(.2,.8,.3,1); }
-  #chatbox.abierto { opacity:1; transform:none; pointer-events:auto; }
-  .cb-top { display:flex; align-items:center; gap:11px; padding:13px 16px; border-bottom:1px solid rgba(214,178,94,.14); background:linear-gradient(180deg,rgba(214,178,94,.07),transparent); flex:0 0 auto; }
-  .cb-top .av { width:36px; height:36px; border-radius:50%; overflow:hidden; border:1px solid var(--oro); flex:none; }
-  .cb-top .av img { width:100%; height:100%; object-fit:cover; }
-  .cb-top .quien { flex:1; min-width:0; }
-  .cb-top strong { display:block; font-family:Didot,"Bodoni 72",Georgia,serif; font-size:.98rem; letter-spacing:.04em; line-height:1.25; }
-  .cb-top small { color:#3ED598; font-size:.67rem; letter-spacing:.04em; }
-  .cb-x { background:none; border:none; color:var(--sombra); font-size:1.5rem; cursor:pointer; line-height:1; padding:4px 6px; border-radius:6px; transition:color .15s; }
-  .cb-x:hover { color:var(--oro2); }
-  /* crece con la conversación; al llegar al tope del panel, hace scroll interno */
-  .cb-msgs { flex:0 1 auto; min-height:0; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:rgba(214,178,94,.3) transparent; }
-  .cb-msgs::-webkit-scrollbar { width:5px; }
-  .cb-msgs::-webkit-scrollbar-thumb { background:rgba(214,178,94,.3); border-radius:4px; }
-  .cb-b { max-width:88%; padding:11px 14px; border-radius:15px; font-size:.87rem; line-height:1.48; animation:entra .35s cubic-bezier(.2,.8,.3,1) both; word-break:break-word; }
-  @keyframes entra { from { opacity:0; transform:translateY(10px) scale(.97); } }
-  .cb-b.bot { align-self:flex-start; background:var(--panel2); border:1px solid rgba(255,255,255,.06); border-bottom-left-radius:5px; color:var(--marfil); }
-  .cb-b.yo { align-self:flex-end; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#161104; border-bottom-right-radius:5px; font-weight:500; }
-  .cb-b.dato { align-self:flex-start; background:rgba(214,178,94,.08); border:1px solid rgba(214,178,94,.25); border-radius:12px; color:var(--oro2); font-size:.84rem; max-width:92%; }
-  .cb-esc { align-self:flex-start; display:inline-flex; gap:5px; padding:14px 16px; background:var(--panel2); border:1px solid rgba(255,255,255,.06); border-radius:15px; border-bottom-left-radius:5px; }
-  .cb-esc i { width:6px; height:6px; border-radius:50%; background:var(--oro); animation:tp2 1s infinite; }
-  .cb-esc i:nth-child(2){animation-delay:.16s} .cb-esc i:nth-child(3){animation-delay:.32s}
-  @keyframes tp2 { 50%{transform:translateY(-5px);opacity:1} 0%,100%{opacity:.45} }
-  .cb-chips { display:flex; flex-wrap:wrap; gap:7px; padding:0 16px; flex:0 0 auto; max-height:118px; overflow-y:auto; scrollbar-width:none; }
-  .cb-chips::-webkit-scrollbar { display:none; }
-  .cb-chips:not(:empty) { padding-bottom:12px; padding-top:2px; }
-  .cb-chip { background:transparent; border:1px solid rgba(214,178,94,.3); color:var(--oro2); font-family:inherit; font-size:.78rem; line-height:1.2; padding:8px 13px; border-radius:999px; cursor:pointer; transition:all .18s; animation:entra .3s both; }
-  .cb-chip:hover { background:rgba(214,178,94,.14); border-color:var(--oro2); transform:translateY(-1px); }
-  .cb-abajo { border-top:1px solid rgba(255,255,255,.06); padding:10px 12px 12px; display:flex; gap:9px; align-items:center; flex:0 0 auto; background:rgba(7,7,8,.6); }
-  .cb-abajo input { flex:1; min-width:0; background:var(--negro); border:1px solid var(--linea); border-radius:999px; padding:11px 15px; color:var(--marfil); font-family:inherit; font-size:.87rem; }
-  .cb-abajo input:focus { border-color:rgba(214,178,94,.5); outline:none; }
-  .cb-enviar { width:38px; height:38px; border-radius:50%; border:none; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#161104; font-size:1rem; cursor:pointer; flex:none; transition:transform .15s; display:grid; place-items:center; }
-  .cb-enviar:hover { transform:scale(1.07); }
-  .cb-pie { display:none; }
-  .cb-cta { display:block; text-align:center; background:linear-gradient(180deg,var(--oro2),var(--oro)); color:#161104; font-weight:700; text-decoration:none; padding:13px; border-radius:10px; margin-top:4px; font-size:.9rem; animation:entra .35s both; }
-
-  footer { border-top:1px solid var(--linea); padding:48px 0 64px; background:var(--panel); }
-  footer .wrap { display:flex; flex-wrap:wrap; gap:30px; justify-content:space-between; align-items:flex-start; }
-  footer a { color:var(--oro2); text-decoration:none; font-weight:600; }
-  footer .col { display:grid; gap:6px; font-size:.9rem; color:var(--humo); }
-  footer .tiny { font-size:.74rem; color:var(--sombra); max-width:34em; }
+  footer { position:relative; z-index:2; border-top:1px solid var(--linea); padding:26px 0 32px; background:rgba(14,14,16,.7); backdrop-filter:blur(8px); }
+  footer .wrap { display:flex; flex-wrap:wrap; gap:14px 28px; justify-content:space-between; align-items:center; }
+  footer a { color:var(--oro2); text-decoration:none; font-weight:600; font-size:.88rem; }
+  footer .fine { font-size:.72rem; color:var(--sombra); }
 </style>
 </head>
 <body>
-<div class="progreso" id="progreso" aria-hidden="true"></div>
-<canvas id="pulso" aria-hidden="true"></canvas>
-<div class="atmos" aria-hidden="true"></div>
 
-<nav id="nav">
-  <div class="wrap">
-    <a class="logo" href="#top"><img src="assets/logo-emblema-1x1-web.jpg" alt="Lion AI"><b>LION <span>AI</span></b></a>
-    <div class="navlinks">
-      <a href="#sistema">El sistema</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#proceso">Cómo funciona</a>
-      <a href="#fundador">Quién está detrás</a>
-      <a class="btn small" href="#hablemos">Diagnóstico gratis</a>
-    </div>
-  </div>
-</nav>
-
-<header class="hero" id="top">
-  <video autoplay muted loop playsinline poster="assets/lion-poster.jpg" id="herovideo">
-    <source src="assets/lion-video.mp4" type="video/mp4">
+<div class="fondo" aria-hidden="true">
+  <video autoplay muted loop playsinline poster="/assets/lion-poster.jpg">
+    <source src="/assets/lion-video.mp4" type="video/mp4">
   </video>
-  <div class="wrap">
-    <div class="eyebrow linea-load d1"><i></i> Sistemas activos 24/7 &nbsp;·&nbsp; Miami, FL &nbsp;·&nbsp; Español &amp; English</div>
-    <h1 class="serif">
-      <span class="linea-load d2" style="display:block">Tu negocio no <span class="tach">nos quiere</span>.</span>
-      <span class="linea-load d3" style="display:block"><em>Nos necesita.</em></span>
-    </h1>
-    <p class="lede linea-load d3">Instalamos sistemas de inteligencia artificial que responden a tus clientes en segundos, agendan citas y persiguen cada venta — de día, de noche, sábados y domingos. Mientras tú diriges, el león caza.</p>
-    <div class="cta-row linea-load d4">
-      <a class="btn big" href="#hablemos">Cuéntanos qué necesitas →</a>
-      <a class="btn ghost" href="#sistema">Ver el sistema en acción</a>
-    </div>
-  </div>
-  <div class="scrollhint">Desliza</div>
-</header>
-
-<div class="cinta" aria-hidden="true">
-  <div class="cinta-inner" id="cinta">
-    <span>Respuesta en <b>segundos</b></span><span class="sep">◆</span><span>Disponibilidad <b>24/7</b></span><span class="sep">◆</span><span>Atención en <b>español e inglés</b></span><span class="sep">◆</span><span>Agendamiento <b>automático</b></span><span class="sep">◆</span><span>Seguimiento <b>continuo</b></span><span class="sep">◆</span><span>Cero llamadas <b>perdidas</b></span><span class="sep">◆</span><span>Lion Systems Group <b>· Miami, FL</b></span><span class="sep">◆</span>
-  </div>
 </div>
 
-<section>
+<main>
   <div class="wrap">
-    <div class="mono reveal">La matemática del problema</div>
-    <h2 class="serif reveal">Cada minuto sin responder tiene un precio. <em>Lo estás pagando tú.</em></h2>
-    <p class="sub reveal">Números medidos de la industria en Estados Unidos — no promesas nuestras.</p>
-    <div class="stats">
-      <div class="stat reveal"><div class="n" data-count="40" data-suffix="%">0%</div><p>de las llamadas a negocios llegan fuera del horario de oficina. Nadie las contesta.</p><small>CallRail · 18M de llamadas</small></div>
-      <div class="stat reveal"><div class="n" data-count="21" data-prefix="×">×0</div><p>más probabilidad de ganar el cliente si respondes en menos de 5 minutos.</p><small>Oldroyd / InsideSales · 100K+ llamadas</small></div>
-      <div class="stat reveal"><div class="n" data-count="47" data-suffix="%">0%</div><p>de las consultas online a negocios jamás reciben una respuesta. Ninguna.</p><small>DelPrete 2024 · estudio independiente</small></div>
-      <div class="stat reveal"><div class="n" data-count="78" data-suffix="%">0%</div><p>de los clientes le compra al primero que responde. No al mejor. Al primero.</p><small>Lead Connect · industria</small></div>
+    <div class="cab">
+      <img src="/assets/logo-emblema-1x1-web.jpg" alt="Lion Systems Group">
+      <h1 class="serif">LION SYSTEMS <span>GROUP</span></h1>
+      <p class="sub">Real estate investments &amp; AI automation. Florida.</p>
+      <p class="llc">Lion Systems Group LLC · Est. 2026</p>
     </div>
-  </div>
-</section>
 
-<section class="sec-line" id="sistema">
-  <div class="wrap">
-    <div class="demo-grid">
-      <div>
-        <div class="mono reveal">El sistema, en vivo</div>
-        <h2 class="serif reveal">Son las 11:47 de la noche. <em>Tu negocio está vendiendo.</em></h2>
-        <p class="sub reveal" style="margin-bottom:28px">Esto no es una animación decorativa: es exactamente lo que tu asistente Lion AI hace cada vez que un cliente escribe — detecta el idioma, responde con tus precios y tu tono, y cierra la cita en tu calendario.</p>
-        <a class="btn reveal" href="#hablemos">Quiero esto en mi negocio</a>
-      </div>
-      <div class="phone reveal" aria-label="Demostración del asistente respondiendo a las 11:47 PM">
-        <div class="phone-top">
-          <div class="phone-ava"><img src="assets/logo-emblema-1x1-web.jpg" alt=""></div>
-          <div><strong>Asistente Lion AI</strong><small>● en línea — siempre</small></div>
-          <span class="phone-hora">11:47 PM</span>
-        </div>
-        <div class="chat" id="chat"></div>
-      </div>
-    </div>
-  </div>
-</section>
+    <div class="puertas">
+      <a class="puerta" href="/deals/">
+        <span class="mono">Division 01</span>
+        <h2>Lion <b>Properties</b></h2>
+        <p>Off-market single-family deals in Duval County, Jacksonville. We source directly from motivated sellers and assign contracts to investors who close fast.</p>
+        <span class="donde">Jacksonville · Duval County, FL</span>
+        <span class="ir">For cash buyers &amp; investors <span>→</span></span>
+      </a>
 
-<section class="sec-line" id="servicios">
-  <div class="wrap">
-    <div class="mono reveal">Qué instalamos</div>
-    <h2 class="serif reveal">Si un proceso se repite, <em>se puede automatizar.</em></h2>
-    <p class="sub reveal">Los seis sistemas que más dinero recuperan — y no somos un menú fijo: somos el equipo técnico que tu operación no tiene.</p>
-    <div class="grid3">
-      <div class="card reveal"><span class="num">I</span><h3>Recepcionista IA bilingüe</h3><p>Contesta WhatsApp, SMS y tu web en segundos, con tus precios y tu tono. Detecta el idioma del cliente solo. Te avisa cuando alguien está listo para comprar.</p></div>
-      <div class="card reveal"><span class="num">II</span><h3>Ninguna llamada perdida</h3><p>Cada llamada que no alcanzas recibe un texto al instante. El cliente que iba a marcar al siguiente en Google, se queda contigo.</p></div>
-      <div class="card reveal"><span class="num">III</span><h3>Citas que se agendan solas</h3><p>El sistema agenda directo en tu calendario, confirma y recuerda. Las sillas vacías por citas olvidadas se acaban.</p></div>
-      <div class="card reveal"><span class="num">IV</span><h3>Seguimiento implacable</h3><p>El que preguntó y no compró recibe seguimiento automático los días 2, 5 y 9 — en tono humano. Ahí vive la mitad de tus ventas perdidas.</p></div>
-      <div class="card reveal"><span class="num">V</span><h3>Email marketing con IA</h3><p>Campañas que se escriben, se segmentan y se envían solas: bienvenida, clientes dormidos, promociones. Tu lista vuelve a producir.</p></div>
-      <div class="card reveal"><span class="num">VI</span><h3>Procesos internos</h3><p>Facturación, cotizaciones, reportes, onboarding, integraciones. Horas de trabajo manual convertidas en minutos.</p></div>
+      <a class="puerta" href="/ai/">
+        <span class="mono">Division 02</span>
+        <h2>Lion <b>AI</b></h2>
+        <p>Sistemas de inteligencia artificial que responden a tus clientes en segundos, agendan citas y hacen seguimiento de cada venta — 24/7, en español e inglés.</p>
+        <span class="donde">Miami · South Florida</span>
+        <span class="ir">Para negocios / for businesses <span>→</span></span>
+      </a>
     </div>
   </div>
-</section>
-
-<section class="sec-line" id="proceso">
-  <div class="wrap">
-    <div class="mono reveal">Cómo funciona</div>
-    <h2 class="serif reveal">De <em>"me duele"</em> a sistema funcionando en dos semanas.</h2>
-    <div class="fases" style="margin-top:52px">
-      <div class="fase reveal"><h3>Diagnóstico</h3><p>15 minutos, gratis, sin carreta técnica. Sales sabiendo exactamente qué se puede automatizar en TU negocio y cuánto te cuesta cada mes no hacerlo.</p></div>
-      <div class="fase destacada reveal"><h3>Demostración</h3><p>Te mostramos el sistema funcionando con tus datos reales: tu carta, tus precios, tu tono. Lo ves respondiendo como tu mejor empleado — antes de invertir un dólar en el proyecto.</p></div>
-      <div class="fase reveal"><h3>Instalación</h3><p>En 7–14 días está trabajando. Capacitamos a tu equipo y el primer mes incluye ajustes ilimitados: si algo no responde bien, lo corregimos hasta que lo haga.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="sec-line">
-  <div class="wrap">
-    <div class="mono reveal">Por qué Lion AI</div>
-    <h2 class="serif reveal">Contratar más personal <em>no era la respuesta.</em></h2>
-    <div class="tabla-shell reveal" style="margin-top:48px">
-      <table class="comp">
-        <tr><th style="color:var(--sombra)">&nbsp;</th><th>Recepcionista tradicional</th><th class="lion">Sistema Lion AI</th></tr>
-        <tr><td>Horario</td><td>8 horas, 5 días</td><td class="lion">24 horas, 365 días</td></tr>
-        <tr><td>Costo mensual</td><td>$2,500+ y subiendo</td><td class="lion">Una fracción — y fijo</td></tr>
-        <tr><td>Idiomas</td><td>Uno, a veces dos</td><td class="lion">Español e inglés, nativos</td></tr>
-        <tr><td>Responde en</td><td>Minutos… si no está ocupada</td><td class="lion">Menos de 5 segundos, siempre</td></tr>
-        <tr><td>Seguimiento a interesados</td><td>Cuando se acuerda</td><td class="lion">Automático: días 2, 5 y 9</td></tr>
-        <tr><td>Se enferma, renuncia, vacaciones</td><td>Sí</td><td class="lion">Jamás</td></tr>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section class="sec-line" id="fundador">
-  <div class="wrap">
-    <div class="fundador">
-      <img class="marca-agua" src="assets/logo-emblema-1x1-web.jpg" alt="" aria-hidden="true">
-      <div class="mono reveal">Quién está detrás</div>
-      <blockquote class="reveal">No te voy a vender promesas: la demostración es gratis y con los datos reales de tu negocio. Si viéndolo funcionar no te convence, no me debes ni las gracias.</blockquote>
-      <div class="quien reveal">
-        <b>ISNEL GARCIA</b>
-        Fundador · Lion Systems Group LLC · Miami, FL<br>
-        Empresa nueva, con hambre — y tecnología probada. Instalo y opero sistemas de automatización con IA todos los días, y tengo una sola obsesión: que tu negocio no pierda ni un cliente más.
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec-line" id="hablemos">
-  <div class="wrap">
-    <div class="form-shell">
-      <div>
-        <div class="mono reveal">El siguiente paso</div>
-        <h2 class="serif reveal">Cuéntanos qué <em>te está doliendo.</em></h2>
-        <p class="sub reveal">30 segundos. Llega directo a nuestro WhatsApp y te respondemos hoy mismo con un plan concreto para tu caso — no con un PDF genérico.</p>
-        <p class="sub reveal" style="margin-bottom:0">Y la promesa de siempre: si tu negocio todavía no necesita esto, te lo decimos de frente.</p>
-      </div>
-      <form id="formulario" class="reveal">
-        <label>Tu nombre
-          <input type="text" id="f-nombre" placeholder="Ej: Carlos Pérez" autocomplete="name">
-        </label>
-        <label>Tu negocio
-          <input type="text" id="f-negocio" placeholder="Ej: Clínica dental en Kendall">
-        </label>
-        <div>
-          <label style="margin-bottom:10px">¿Qué te está doliendo? (toca los que apliquen)</label>
-          <div class="chips" id="chips">
-            <span class="chip" tabindex="0">📞 Llamadas perdidas</span>
-            <span class="chip" tabindex="0">💬 WhatsApp saturado</span>
-            <span class="chip" tabindex="0">📅 Citas a mano</span>
-            <span class="chip" tabindex="0">🥶 Leads sin seguimiento</span>
-            <span class="chip" tabindex="0">📧 Email marketing</span>
-            <span class="chip" tabindex="0">⚙️ Procesos manuales</span>
-            <span class="chip" tabindex="0">🤷 Otra cosa</span>
-          </div>
-        </div>
-        <label>Cuéntanos más (opcional)
-          <textarea id="f-detalle" placeholder="Ej: se me pierden los mensajes de Instagram los fines de semana…"></textarea>
-        </label>
-        <button type="submit" class="btn big">Enviar por WhatsApp →</button>
-        <p class="form-nota">Se abre tu WhatsApp con el mensaje ya escrito — tú solo le das enviar. Sin bases de datos raras, sin spam.</p>
-      </form>
-    </div>
-  </div>
-</section>
+</main>
 
 <footer>
   <div class="wrap">
-    <div class="col">
-      <strong style="color:var(--marfil);font-family:Didot,'Bodoni 72',Georgia,serif;letter-spacing:.1em">LION SYSTEMS GROUP LLC</strong>
-      <a href="https://wa.me/13468231378">WhatsApp: +1 (346) 823-1378</a>
+    <div>
       <a href="mailto:isnel@lionsystemsgroup.com">isnel@lionsystemsgroup.com</a>
-      <span>Miami, Florida</span>
+      &nbsp;·&nbsp;
+      <a href="tel:+13468231378">(346) 823-1378</a>
     </div>
-    <p class="tiny">Automatización con inteligencia artificial para negocios del sur de Florida. Atención en español e inglés. © 2026 Lion Systems Group LLC. Todos los derechos reservados.</p>
+    <span class="fine">© 2026 Lion Systems Group LLC · Florida</span>
   </div>
 </footer>
-
-<script>
-(function () {
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  var cinta = document.getElementById('cinta');
-  cinta.innerHTML += cinta.innerHTML;
-
-  /* Fallback de la barra de progreso para navegadores sin scroll-timeline */
-  if (!CSS.supports('animation-timeline: scroll()') && !reduce) {
-    var barra = document.getElementById('progreso');
-    window.addEventListener('scroll', function () {
-      var h = document.documentElement;
-      barra.style.transform = 'scaleX(' + (h.scrollTop / (h.scrollHeight - h.clientHeight)) + ')';
-    }, { passive:true });
-  }
-
-  if (reduce) { var v = document.getElementById('herovideo'); if (v) { v.removeAttribute('autoplay'); v.pause(); } }
-
-  var guion = [
-    { tipo:'cliente', texto:'Hola! ¿Tienen cita disponible para mañana? 🙏', espera:900 },
-    { tipo:'ia', texto:'¡Hola! 😊 Claro que sí. Tengo 10:30 a.m. o 3:00 p.m. ¿Cuál te sirve más?', espera:1500, escribe:true },
-    { tipo:'cliente', texto:'La de 10:30 está perfecta', espera:1300 },
-    { tipo:'ia', texto:'Listo ✅ Quedaste para mañana a las 10:30 a.m. Te llega la confirmación por aquí. ¿Te ayudo con algo más?', espera:1600, escribe:true },
-    { tipo:'cliente', texto:'No, muchas gracias!! 🙌', espera:1200 },
-    { tipo:'ia', texto:'¡Con gusto! Te esperamos mañana. 🦁', espera:1400, escribe:true },
-    { tipo:'sistema', texto:'— El dueño estaba durmiendo. La venta se cerró igual. —', espera:3400 }
-  ];
-  var chat = document.getElementById('chat');
-  function burbuja(tipo, html) {
-    var d = document.createElement('div');
-    d.className = 'msg ' + tipo; d.innerHTML = html;
-    chat.appendChild(d);
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ d.classList.add('visible'); }); });
-    return d;
-  }
-  function correr(i) {
-    if (i >= guion.length) { setTimeout(function(){ chat.innerHTML=''; correr(0); }, 1400); return; }
-    var m = guion[i];
-    if (m.escribe && !reduce) {
-      var t = burbuja('ia', '<span class="typing"><i></i><i></i><i></i></span>');
-      setTimeout(function () { t.innerHTML = m.texto; setTimeout(function(){ correr(i+1); }, m.espera); }, 900);
-    } else {
-      burbuja(m.tipo, m.texto);
-      setTimeout(function(){ correr(i+1); }, reduce ? 500 : m.espera);
-    }
-  }
-  correr(0);
-
-  if ('IntersectionObserver' in window) {
-    var els = document.querySelectorAll('.reveal');
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        en.target.classList.add('in');
-        var n = en.target.querySelector ? en.target.querySelector('.n[data-count]') : null;
-        if (en.target.classList.contains('stat')) n = en.target.querySelector('.n[data-count]');
-        if (n && !n.dataset.hecho) {
-          n.dataset.hecho = 1;
-          var fin = +n.dataset.count, pre = n.dataset.prefix || '', suf = n.dataset.suffix || '';
-          if (reduce) { n.textContent = pre + fin + suf; }
-          else {
-            var t0 = null;
-            (function paso(ts) {
-              if (!t0) t0 = ts;
-              var p = Math.min((ts - t0) / 1300, 1);
-              n.textContent = pre + Math.round(fin * (1 - Math.pow(1 - p, 3))) + suf;
-              if (p < 1) requestAnimationFrame(paso);
-            })(performance.now());
-          }
-        }
-        io.unobserve(en.target);
-      });
-    }, { threshold:.18 });
-    els.forEach(function (e) { io.observe(e); });
-  } else {
-    document.querySelectorAll('.reveal').forEach(function(e){ e.classList.add('in'); });
-  }
-
-  var chips = document.querySelectorAll('.chip');
-  chips.forEach(function (c) {
-    function tog() { c.classList.toggle('on'); }
-    c.addEventListener('click', tog);
-    c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
-  });
-  document.getElementById('formulario').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var nombre = document.getElementById('f-nombre').value.trim();
-    var negocio = document.getElementById('f-negocio').value.trim();
-    var detalle = document.getElementById('f-detalle').value.trim();
-    var dolores = Array.prototype.filter.call(chips, function (c) { return c.classList.contains('on'); })
-      .map(function (c) { return c.textContent.trim(); }).join(', ');
-    var msg = 'Hola! Soy ' + (nombre || '—') + ', de ' + (negocio || '—') + '.'
-      + (dolores ? '\nMe está doliendo: ' + dolores + '.' : '')
-      + (detalle ? '\nDetalle: ' + detalle : '')
-      + '\nQuiero saber cómo lo automatizamos con Lion AI.';
-    window.open('https://wa.me/13468231378?text=' + encodeURIComponent(msg), '_blank');
-  });
-})();
-</script>
-
-<button id="lanza" aria-label="Abrir el asistente de Lion AI">
-  <span class="globo">¿Hablamos? <b>Respondo al instante</b></span>
-  <span class="disco"><img src="assets/logo-emblema-1x1-web.jpg" alt=""><span class="vivo"></span></span>
-</button>
-
-<section id="chatbox" role="dialog" aria-label="Asistente Lion AI" aria-modal="false">
-  <div class="cb-top">
-    <div class="av"><img src="assets/logo-emblema-1x1-web.jpg" alt=""></div>
-    <div class="quien"><strong>Asistente Lion AI</strong><small>● En línea · responde 24/7</small></div>
-    <button class="cb-x" id="cb-cerrar" aria-label="Cerrar">×</button>
-  </div>
-  <div class="cb-msgs" id="cb-msgs"></div>
-  <div class="cb-chips" id="cb-chips"></div>
-  <form class="cb-abajo" id="cb-form">
-    <input id="cb-input" type="text" placeholder="Escribe tu respuesta…" autocomplete="off" aria-label="Tu mensaje">
-    <button class="cb-enviar" type="submit" aria-label="Enviar">↑</button>
-  </form>
-  <div class="cb-pie">Asistente de Lion Systems Group · Miami</div>
-</section>
-
-<script>
-/* ===== ASISTENTE LION AI — el mismo tipo de sistema que instalamos ===== */
-(function () {
-  var CRM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzfaWHc2ky2HzWAJz64zFWS8ANlXSC7vkGnmThauEWdF7AY9XLtDaZ2L7n4DURrxboNdQ/exec';
-  var WA = '13468231378';
-
-  var lanza = document.getElementById('lanza'), caja = document.getElementById('chatbox');
-  var msgs = document.getElementById('cb-msgs'), chips = document.getElementById('cb-chips');
-  var form = document.getElementById('cb-form'), input = document.getElementById('cb-input');
-  if (!lanza || !caja) return;
-
-  var L = { rubro:'', dolor:'', nombre:'', contacto:'', negocio:'', notas:[],
-            rol:'', volumen:'', urgencia:'', score:0, nivel:'' };
-  var paso = 0, cerrado = false;
-
-  var NICHOS = {
-    dental:   { k:['dental','dentista','odont','clinica dental','ortodon'], t:'clínica dental',
-                d:'La ADA reporta que las citas perdidas son la razón #1 de huecos en la agenda — y un solo no-show diario cuesta entre $20,000 y $70,000 al año.' },
-    estetica: { k:['spa','estetic','estétic','botox','belleza','medspa','med spa','cosmet'], t:'centro de estética',
-                d:'La visita promedio en un med spa es de $527 (AmSpa 2024). Dos consultas frías por semana son más de $4,000 al mes yéndose a la competencia.' },
-    inmob:    { k:['inmobil','realtor','bienes raices','bienes raíces','propiedad','real estate'], t:'inmobiliaria',
-                d:'Un estudio de 2024 encontró que el 47% de las consultas online a agentes jamás recibe respuesta. Y una sola comisión en Miami son $10,000 o más.' },
-    resto:    { k:['restaurant','comida','cocina','catering','panader','cafe','café','food'], t:'restaurante',
-                d:'El 71% de las llamadas a un restaurante son de dinero: reservas, pedidos y catering. En hora pico, hasta la mitad se pierden sin contestar.' },
-    hogar:    { k:['aire','hvac','plomer','plumb','remodel','techo','roof','construc','contratista','electric'], t:'empresa de servicios',
-                d:'ServiceTitan midió en más de 3,000 negocios del gremio que los equipos pequeños solo logran agendar el 24% de sus llamadas.' },
-    fitness:  { k:['gym','gimnasio','fitness','pilates','yoga','entrena','crossfit'], t:'gimnasio',
-                d:'El que pide su clase de prueba de noche y no recibe respuesta hasta el otro día, ya perdió el impulso — y con él, una membresía anual.' },
-    academia: { k:['academia','escuela','clase','tutor','curso','music','idioma','school'], t:'academia',
-                d:'Cada familia que pregunta y no recibe respuesta el mismo día se matricula en otro lado — y una matrícula son cientos de dólares al mes durante años.' },
-    ecom:     { k:['tienda','ecommerce','e-commerce','shopify','online','venta online','producto'], t:'tienda online',
-                d:'Cerca del 70% de los carritos se abandonan. Recuperarlos por WhatsApp convierte entre 5% y 15% — el email no llega ni al 2%.' },
-    otro:     { k:[], t:'negocio',
-                d:'El 40% de las llamadas a negocios pequeños entra fuera del horario de oficina (CallRail, 18 millones de llamadas) — y el 78% de los clientes le compra al primero que responde.' }
-  };
-
-  function detecta(txt) {
-    var t = (txt || '').toLowerCase();
-    for (var k in NICHOS) { for (var i = 0; i < NICHOS[k].k.length; i++) { if (t.indexOf(NICHOS[k].k[i]) !== -1) return k; } }
-    return null;
-  }
-  function abajo() { msgs.scrollTop = msgs.scrollHeight; }
-  function burbuja(txt, clase) {
-    var d = document.createElement('div');
-    d.className = 'cb-b ' + (clase || 'bot'); d.innerHTML = txt;
-    msgs.appendChild(d); abajo(); return d;
-  }
-  function escribiendo(ms, luego) {
-    var e = document.createElement('div');
-    e.className = 'cb-esc'; e.innerHTML = '<i></i><i></i><i></i>';
-    msgs.appendChild(e); abajo();
-    setTimeout(function () { e.remove(); luego(); }, ms);
-  }
-  function bot(txt, clase, ms, luego) {
-    escribiendo(ms || (600 + Math.min(txt.length * 12, 1100)), function () {
-      burbuja(txt, clase); if (luego) luego();
-    });
-  }
-  function opciones(lista, fn) {
-    chips.innerHTML = '';
-    lista.forEach(function (o, i) {
-      var b = document.createElement('button');
-      b.type = 'button'; b.className = 'cb-chip'; b.textContent = o;
-      b.style.animationDelay = (i * 0.05) + 's';
-      b.onclick = function () { chips.innerHTML = ''; burbuja(o, 'yo'); fn(o); };
-      chips.appendChild(b);
-    });
-  }
-
-  /* ---------- guion ---------- */
-  function arranca() {
-    if (msgs.children.length) return;
-    bot('Hola 👋 Soy el asistente de <b>Lion AI</b>. Yo soy un ejemplo de lo que instalamos: respondo al instante, a cualquier hora.', 'bot', 700, function () {
-      bot('Para decirte algo útil y no genérico: <b>¿en qué rubro está tu negocio?</b>', 'bot', 900, function () {
-        opciones(['🦷 Salud / dental', '💆 Estética', '🏠 Inmobiliaria', '🍽️ Restaurante', '🔧 Servicios del hogar', '💪 Gimnasio', '📚 Academia', '🛍️ Tienda online', 'Otro'], rubroElegido);
-      });
-    });
-  }
-  function rubroElegido(txt) {
-    var k = detecta(txt) || 'otro';
-    L.rubro = NICHOS[k].t; L.notas.push('Rubro: ' + txt);
-    bot('Perfecto. Con ' + (k === 'otro' ? 'tu tipo de negocio' : 'las ' + L.rubro + 's') + ' vemos siempre el mismo patrón:', 'bot', 700, function () {
-      bot(NICHOS[k].d, 'dato', 900, function () {
-        bot('¿Y hoy cómo atienden a los clientes que escriben o llaman?', 'bot', 800, function () {
-          opciones(['Yo mismo, cuando puedo', 'Alguien del equipo', 'Solo en horario de oficina', 'Se nos pierden mensajes'], dolorElegido);
-        });
-      });
-    });
-  }
-  function dolorElegido(txt) {
-    L.dolor = txt; L.notas.push('Atención actual: ' + txt);
-    if (/pierden/i.test(txt)) L.score += 2; else if (/oficina|mismo/i.test(txt)) L.score += 1;
-    bot('Gracias, eso me dice mucho. Ahí es justo donde entra el sistema: responde en segundos las 24 horas y le hace seguimiento a cada interesado.', 'bot', 950, function () {
-      bot('Para saber si te conviene de verdad — y no hacerte perder el tiempo: <b>¿cuántos clientes nuevos te contactan al mes, más o menos?</b>', 'bot', 950, function () {
-        opciones(['Menos de 20', 'Entre 20 y 50', 'Entre 50 y 200', 'Más de 200'], volumenElegido);
-      });
-    });
-  }
-  function volumenElegido(txt) {
-    L.volumen = txt; L.notas.push('Volumen: ' + txt);
-    if (/Más de 200/.test(txt)) L.score += 3;
-    else if (/50 y 200/.test(txt)) L.score += 3;
-    else if (/20 y 50/.test(txt)) L.score += 2;
-    else L.score += 0;
-    var msg = /Menos de 20/.test(txt)
-      ? 'Perfecto, gracias por la franqueza.'
-      : 'Con ese volumen la matemática es clarísima: aunque recuperes solo un puñado al mes, el sistema ya se pagó.';
-    bot(msg, 'bot', 800, function () {
-      bot('¿Y tú <b>tomas las decisiones</b> del negocio o hay alguien más que las aprueba?', 'bot', 900, function () {
-        opciones(['Soy el dueño', 'Soy socio o gerente', 'Consulto con otra persona', 'Solo estoy investigando'], rolElegido);
-      });
-    });
-  }
-  function rolElegido(txt) {
-    L.rol = txt; L.notas.push('Rol: ' + txt);
-    if (/dueño/i.test(txt)) L.score += 3;
-    else if (/socio|gerente/i.test(txt)) L.score += 2;
-    else if (/Consulto/i.test(txt)) L.score += 1;
-    bot('Entendido.', 'bot', 550, function () {
-      bot('Última cosa y te dejo tranquilo: <b>¿para cuándo te gustaría tenerlo funcionando?</b>', 'bot', 850, function () {
-        opciones(['Lo antes posible', 'Este mes', 'En unos meses', 'Solo estoy mirando'], urgenciaElegida);
-      });
-    });
-  }
-  function urgenciaElegida(txt) {
-    L.urgencia = txt; L.notas.push('Urgencia: ' + txt);
-    if (/antes posible/i.test(txt)) L.score += 3;
-    else if (/Este mes/i.test(txt)) L.score += 2;
-    else if (/unos meses/i.test(txt)) L.score += 1;
-
-    L.nivel = L.score >= 7 ? 'CALIENTE' : (L.score >= 4 ? 'TIBIO' : 'FRIO');
-
-    if (L.nivel === 'FRIO') { despedida(); return; }
-
-    var frase = L.nivel === 'CALIENTE'
-      ? 'Tu caso es de los que resolvemos rápido y bien. Vale la pena que lo veas funcionando <b>con los datos reales de tu negocio</b> — son 15 minutos y es gratis.'
-      : 'Con lo que me cuentas, creo que te sirve. Te propongo verlo funcionando con tus datos reales: 15 minutos, gratis, sin compromiso.';
-    bot(frase, 'bot', 1000, function () {
-      bot('¿Cómo te llamas?', 'bot', 600, function () { paso = 1; input.placeholder = 'Tu nombre…'; input.focus(); });
-    });
-  }
-  function despedida() {
-    bot('Te voy a ser honesto, que es como trabajamos: por lo que me cuentas, <b>hoy todavía no te conviene invertir en esto</b> — y prefiero decírtelo antes que venderte algo que no vas a aprovechar.', 'bot', 1100, function () {
-      bot('Lo que sí te sirve ahora mismo: responde siempre en menos de 5 minutos, aunque sea con un mensaje corto. Eso solo ya te sube las ventas, y es gratis.', 'bot', 1100, function () {
-        bot('Cuando el volumen te desborde o quieras dejar de perder los mensajes de la noche, aquí estaremos. ¿Te dejo el WhatsApp por si acaso?', 'bot', 950, function () {
-          opciones(['Sí, guárdame el contacto', 'Gracias, luego vuelvo'], function (r) {
-            if (/Sí/.test(r)) {
-              paso = 1; L.notas.push('Lead frío: pidió contacto igual');
-              bot('Claro. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); });
-            } else {
-              L.nombre = L.nombre || 'Visitante';
-              bot('Con gusto. Éxitos con tu negocio 🦁', 'bot', 600, guarda);
-            }
-          });
-        });
-      });
-    });
-  }
-  function libre(txt) {
-    if (paso === 1) {
-      L.nombre = txt; paso = 2;
-      bot('Un gusto, ' + txt.split(' ')[0] + '. ¿Cómo se llama tu negocio?', 'bot', 700, function () {
-        input.placeholder = 'Nombre del negocio…';
-      });
-      return;
-    }
-    if (paso === 2) {
-      L.negocio = txt; paso = 3;
-      bot('Anotado. Por último, <b>¿a qué número de WhatsApp o correo te contactamos</b> para coordinar la demostración?', 'bot', 800, function () {
-        input.placeholder = 'WhatsApp o correo…';
-      });
-      return;
-    }
-    if (paso === 3) {
-      L.contacto = txt; paso = 4;
-      cierra();
-      return;
-    }
-    /* fuera del guion: intenta entender por palabras clave */
-    var k = detecta(txt);
-    if (k) { rubroElegido(txt); return; }
-    var t = txt.toLowerCase();
-    if (/precio|costo|cuanto|cuánto|vale|tarifa/.test(t)) {
-      bot('El precio depende de lo que tu operación necesite — por eso primero hacemos la demostración gratuita: sales sabiendo qué se puede automatizar y cuánto te cuesta hoy no hacerlo. ¿Te va bien si coordinamos esos 15 minutos?', 'bot', 900, function () {
-        opciones(['Sí, coordinemos', 'Antes tengo otra duda'], function (r) {
-          if (r.indexOf('Sí') === 0) { paso = 1; bot('Genial. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
-          else bot('Claro, dime — te leo.', 'bot', 500);
-        });
-      });
-      return;
-    }
-    if (/tiempo|cuanto tarda|demora|instalar|implement/.test(t)) {
-      bot('La instalación toma entre 7 y 14 días, y el primer mes incluye ajustes ilimitados. ¿Quieres que coordinemos la demostración para que lo veas con tus datos?', 'bot', 900, function () {
-        opciones(['Sí, coordinemos', 'Todavía no'], function (r) {
-          if (r.indexOf('Sí') === 0) { paso = 1; bot('Perfecto. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
-          else bot('Sin problema. Aquí estaré cuando quieras.', 'bot', 500);
-        });
-      });
-      return;
-    }
-    L.notas.push('Dijo: ' + txt);
-    bot('Te entiendo. Para darte una respuesta concreta a eso y no marearte con generalidades, lo mejor es que lo veas aplicado a tu caso en la demostración de 15 minutos. ¿Cómo te llamas?', 'bot', 900, function () {
-      paso = 1; input.placeholder = 'Tu nombre…'; input.focus();
-    });
-  }
-  function cierra() {
-    var resumen = 'Hola Isnel! Soy ' + (L.nombre || '—') + (L.negocio ? ', de ' + L.negocio : '') + '.'
-      + (L.rubro ? '\nRubro: ' + L.rubro + '.' : '')
-      + (L.rol ? '\nEn el negocio: ' + L.rol + '.' : '')
-      + (L.volumen ? '\nClientes nuevos al mes: ' + L.volumen + '.' : '')
-      + (L.dolor ? '\nHoy atendemos así: ' + L.dolor + '.' : '')
-      + (L.urgencia ? '\nQuiero tenerlo: ' + L.urgencia + '.' : '')
-      + (L.contacto ? '\nMi contacto: ' + L.contacto : '')
-      + (L.nivel === 'FRIO' ? '\nPor ahora solo quiero dejar mi contacto.' : '\nQuiero coordinar la demostración de 15 minutos.');
-    bot('Listo, ' + (L.nombre || '').split(' ')[0] + '. Ya tengo todo lo necesario ✅', 'bot', 800, function () {
-      bot(L.nivel === 'FRIO'
-          ? 'Toca el botón y le dejas tu contacto a Isnel — te escribirá cuando sea el momento.'
-          : 'Toca el botón y te llevo directo al WhatsApp de Isnel con el resumen escrito — solo le das enviar y coordinamos la hora.', 'bot', 900, function () {
-        var a = document.createElement('a');
-        a.className = 'cb-cta'; a.target = '_blank'; a.rel = 'noopener';
-        a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(resumen);
-        a.textContent = L.nivel === 'FRIO' ? 'Dejar mi contacto →' : 'Enviar y coordinar mi demostración →';
-        msgs.appendChild(a); abajo();
-        input.placeholder = 'Escribe si necesitas algo más…';
-        guarda();
-      });
-    });
-  }
-  function guarda() {
-    if (!CRM_ENDPOINT) return;
-    var icono = L.nivel === 'CALIENTE' ? '🔥' : (L.nivel === 'TIBIO' ? '🟡' : '⚪');
-    var d = { nombre:L.nombre, negocio:L.negocio, rubro:L.rubro, contacto:L.contacto,
-              dolor:L.dolor, origen:'chatbox web',
-              notas: icono + ' ' + (L.nivel || 'SIN CALIFICAR') + ' (' + L.score + '/10) · '
-                     + [L.rol, L.volumen, L.urgencia].filter(Boolean).join(' · ')
-                     + (L.notas.length ? ' · ' + L.notas.join(' | ') : '') };
-    /* GET con parámetros: el método que Apps Script sirve sin fricción de CORS */
-    var q = Object.keys(d).map(function (k) {
-      return encodeURIComponent(k) + '=' + encodeURIComponent((d[k] || '').toString().slice(0, 400));
-    }).join('&');
-    try { fetch(CRM_ENDPOINT + '?' + q, { method:'GET', mode:'no-cors', cache:'no-store' }); }
-    catch (e) { try { new Image().src = CRM_ENDPOINT + '?' + q; } catch (e2) {} }
-  }
-
-  /* ---------- interacción ---------- */
-  function abre() {
-    caja.classList.add('abierto'); lanza.classList.add('oculto');
-    arranca(); setTimeout(function(){ if (window.innerWidth > 560) input.focus(); }, 350);
-  }
-  function tapa() { caja.classList.remove('abierto'); lanza.classList.remove('oculto'); }
-  lanza.addEventListener('click', abre);
-  document.getElementById('cb-cerrar').addEventListener('click', tapa);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && caja.classList.contains('abierto')) tapa(); });
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var v = input.value.trim(); if (!v) return;
-    burbuja(v, 'yo'); input.value = ''; chips.innerHTML = '';
-    setTimeout(function(){ libre(v); }, 220);
-  });
-
-  /* invitación discreta: si el visitante llega al final sin abrirlo */
-  var invitado = false;
-  addEventListener('scroll', function () {
-    if (invitado || cerrado) return;
-    var h = document.documentElement;
-    if (h.scrollTop / (h.scrollHeight - h.clientHeight) > 0.55) {
-      invitado = true;
-      lanza.querySelector('.globo').innerHTML = '¿Te muestro cómo funciona? <b>Pregúntame</b>';
-    }
-  }, { passive:true });
-})();
-</script>
-
-<script>
-/* ===== EL PULSO DEL SISTEMA — orbe dorado que desciende con el scroll
-   encendiendo la red neuronal del fondo. Vive DETRÁS del contenido. ===== */
-(function () {
-  var cv = document.getElementById('pulso');
-  if (!cv || !cv.getContext) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  var ctx = cv.getContext('2d'), W = 0, H = 0, dpr = Math.min(devicePixelRatio || 1, 2);
-  var nodos = [], chispas = [], estela = [];
-
-  function medir() {
-    W = innerWidth; H = innerHeight;
-    cv.width = W * dpr; cv.height = H * dpr;
-    cv.style.width = W + 'px'; cv.style.height = H + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    nodos = [];
-    var cols = W < 700 ? 4 : 7, filas = W < 700 ? 7 : 6;
-    for (var i = 0; i < cols; i++) {
-      for (var j = 0; j < filas; j++) {
-        nodos.push({
-          bx: (i + 0.5) / cols * W + (Math.random() - 0.5) * (W / cols) * 0.6,
-          by: (j + 0.5) / filas * H + (Math.random() - 0.5) * (H / filas) * 0.6,
-          x: 0, y: 0, f: Math.random() * 6.28, v: 0.25 + Math.random() * 0.5,
-          r: 8 + Math.random() * 16, luz: 0
-        });
-      }
-    }
-  }
-  medir();
-  addEventListener('resize', medir);
-
-  var pT = 0, pS = 0, vel = 0, prev = 0;
-  addEventListener('scroll', function () {
-    var h = document.documentElement;
-    var np = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
-    vel = Math.min(1, Math.abs(np - prev) * 26); prev = np; pT = np;
-    manda = 0;                       /* el scroll retoma el mando */
-  }, { passive: true });
-
-  /* EL ORBE SIGUE EL CURSOR: manda=1 mientras el mouse se mueve; al quedarse
-     quieto o al hacer scroll, el orbe regresa suavemente a su carril. */
-  var mx = 0, my = 0, manda = 0, mando = 0, quieto;
-  var ox = innerWidth * 0.78, oy = innerHeight * 0.14;
-  addEventListener('pointermove', function (e) {
-    if (e.pointerType === 'touch') return;
-    mx = e.clientX; my = e.clientY; manda = 1;
-    vel = Math.min(1, Math.max(vel, Math.hypot(e.movementX || 0, e.movementY || 0) / 26));
-    clearTimeout(quieto);
-    quieto = setTimeout(function () { manda = 0; }, 2600);
-  }, { passive: true });
-  addEventListener('pointerleave', function () { manda = 0; });
-
-  var t0 = performance.now();
-  (function frame(now) {
-    var t = (now - t0) / 1000;
-    pS += (pT - pS) * 0.09;
-    vel *= 0.93;
-    cv.classList.toggle('on', pS > 0.015 || pT > 0.015 || manda === 1 || mando > 0.02);
-
-    /* carril del scroll (reposo) */
-    var cx = W * (W < 700 ? 0.84 : 0.78) + Math.sin(t * 0.7) * 26;
-    var cy = H * 0.14 + pS * H * 0.72;
-
-    /* mezcla suave entre carril y cursor */
-    mando += ((manda ? 1 : 0) - mando) * 0.06;
-    var tx = cx + (mx - cx) * mando;
-    var ty = cy + (my - cy) * mando;
-    ox += (tx - ox) * 0.12;
-    oy += (ty - oy) * 0.12;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.globalCompositeOperation = 'lighter';
-
-    /* rastro: la costura dorada por donde ya pasó (se atenúa al tomar el cursor) */
-    var op = (0.16 + vel * 0.2) * (1 - mando * 0.75);
-    var g0 = ctx.createLinearGradient(cx, H * 0.14, cx, cy);
-    g0.addColorStop(0, 'rgba(214,178,94,0)');
-    g0.addColorStop(1, 'rgba(214,178,94,' + op + ')');
-    ctx.strokeStyle = g0; ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.moveTo(cx, H * 0.14); ctx.lineTo(cx, cy); ctx.stroke();
-
-    /* nodos: deriva suave + encendido al paso del orbe */
-    for (var i = 0; i < nodos.length; i++) {
-      var n = nodos[i];
-      n.x = n.bx + Math.cos(t * n.v + n.f) * n.r;
-      n.y = n.by + Math.sin(t * n.v * 0.8 + n.f) * n.r;
-      var d = Math.hypot(n.x - ox, n.y - oy);
-      var alcance = 240 + vel * 120;
-      if (d < alcance) n.luz = Math.max(n.luz, 1 - d / alcance);
-      n.luz *= 0.965;
-    }
-
-    /* conexiones */
-    for (var a = 0; a < nodos.length; a++) {
-      for (var b = a + 1; b < nodos.length; b++) {
-        var p = nodos[a], q = nodos[b];
-        var dx = p.x - q.x, dy = p.y - q.y, dd = dx * dx + dy * dy;
-        var lim = W < 700 ? 34000 : 46000;
-        if (dd > lim) continue;
-        var base = 0.05 * (1 - dd / lim);
-        var viva = Math.max(p.luz, q.luz);
-        ctx.strokeStyle = 'rgba(214,178,94,' + (base + viva * 0.5 * (1 - dd / lim)) + ')';
-        ctx.lineWidth = 0.6 + viva * 1.4;
-        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
-      }
-    }
-
-    /* puntos */
-    for (var k = 0; k < nodos.length; k++) {
-      var m = nodos[k];
-      var rr = 1.3 + m.luz * 3.4;
-      ctx.fillStyle = 'rgba(240,212,138,' + (0.18 + m.luz * 0.8) + ')';
-      ctx.beginPath(); ctx.arc(m.x, m.y, rr, 0, 6.2832); ctx.fill();
-      if (m.luz > 0.25) {
-        var gl = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 26 * m.luz);
-        gl.addColorStop(0, 'rgba(240,212,138,' + m.luz * 0.28 + ')');
-        gl.addColorStop(1, 'rgba(240,212,138,0)');
-        ctx.fillStyle = gl;
-        ctx.beginPath(); ctx.arc(m.x, m.y, 26 * m.luz, 0, 6.2832); ctx.fill();
-      }
-    }
-
-    /* chispas que caen del orbe */
-    if (chispas.length < 90 && Math.random() < 0.55 + vel) {
-      chispas.push({ x: ox + (Math.random() - 0.5) * 14, y: oy + (Math.random() - 0.5) * 14,
-        vx: (Math.random() - 0.5) * 0.5, vy: 0.35 + Math.random() * 1.1, v: 1 });
-    }
-    for (var c = chispas.length - 1; c >= 0; c--) {
-      var s = chispas[c];
-      s.x += s.vx; s.y += s.vy; s.v -= 0.012;
-      if (s.v <= 0) { chispas.splice(c, 1); continue; }
-      ctx.fillStyle = 'rgba(240,212,138,' + s.v * 0.55 + ')';
-      ctx.beginPath(); ctx.arc(s.x, s.y, 1.1 * s.v, 0, 6.2832); ctx.fill();
-    }
-
-    /* el orbe */
-    var halo = 40 + vel * 60 + Math.sin(t * 2.4) * 5;
-    var g1 = ctx.createRadialGradient(ox, oy, 0, ox, oy, halo);
-    g1.addColorStop(0, 'rgba(255,240,200,.95)');
-    g1.addColorStop(0.14, 'rgba(240,212,138,.55)');
-    g1.addColorStop(0.45, 'rgba(214,178,94,.16)');
-    g1.addColorStop(1, 'rgba(214,178,94,0)');
-    ctx.fillStyle = g1;
-    ctx.beginPath(); ctx.arc(ox, oy, halo, 0, 6.2832); ctx.fill();
-    ctx.fillStyle = 'rgba(255,248,226,.95)';
-    ctx.beginPath(); ctx.arc(ox, oy, 3.4 + vel * 2.6, 0, 6.2832); ctx.fill();
-
-    /* anillo de energía al moverse rápido */
-    if (vel > 0.06) {
-      ctx.strokeStyle = 'rgba(240,212,138,' + vel * 0.5 + ')';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(ox, oy, 16 + vel * 46, 0, 6.2832); ctx.stroke();
-    }
-
-    ctx.globalCompositeOperation = 'source-over';
-    requestAnimationFrame(frame);
-  })(t0);
-})();
-</script>
 
 </body>
 </html>
