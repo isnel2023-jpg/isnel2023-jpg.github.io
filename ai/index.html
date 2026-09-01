@@ -582,6 +582,27 @@
      Cada tema: palabras que lo disparan + la respuesta. El asistente responde
      cualquier pregunta que caiga aquí, en cualquier orden, sin guion rígido. */
   var KB = [
+    { k:['hola','buenas','buenos dias','buenos días','buenas tardes','buenas noches','que tal','qué tal','saludos','hey'],
+      r:'¡Hola! 👋 Muy bien por aquí, gracias por preguntar. ¿En qué te ayudo — quieres saber qué hacemos, cuánto cuesta, o me cuentas de tu negocio?' },
+
+    { k:['como estas','cómo estás','como esta','cómo está','como va','todo bien','que hay','qué hay'],
+      r:'Muy bien, gracias 😊 Aquí despierto a cualquier hora — literalmente, ese es mi trabajo. ¿Y tú, en qué andas? ¿Buscando cómo no perder clientes o solo curioseando cómo funciona esto?' },
+
+    { k:['eres humano','eres robot','eres real','eres una persona','eres un bot','eres ia','eres inteligencia'],
+      r:'Soy una inteligencia artificial, sí — y precisamente por eso estoy aquí a esta hora contestándote. Este mismo tipo de asistente es el que le instalamos a los negocios: uno que atiende cuando el dueño está durmiendo o con un cliente. Si en algún momento necesitas hablar con Isnel de verdad, te paso su WhatsApp.' },
+
+    { k:['como te llamas','cómo te llamas','tu nombre','quien eres tu','quién eres tú'],
+      r:'Soy el asistente de Lion AI. Trabajo para Isnel García, que es quien está detrás de todo esto aquí en Miami. ¿Te cuento qué hacemos?' },
+
+    { k:['adios','adiós','chao','chau','hasta luego','nos vemos','bye'],
+      r:'¡Con gusto! Aquí estaré cuando quieras, a la hora que sea. Y si en algún momento te desborda el teléfono del negocio, ya sabes dónde encontrarnos 🦁' },
+
+    { k:['no se','no sé','ninguna','nada','solo miraba','curioseando','solo veia','solo veía'],
+      r:'Tranquilo, mira con calma. Si te da curiosidad: lo que hacemos es que ningún cliente que te escriba o te llame se quede sin respuesta, ni de noche ni los domingos. ¿Tienes un negocio o estás viendo por otra cosa?' },
+
+    { k:['ayuda','ayudame','ayúdame','necesito','problema','tengo un problema'],
+      r:'Claro, cuéntame qué está pasando. ¿Es que se te pierden llamadas o mensajes, que no das abasto con la atención, o algo distinto? Con que me digas por dónde va, te digo si esto te sirve o no.' },
+
     { k:['precio','cuesta','costo','vale','cuanto','cuánto','tarifa','presupuesto','inversion','inversión','caro','barato','cobran','pagar'],
       r:'Depende de lo que tu negocio necesite, y prefiero no tirarte un número al aire. El rango va desde <b>$497 de instalación más $197 al mes</b> (lo básico: contestar llamadas perdidas y preguntas frecuentes) hasta <b>$1,997 más $497 al mes</b> (el sistema completo con agendamiento y seguimiento). Casi siempre sale menos que un empleado de medio tiempo, y trabaja las 24 horas.<br><br>En la demostración gratuita te doy el número exacto para tu caso. ¿Te la agendo?' },
 
@@ -818,8 +839,16 @@
       return;
     }
     L.notas.push('Preguntó: '+txt);
-    bot('Buena pregunta. Para responderte con algo útil y no genérico, cuéntame: <b>¿a qué se dedica tu negocio?</b> Con eso te digo exactamente cómo aplicaría en tu caso.','bot',800,function(){
-      opciones(['Clínica o consultorio','Restaurante','Servicios del hogar','Otro tipo de negocio'], entrada);
+    var salidas=[
+      'Mmm, esa no me la sé de memoria — y prefiero no inventarte nada. Isnel te la responde en dos minutos por WhatsApp. ¿O prefieres que te cuente primero qué hacemos?',
+      'Esa se me escapa. Lo que sí te puedo decir: si tu negocio pierde clientes porque nadie contesta a tiempo, ahí sí soy útil. ¿Es tu caso?',
+      'No tengo esa respuesta a la mano, y no te voy a improvisar. ¿Te cuento mejor cómo funciona lo nuestro, o te paso directo con Isnel?'
+    ];
+    bot(salidas[Math.floor(Math.random()*salidas.length)],'bot',700,function(){
+      opciones(['¿Qué hacen exactamente?','Hablar con Isnel','Tengo un negocio y quiero saber'], function(r){
+        if(/Isnel/.test(r)){ paso=1; bot('Perfecto. ¿Cómo te llamas?','bot',600,function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
+        else entrada(r);
+      });
     });
   }
 
