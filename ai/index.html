@@ -565,8 +565,7 @@
 /* ===== ASISTENTE LION AI v2 — conversación abierta con IA ===== */
 (function () {
   var CRM = 'https://script.google.com/macros/s/AKfycbzfaWHc2ky2HzWAJz64zFWS8ANlXSC7vkGnmThauEWdF7AY9XLtDaZ2L7n4DURrxboNdQ/exec';
-  /* Cuando montes el Worker de Cloudflare, pega su URL aquí y el asistente pasa a IA real */
-  var IA = '';
+  var IA = 'https://lion-ai.resonant-shroud-af6.workers.dev';
   var WA = '13468231378';
 
   var lanza = document.getElementById('lanza'), caja = document.getElementById('chatbox');
@@ -856,18 +855,35 @@
   function preguntaIA(txt){
     var e=document.createElement('div'); e.className='cb-esc'; e.innerHTML='<i></i><i></i><i></i>';
     msgs.appendChild(e); abajo();
+    var cerrado=false;
+    function local(){
+      if(cerrado) return; cerrado=true; e.remove();
+      var kb=buscaKB(txt);
+      if(kb){ burbuja(kb.r,'bot'); historial.push({r:'a',t:kb.r}); }
+      else {
+        var salidas=['Mmm, esa no me la sé de memoria — y prefiero no inventarte nada. Isnel te la responde en dos minutos por WhatsApp. ¿O prefieres que te cuente primero qué hacemos?',
+          'Esa se me escapa. Lo que sí te puedo decir: si tu negocio pierde clientes porque nadie contesta a tiempo, ahí sí soy útil. ¿Es tu caso?'];
+        var t=salidas[Math.floor(Math.random()*salidas.length)];
+        burbuja(t,'bot'); historial.push({r:'a',t:t});
+      }
+    }
+    var reloj=setTimeout(local,14000);
+    var ctl = window.AbortController ? new AbortController() : null;
     fetch(IA,{method:'POST',headers:{'Content-Type':'application/json'},
+      signal: ctl?ctl.signal:undefined,
       body:JSON.stringify({ mensajes:historial.slice(-12), lead:L })})
       .then(function(r){ return r.json(); })
-      .then(function(d){ e.remove();
-        var t=(d&&d.texto)||'Perdona, se me trabó la respuesta. ¿Me lo repites?';
+      .then(function(d){
+        if(cerrado) return;
+        var t=(d&&d.texto)||'';
+        if(!t || /se me trab/i.test(t)){ local(); return; }
+        cerrado=true; clearTimeout(reloj); e.remove();
         burbuja(t,'bot'); historial.push({r:'a',t:t});
-        if(d&&d.cerrar&&paso===0){ setTimeout(function(){ bot('¿Te agendo la demostración de 15 minutos? ¿Cómo te llamas?','bot',600,function(){ paso=1; input.focus(); }); },700); }
+        if(d.nota) L.notas.push(d.nota);
+        if(d.caliente){ L.score=Math.max(L.score,70);
+          if(paso===0){ setTimeout(function(){ bot('¿Te agendo la demostración de 15 minutos con Isnel? ¿Cómo te llamas?','bot',700,function(){ paso=1; input.placeholder='Tu nombre…'; input.focus(); }); },900); } }
       })
-      .catch(function(){ e.remove();
-        var kb=buscaKB(txt);
-        burbuja(kb?kb.r:'Perdona, no te entendí bien. ¿Me cuentas de qué es tu negocio?','bot');
-      });
+      .catch(function(){ clearTimeout(reloj); local(); });
   }
 
   function cierra(){
