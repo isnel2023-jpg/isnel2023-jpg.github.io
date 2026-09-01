@@ -562,9 +562,11 @@
 </section>
 
 <script>
-/* ===== ASISTENTE LION AI — el mismo tipo de sistema que instalamos ===== */
+/* ===== ASISTENTE LION AI v2 — conversación abierta con IA ===== */
 (function () {
-  var CRM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzfaWHc2ky2HzWAJz64zFWS8ANlXSC7vkGnmThauEWdF7AY9XLtDaZ2L7n4DURrxboNdQ/exec';
+  var CRM = 'https://script.google.com/macros/s/AKfycbzfaWHc2ky2HzWAJz64zFWS8ANlXSC7vkGnmThauEWdF7AY9XLtDaZ2L7n4DURrxboNdQ/exec';
+  /* Cuando montes el Worker de Cloudflare, pega su URL aquí y el asistente pasa a IA real */
+  var IA = '';
   var WA = '13468231378';
 
   var lanza = document.getElementById('lanza'), caja = document.getElementById('chatbox');
@@ -572,265 +574,324 @@
   var form = document.getElementById('cb-form'), input = document.getElementById('cb-input');
   if (!lanza || !caja) return;
 
-  var L = { rubro:'', dolor:'', nombre:'', contacto:'', negocio:'', notas:[],
-            rol:'', volumen:'', urgencia:'', score:0, nivel:'' };
-  var paso = 0, cerrado = false;
+  var L = { rubro:'', dolor:'', nombre:'', negocio:'', contacto:'', rol:'', volumen:'', urgencia:'',
+            score:0, nivel:'', notas:[], temas:[] };
+  var paso = 0, historial = [];
+
+  /* ============ BASE DE CONOCIMIENTO ============
+     Cada tema: palabras que lo disparan + la respuesta. El asistente responde
+     cualquier pregunta que caiga aquí, en cualquier orden, sin guion rígido. */
+  var KB = [
+    { k:['precio','cuesta','costo','vale','cuanto','cuánto','tarifa','presupuesto','inversion','inversión','caro','barato','cobran','pagar'],
+      r:'Depende de lo que tu negocio necesite, y prefiero no tirarte un número al aire. El rango va desde <b>$497 de instalación más $197 al mes</b> (lo básico: contestar llamadas perdidas y preguntas frecuentes) hasta <b>$1,997 más $497 al mes</b> (el sistema completo con agendamiento y seguimiento). Casi siempre sale menos que un empleado de medio tiempo, y trabaja las 24 horas.<br><br>En la demostración gratuita te doy el número exacto para tu caso. ¿Te la agendo?' },
+
+    { k:['web','pagina','página','sitio','website','landing','diseño','diseno'],
+      r:'Sí, también hacemos páginas web — de hecho esta que estás viendo la hicimos nosotros. Pero te soy honesto: <b>una página bonita sin nada que capture al visitante es un folleto caro</b>. Lo que de verdad cambia tus ventas es que alguien responda cuando el cliente pregunta. Por eso empezamos por el asistente y, si hace falta, renovamos la página alrededor de eso.' },
+
+    { k:['seo','google','posicionamiento','aparecer','buscar','busqueda','búsqueda','primera pagina'],
+      r:'Trabajamos SEO local, sí. Con una advertencia honesta: <b>el SEO tarda entre 3 y 6 meses</b> en dar resultados reales. Si necesitas clientes este mes, primero tapamos la fuga (los que ya te contactan y se pierden por falta de respuesta) y en paralelo montamos el SEO para el mediano plazo. Así ves resultados desde la semana uno y también dentro de seis meses.' },
+
+    { k:['whatsapp','wasap','wasa','mensaje','mensajes','chat'],
+      r:'El asistente atiende tu WhatsApp igual que una persona: responde en segundos, contesta precios y horarios, toma los datos del cliente y te avisa cuando alguien está listo para comprar. Si la conversación se pone seria, te la pasa a ti con todo el contexto. Funciona en español e inglés, según te escriba el cliente.' },
+
+    { k:['llamada','llamadas','telefono','teléfono','sms','texto','perdida','perdidas','contestar'],
+      r:'Cada llamada que no alcanzas a contestar recibe un mensaje de texto automático al instante: <i>"Vimos tu llamada, ¿en qué te ayudamos?"</i>. El cliente que iba a marcarle al siguiente en Google se queda contigo. El 40% de las llamadas a negocios pequeños entra fuera del horario de oficina — ahí es donde está el dinero que hoy se pierde.' },
+
+    { k:['cita','citas','agenda','agendar','calendario','reserva','reservas','booking','turno'],
+      r:'El sistema agenda directo en tu calendario, confirma al cliente y le manda recordatorios antes de la cita. Se conecta con Google Calendar y con casi cualquier sistema que ya uses. Los recordatorios automáticos son lo que corta las citas perdidas, que en clínicas son la razón número uno de huecos en la agenda.' },
+
+    { k:['seguimiento','follow','perseguir','recontactar','no compro','no compró','interesado'],
+      r:'El que preguntó y no compró recibe seguimiento automático los días 2, 5 y 9 — escrito con IA en tono humano, no como plantilla. Ahí vive la mitad de las ventas que hoy se pierden: gente que sí quería, pero se le pasó.' },
+
+    { k:['email','correo','mail','campaña','campana','newsletter','marketing'],
+      r:'Hacemos email marketing con IA: campañas que se escriben, se segmentan y se envían solas — bienvenida a clientes nuevos, recuperación de clientes dormidos, promociones de temporada. Tú apruebas, el sistema ejecuta. Es de lo que más rápido revive una lista de clientes que tienes muerta.' },
+
+    { k:['proceso','automatizar','automatización','automatizacion','factura','facturacion','facturación','reporte','reportes','inventario','crm','interno','operacion','operación'],
+      r:'Sí — si un proceso de tu empresa se repite, se puede automatizar: facturación, cotizaciones, reportes semanales, incorporación de clientes nuevos, conexión entre tus sistemas. Analizamos cómo trabaja tu equipo hoy y convertimos horas de trabajo manual en minutos.' },
+
+    { k:['redes','instagram','facebook','tiktok','contenido','post','publicar'],
+      r:'Montamos sistemas que generan borradores de contenido para redes en tu voz — tú solo revisas y publicas. Sirve para tener constancia sin contratar a nadie. Eso sí: si tu negocio pierde clientes por no responder, arreglamos eso primero; publicar más solo trae más gente a una puerta que nadie abre.' },
+
+    { k:['tiempo','cuanto tarda','cuánto tarda','demora','instalar','implementar','listo','rapido','rápido'],
+      r:'La instalación toma entre <b>7 y 14 días</b> desde que arrancamos. El primer mes incluye ajustes ilimitados: si el asistente no responde como quieres, lo corregimos hasta que quede. Y desde el día uno ya está contestando.' },
+
+    { k:['funciona','como funciona','cómo funciona','demo','demostracion','demostración','ver','probar','ejemplo'],
+      r:'La mejor forma de entenderlo es que lo veas: hacemos una <b>demostración gratuita de 15 minutos</b> con los datos reales de tu negocio — tus servicios, tus precios, tus horarios — y ves al asistente contestando como si fuera tu mejor empleado. Antes de que inviertas un dólar. ¿Te la agendo?' },
+
+    { k:['robot','robotico','robótico','suena','natural','humano','falso','artificial'],
+      r:'Esa es la duda más común, y es válida. El asistente se entrena con tu forma de hablar y tus respuestas reales, así que suena a tu negocio, no a un robot genérico. Y cuando la conversación necesita a un humano, te la pasa con todo el contexto — el cliente nunca queda atrapado con una máquina.' },
+
+    { k:['ingles','inglés','idioma','bilingue','bilingüe','español','espanol','traduce'],
+      r:'Atiende en español e inglés, y detecta solo en qué idioma le escribe el cliente. En Miami eso importa más de lo que parece: más de la mitad de los clientes prefiere que le hablen en español, y muchos negocios los están perdiendo por tener todo en inglés.' },
+
+    { k:['contrato','permanencia','cancelar','compromiso','amarrado','obligacion','obligación'],
+      r:'Sin contrato de permanencia. Es mes a mes: si el sistema no te está produciendo, lo cancelas y ya. Nosotros solo ganamos si tú sigues ganando — por eso preferimos que lo pruebes viendo la demostración primero.' },
+
+    { k:['garantia','garantía','riesgo','y si no funciona','no me sirve','devolucion','devolución'],
+      r:'El primer mes incluye ajustes ilimitados, y no hay permanencia. Y antes de que pagues nada, ves la demostración funcionando con los datos de tu negocio. Si al verla no te convence, me lo dices de frente y quedamos como amigos — así de simple.' },
+
+    { k:['quien','quién','isnel','empresa','ustedes','equipo','confiar','experiencia','años'],
+      r:'Somos <b>Lion Systems Group LLC</b>, aquí en Miami. Me llamo Isnel García y yo mismo instalo y opero estos sistemas todos los días. Somos una empresa nueva y no lo escondo: por eso la demostración es gratis y con tus datos reales — no te pido que confíes, te pido que veas.' },
+
+    { k:['donde','dónde','ubicacion','ubicación','miami','zona','presencial','visitar','oficina'],
+      r:'Estamos en Miami y trabajamos con negocios de todo el sur de Florida: Hialeah, Doral, Kendall, Miami Lakes, Pembroke Pines, Miramar. Si quieres, me paso por tu negocio en persona — muchos clientes prefieren verlo así.' },
+
+    { k:['tipo de negocio','sirve para','funciona para','mi negocio','rubro','industria','clinica','clínica','restaurante','taller','gimnasio','abogado','dentista'],
+      r:'Trabajamos sobre todo con clínicas dentales y estéticas, servicios del hogar (aire, plomería, remodelación), restaurantes con catering, academias, firmas de abogados e inmobiliarias. Pero la regla real es simple: <b>si tu negocio pierde clientes por no responder a tiempo, esto te sirve</b>. ¿En qué rubro estás tú?' },
+
+    { k:['integra','integracion','integración','conecta','sistema','software','shopify','wordpress','pos'],
+      r:'Se conecta con lo que ya usas: tu calendario, tu CRM, tu punto de venta, tu tienda online. No hay que cambiar de sistema ni que tu equipo aprenda nada nuevo — el asistente se acomoda a tu operación, no al revés.' },
+
+    { k:['empleado','recepcionista','secretaria','reemplaza','despedir','personal'],
+      r:'No viene a reemplazar a nadie. Viene a que tu gente rinda el doble: el asistente contesta lo repetido (precios, horarios, ubicación, disponibilidad) y le pasa a tu equipo solo lo que vale su tiempo — el cliente que ya está listo para comprar.' },
+
+    { k:['gracias','ok','listo','perfecto','bien','entiendo','vale'],
+      r:'Con gusto. ¿Hay algo más que quieras saber, o te agendo la demostración de 15 minutos?' }
+  ];
+
+  function norm(s){ return (s||'').toLowerCase().replace(/[¿?¡!.,;:]/g,' '); }
+  function buscaKB(txt){
+    var t=norm(txt), mejor=null, top=0;
+    KB.forEach(function(item){
+      var p=0;
+      item.k.forEach(function(w){ if(t.indexOf(w)!==-1) p+= w.length>6?2:1; });
+      if(p>top){ top=p; mejor=item; }
+    });
+    return top>=1 ? mejor : null;
+  }
 
   var NICHOS = {
-    dental:   { k:['dental','dentista','odont','clinica dental','ortodon'], t:'clínica dental',
-                d:'La ADA reporta que las citas perdidas son la razón #1 de huecos en la agenda — y un solo no-show diario cuesta entre $20,000 y $70,000 al año.' },
-    estetica: { k:['spa','estetic','estétic','botox','belleza','medspa','med spa','cosmet'], t:'centro de estética',
-                d:'La visita promedio en un med spa es de $527 (AmSpa 2024). Dos consultas frías por semana son más de $4,000 al mes yéndose a la competencia.' },
-    inmob:    { k:['inmobil','realtor','bienes raices','bienes raíces','propiedad','real estate'], t:'inmobiliaria',
-                d:'Un estudio de 2024 encontró que el 47% de las consultas online a agentes jamás recibe respuesta. Y una sola comisión en Miami son $10,000 o más.' },
-    resto:    { k:['restaurant','comida','cocina','catering','panader','cafe','café','food'], t:'restaurante',
-                d:'El 71% de las llamadas a un restaurante son de dinero: reservas, pedidos y catering. En hora pico, hasta la mitad se pierden sin contestar.' },
-    hogar:    { k:['aire','hvac','plomer','plumb','remodel','techo','roof','construc','contratista','electric'], t:'empresa de servicios',
-                d:'ServiceTitan midió en más de 3,000 negocios del gremio que los equipos pequeños solo logran agendar el 24% de sus llamadas.' },
-    fitness:  { k:['gym','gimnasio','fitness','pilates','yoga','entrena','crossfit'], t:'gimnasio',
-                d:'El que pide su clase de prueba de noche y no recibe respuesta hasta el otro día, ya perdió el impulso — y con él, una membresía anual.' },
-    academia: { k:['academia','escuela','clase','tutor','curso','music','idioma','school'], t:'academia',
-                d:'Cada familia que pregunta y no recibe respuesta el mismo día se matricula en otro lado — y una matrícula son cientos de dólares al mes durante años.' },
-    ecom:     { k:['tienda','ecommerce','e-commerce','shopify','online','venta online','producto'], t:'tienda online',
-                d:'Cerca del 70% de los carritos se abandonan. Recuperarlos por WhatsApp convierte entre 5% y 15% — el email no llega ni al 2%.' },
-    otro:     { k:[], t:'negocio',
-                d:'El 40% de las llamadas a negocios pequeños entra fuera del horario de oficina (CallRail, 18 millones de llamadas) — y el 78% de los clientes le compra al primero que responde.' }
+    dental:{k:['dental','dentista','odont','ortodon','implante'],t:'clínica dental',
+      d:'La Asociación Dental Americana reporta que las citas perdidas son la razón #1 de huecos en la agenda — y un solo no-show diario cuesta entre $20,000 y $70,000 al año.'},
+    estetica:{k:['spa','estetic','estétic','botox','belleza','medspa','med spa','cosmet','facial'],t:'centro de estética',
+      d:'La visita promedio en un med spa es de $527 (AmSpa 2024). Dos consultas frías por semana son más de $4,000 al mes yéndose a la competencia.'},
+    legal:{k:['abogad','legal','ley','inmigracion','inmigración','accidente','bufete','firma'],t:'firma de abogados',
+      d:'En temas legales el que contesta primero se queda el caso. Y un solo caso perdido por no contestar vale más que años del sistema completo.'},
+    inmob:{k:['inmobil','realtor','bienes raices','bienes raíces','propiedad','real estate'],t:'inmobiliaria',
+      d:'Un estudio de 2024 encontró que el 47% de las consultas online a agentes jamás recibe respuesta. Y una comisión en Miami son $10,000 o más.'},
+    resto:{k:['restaurant','comida','cocina','catering','panader','cafe','café','food','bar'],t:'restaurante',
+      d:'El 71% de las llamadas a un restaurante son de dinero: reservas, pedidos y catering. En hora pico, hasta la mitad se pierden sin contestar.'},
+    hogar:{k:['aire','hvac','plomer','plumb','remodel','techo','roof','construc','contratista','electric','plagas','cerrajer','mudanza','limpieza'],t:'empresa de servicios',
+      d:'ServiceTitan midió en más de 3,000 negocios del gremio que los equipos pequeños solo logran agendar el 24% de sus llamadas.'},
+    fitness:{k:['gym','gimnasio','fitness','pilates','yoga','entrena','crossfit'],t:'gimnasio',
+      d:'El que pide su clase de prueba de noche y no recibe respuesta hasta el otro día ya perdió el impulso — y con él, una membresía anual.'},
+    academia:{k:['academia','escuela','clase','tutor','curso','music','idioma','school','danza'],t:'academia',
+      d:'Cada familia que pregunta y no recibe respuesta el mismo día se matricula en otro lado — y una matrícula son cientos de dólares al mes durante años.'},
+    ecom:{k:['tienda','ecommerce','e-commerce','shopify','online','venta online','producto'],t:'tienda online',
+      d:'Cerca del 70% de los carritos se abandonan. Recuperarlos por WhatsApp convierte entre 5% y 15% — el email no llega ni al 2%.'},
+    salud:{k:['medic','médic','clinic','clínic','doctor','quiropr','veterinar','terapia','psicolog'],t:'consultorio',
+      d:'El paciente que no recibe respuesta llama al siguiente consultorio de la lista. El 78% se queda con el primero que le contesta.'},
+    prof:{k:['contad','cpa','taxes','impuesto','seguro','notari','consultor','agencia'],t:'oficina de servicios',
+      d:'En temporada alta el teléfono se desborda y ahí se pierden los clientes nuevos — justo cuando más entran.'}
   };
+  function detecta(txt){ var t=norm(txt);
+    for(var k in NICHOS){ for(var i=0;i<NICHOS[k].k.length;i++){ if(t.indexOf(NICHOS[k].k[i])!==-1) return k; } }
+    return null; }
 
-  function detecta(txt) {
-    var t = (txt || '').toLowerCase();
-    for (var k in NICHOS) { for (var i = 0; i < NICHOS[k].k.length; i++) { if (t.indexOf(NICHOS[k].k[i]) !== -1) return k; } }
-    return null;
-  }
-  function abajo() { msgs.scrollTop = msgs.scrollHeight; }
-  function burbuja(txt, clase) {
-    var d = document.createElement('div');
-    d.className = 'cb-b ' + (clase || 'bot'); d.innerHTML = txt;
-    msgs.appendChild(d); abajo(); return d;
-  }
-  function escribiendo(ms, luego) {
-    var e = document.createElement('div');
-    e.className = 'cb-esc'; e.innerHTML = '<i></i><i></i><i></i>';
-    msgs.appendChild(e); abajo();
-    setTimeout(function () { e.remove(); luego(); }, ms);
-  }
-  function bot(txt, clase, ms, luego) {
-    escribiendo(ms || (600 + Math.min(txt.length * 12, 1100)), function () {
-      burbuja(txt, clase); if (luego) luego();
-    });
-  }
-  function opciones(lista, fn) {
-    chips.innerHTML = '';
-    lista.forEach(function (o, i) {
-      var b = document.createElement('button');
-      b.type = 'button'; b.className = 'cb-chip'; b.textContent = o;
-      b.style.animationDelay = (i * 0.05) + 's';
-      b.onclick = function () { chips.innerHTML = ''; burbuja(o, 'yo'); fn(o); };
-      chips.appendChild(b);
-    });
-  }
+  function abajo(){ msgs.scrollTop = msgs.scrollHeight; }
+  function burbuja(t,c){ var d=document.createElement('div'); d.className='cb-b '+(c||'bot'); d.innerHTML=t;
+    msgs.appendChild(d); abajo(); return d; }
+  function escribiendo(ms,fn){ var e=document.createElement('div'); e.className='cb-esc';
+    e.innerHTML='<i></i><i></i><i></i>'; msgs.appendChild(e); abajo();
+    setTimeout(function(){ e.remove(); fn(); }, ms); }
+  function bot(t,c,ms,fn){ historial.push({r:'a',t:t.replace(/<[^>]+>/g,'')});
+    escribiendo(ms||(500+Math.min(t.length*10,900)), function(){ burbuja(t,c); if(fn) fn(); }); }
+  function opciones(lista,fn){ chips.innerHTML='';
+    lista.forEach(function(o,i){ var b=document.createElement('button'); b.type='button'; b.className='cb-chip';
+      b.textContent=o; b.style.animationDelay=(i*.05)+'s';
+      b.onclick=function(){ chips.innerHTML=''; burbuja(o,'yo'); historial.push({r:'u',t:o}); fn(o); };
+      chips.appendChild(b); }); }
 
-  /* ---------- guion ---------- */
-  function arranca() {
-    if (msgs.children.length) return;
-    bot('Hola 👋 Soy el asistente de <b>Lion AI</b>. Yo soy un ejemplo de lo que instalamos: respondo al instante, a cualquier hora.', 'bot', 700, function () {
-      bot('Para decirte algo útil y no genérico: <b>¿en qué rubro está tu negocio?</b>', 'bot', 900, function () {
-        opciones(['🦷 Salud / dental', '💆 Estética', '🏠 Inmobiliaria', '🍽️ Restaurante', '🔧 Servicios del hogar', '💪 Gimnasio', '📚 Academia', '🛍️ Tienda online', 'Otro'], rubroElegido);
+  /* ============ FLUJO ============ */
+  function arranca(){
+    if(msgs.children.length) return;
+    bot('Hola 👋 Soy el asistente de <b>Lion AI</b>. Yo mismo soy un ejemplo de lo que instalamos: respondo al instante, a cualquier hora.','bot',600,function(){
+      bot('Pregúntame lo que quieras — precios, qué hacemos, cómo funciona — o cuéntame de tu negocio y te digo qué se puede automatizar.','bot',800,function(){
+        opciones(['¿Qué hacen exactamente?','¿Cuánto cuesta?','Tengo una clínica','Tengo otro negocio'], entrada);
       });
     });
   }
-  function rubroElegido(txt) {
-    var k = detecta(txt) || 'otro';
-    L.rubro = NICHOS[k].t; L.notas.push('Rubro: ' + txt);
-    bot('Perfecto. Con ' + (k === 'otro' ? 'tu tipo de negocio' : 'las ' + L.rubro + 's') + ' vemos siempre el mismo patrón:', 'bot', 700, function () {
-      bot(NICHOS[k].d, 'dato', 900, function () {
-        bot('¿Y hoy cómo atienden a los clientes que escriben o llaman?', 'bot', 800, function () {
-          opciones(['Yo mismo, cuando puedo', 'Alguien del equipo', 'Solo en horario de oficina', 'Se nos pierden mensajes'], dolorElegido);
+
+  function entrada(txt){
+    var n=detecta(txt);
+    if(n){ rubro(txt,n); return; }
+    var kb=buscaKB(txt);
+    if(kb){ bot(kb.r,'bot',700,sugerir); return; }
+    if(/qu[eé] hacen|servicio|ofrecen/i.test(txt)){
+      bot('Instalamos sistemas de inteligencia artificial que <b>contestan por tu negocio</b>: responden WhatsApp, SMS y tu web en segundos, mandan un texto a cada llamada perdida, agendan citas solas y hacen seguimiento a los interesados. También hacemos email marketing con IA, páginas web y automatización de procesos internos.','bot',900,function(){
+        bot('¿De qué es tu negocio? Así te digo qué se pierde hoy en tu rubro en concreto.','bot',700);
+      });
+      return;
+    }
+    bot('Cuéntame un poco más de tu negocio — ¿a qué te dedicas? Con eso te digo exactamente qué se puede automatizar y cuánto te cuesta hoy no hacerlo.','bot',800);
+  }
+
+  function rubro(txt,k){
+    L.rubro=NICHOS[k].t; L.notas.push('Rubro: '+txt); L.temas.push(k);
+    bot('Perfecto. Con las '+L.rubro+'s vemos siempre el mismo patrón:','bot',700,function(){
+      bot(NICHOS[k].d,'dato',900,function(){
+        bot('¿Y hoy cómo atienden a los clientes que escriben o llaman?','bot',700,function(){
+          opciones(['Yo mismo, cuando puedo','Alguien del equipo','Solo en horario de oficina','Se nos pierden mensajes'], dolor);
         });
       });
     });
   }
-  function dolorElegido(txt) {
-    L.dolor = txt; L.notas.push('Atención actual: ' + txt);
-    if (/pierden/i.test(txt)) L.score += 2; else if (/oficina|mismo/i.test(txt)) L.score += 1;
-    bot('Gracias, eso me dice mucho. Ahí es justo donde entra el sistema: responde en segundos las 24 horas y le hace seguimiento a cada interesado.', 'bot', 950, function () {
-      bot('Para saber si te conviene de verdad — y no hacerte perder el tiempo: <b>¿cuántos clientes nuevos te contactan al mes, más o menos?</b>', 'bot', 950, function () {
-        opciones(['Menos de 20', 'Entre 20 y 50', 'Entre 50 y 200', 'Más de 200'], volumenElegido);
+
+  function dolor(txt){
+    L.dolor=txt; L.notas.push('Atención actual: '+txt);
+    if(/pierden/i.test(txt)) L.score+=2; else if(/oficina|mismo/i.test(txt)) L.score+=1;
+    bot('Gracias, eso me dice mucho. Ahí es justo donde entra el sistema: responde en segundos las 24 horas y le hace seguimiento a cada interesado.','bot',900,function(){
+      bot('Para saber si te conviene de verdad — y no hacerte perder el tiempo: <b>¿cuántos clientes nuevos te contactan al mes, más o menos?</b>','bot',900,function(){
+        opciones(['Menos de 20','Entre 20 y 50','Entre 50 y 200','Más de 200'], volumen);
       });
     });
   }
-  function volumenElegido(txt) {
-    L.volumen = txt; L.notas.push('Volumen: ' + txt);
-    if (/Más de 200/.test(txt)) L.score += 3;
-    else if (/50 y 200/.test(txt)) L.score += 3;
-    else if (/20 y 50/.test(txt)) L.score += 2;
-    else L.score += 0;
-    var msg = /Menos de 20/.test(txt)
-      ? 'Perfecto, gracias por la franqueza.'
-      : 'Con ese volumen la matemática es clarísima: aunque recuperes solo un puñado al mes, el sistema ya se pagó.';
-    bot(msg, 'bot', 800, function () {
-      bot('¿Y tú <b>tomas las decisiones</b> del negocio o hay alguien más que las aprueba?', 'bot', 900, function () {
-        opciones(['Soy el dueño', 'Soy socio o gerente', 'Consulto con otra persona', 'Solo estoy investigando'], rolElegido);
+  function volumen(txt){
+    L.volumen=txt; L.notas.push('Volumen: '+txt);
+    if(/M[áa]s de 200|50 y 200/.test(txt)) L.score+=3; else if(/20 y 50/.test(txt)) L.score+=2;
+    bot(/Menos de 20/.test(txt)?'Perfecto, gracias por la franqueza.':'Con ese volumen la matemática es clarísima: aunque recuperes solo unos pocos al mes, el sistema ya se pagó.','bot',700,function(){
+      bot('¿Y tú <b>tomas las decisiones</b> del negocio o hay alguien más que las aprueba?','bot',800,function(){
+        opciones(['Soy el dueño','Soy socio o gerente','Consulto con otra persona','Solo estoy investigando'], rol);
       });
     });
   }
-  function rolElegido(txt) {
-    L.rol = txt; L.notas.push('Rol: ' + txt);
-    if (/dueño/i.test(txt)) L.score += 3;
-    else if (/socio|gerente/i.test(txt)) L.score += 2;
-    else if (/Consulto/i.test(txt)) L.score += 1;
-    bot('Entendido.', 'bot', 550, function () {
-      bot('Última cosa y te dejo tranquilo: <b>¿para cuándo te gustaría tenerlo funcionando?</b>', 'bot', 850, function () {
-        opciones(['Lo antes posible', 'Este mes', 'En unos meses', 'Solo estoy mirando'], urgenciaElegida);
+  function rol(txt){
+    L.rol=txt; L.notas.push('Rol: '+txt);
+    if(/due/i.test(txt)) L.score+=3; else if(/socio|gerente/i.test(txt)) L.score+=2; else if(/Consulto/i.test(txt)) L.score+=1;
+    bot('Entendido.','bot',500,function(){
+      bot('Última cosa y te dejo tranquilo: <b>¿para cuándo te gustaría tenerlo funcionando?</b>','bot',800,function(){
+        opciones(['Lo antes posible','Este mes','En unos meses','Solo estoy mirando'], urgencia);
       });
     });
   }
-  function urgenciaElegida(txt) {
-    L.urgencia = txt; L.notas.push('Urgencia: ' + txt);
-    if (/antes posible/i.test(txt)) L.score += 3;
-    else if (/Este mes/i.test(txt)) L.score += 2;
-    else if (/unos meses/i.test(txt)) L.score += 1;
-
-    L.nivel = L.score >= 7 ? 'CALIENTE' : (L.score >= 4 ? 'TIBIO' : 'FRIO');
-
-    if (L.nivel === 'FRIO') { despedida(); return; }
-
-    var frase = L.nivel === 'CALIENTE'
-      ? 'Tu caso es de los que resolvemos rápido y bien. Vale la pena que lo veas funcionando <b>con los datos reales de tu negocio</b> — son 15 minutos y es gratis.'
-      : 'Con lo que me cuentas, creo que te sirve. Te propongo verlo funcionando con tus datos reales: 15 minutos, gratis, sin compromiso.';
-    bot(frase, 'bot', 1000, function () {
-      bot('¿Cómo te llamas?', 'bot', 600, function () { paso = 1; input.placeholder = 'Tu nombre…'; input.focus(); });
+  function urgencia(txt){
+    L.urgencia=txt; L.notas.push('Urgencia: '+txt);
+    if(/antes posible/i.test(txt)) L.score+=3; else if(/Este mes/i.test(txt)) L.score+=2; else if(/unos meses/i.test(txt)) L.score+=1;
+    L.nivel = L.score>=7?'CALIENTE':(L.score>=4?'TIBIO':'FRIO');
+    if(L.nivel==='FRIO'){ despedida(); return; }
+    bot(L.nivel==='CALIENTE'
+      ?'Tu caso es de los que resolvemos rápido y bien. Vale la pena que lo veas funcionando <b>con los datos reales de tu negocio</b> — son 15 minutos y es gratis.'
+      :'Con lo que me cuentas, creo que te sirve. Te propongo verlo funcionando con tus datos reales: 15 minutos, gratis, sin compromiso.','bot',900,function(){
+      bot('¿Cómo te llamas?','bot',600,function(){ paso=1; input.placeholder='Tu nombre…'; input.focus(); });
     });
   }
-  function despedida() {
-    bot('Te voy a ser honesto, que es como trabajamos: por lo que me cuentas, <b>hoy todavía no te conviene invertir en esto</b> — y prefiero decírtelo antes que venderte algo que no vas a aprovechar.', 'bot', 1100, function () {
-      bot('Lo que sí te sirve ahora mismo: responde siempre en menos de 5 minutos, aunque sea con un mensaje corto. Eso solo ya te sube las ventas, y es gratis.', 'bot', 1100, function () {
-        bot('Cuando el volumen te desborde o quieras dejar de perder los mensajes de la noche, aquí estaremos. ¿Te dejo el WhatsApp por si acaso?', 'bot', 950, function () {
-          opciones(['Sí, guárdame el contacto', 'Gracias, luego vuelvo'], function (r) {
-            if (/Sí/.test(r)) {
-              paso = 1; L.notas.push('Lead frío: pidió contacto igual');
-              bot('Claro. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); });
-            } else {
-              L.nombre = L.nombre || 'Visitante';
-              bot('Con gusto. Éxitos con tu negocio 🦁', 'bot', 600, guarda);
-            }
+  function despedida(){
+    bot('Te voy a ser honesto, que es como trabajamos: por lo que me cuentas, <b>hoy todavía no te conviene invertir en esto</b> — y prefiero decírtelo antes que venderte algo que no vas a aprovechar.','bot',1000,function(){
+      bot('Lo que sí te sirve ahora mismo: responde siempre en menos de 5 minutos, aunque sea con un mensaje corto. Eso solo ya te sube las ventas, y es gratis.','bot',1000,function(){
+        bot('Cuando el volumen te desborde, aquí estaremos. ¿Te dejo el WhatsApp por si acaso?','bot',900,function(){
+          opciones(['Sí, guárdame el contacto','Gracias, luego vuelvo'], function(r){
+            if(/Sí/.test(r)){ paso=1; L.notas.push('Lead frío: pidió contacto'); bot('Claro. ¿Cómo te llamas?','bot',600,function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
+            else { L.nombre=L.nombre||'Visitante'; bot('Con gusto. Éxitos con tu negocio 🦁','bot',600,guarda); }
           });
         });
       });
     });
   }
-  function libre(txt) {
-    if (paso === 1) {
-      L.nombre = txt; paso = 2;
-      bot('Un gusto, ' + txt.split(' ')[0] + '. ¿Cómo se llama tu negocio?', 'bot', 700, function () {
-        input.placeholder = 'Nombre del negocio…';
-      });
+  function sugerir(){
+    if(paso>0||L.rubro) return;
+    setTimeout(function(){ if(!chips.children.length)
+      opciones(['¿Cómo funciona?','¿Cuánto cuesta?','Quiero la demostración','Tengo otra pregunta'], entrada);
+    }, 400);
+  }
+
+  /* ============ ENTRADA LIBRE ============ */
+  function libre(txt){
+    /* Captura de datos si estamos en la secuencia de cierre */
+    if(paso===1){ L.nombre=txt; paso=2;
+      bot('Un gusto, '+txt.split(' ')[0]+'. ¿Cómo se llama tu negocio?','bot',700,function(){ input.placeholder='Nombre del negocio…'; });
+      return; }
+    if(paso===2){ L.negocio=txt; paso=3;
+      bot('Anotado. Por último, <b>¿a qué WhatsApp o correo te contactamos</b> para coordinar la demostración?','bot',800,function(){ input.placeholder='WhatsApp o correo…'; });
+      return; }
+    if(paso===3){ L.contacto=txt; paso=4; cierra(); return; }
+
+    /* Si hay IA real montada, deja que responda cualquier cosa */
+    if(IA){ preguntaIA(txt); return; }
+
+    /* Motor local: rubro > base de conocimiento > pedir contexto */
+    var n=detecta(txt);
+    if(n && !L.rubro){ rubro(txt,n); return; }
+    var kb=buscaKB(txt);
+    if(kb){ L.temas.push(kb.k[0]); bot(kb.r,'bot',700,sugerir); return; }
+    if(/agenda|demo|quiero|hablar|llamar|reunion|reunión|cita/i.test(norm(txt))){
+      bot('Perfecto. ¿Cómo te llamas?','bot',600,function(){ paso=1; input.placeholder='Tu nombre…'; input.focus(); });
       return;
     }
-    if (paso === 2) {
-      L.negocio = txt; paso = 3;
-      bot('Anotado. Por último, <b>¿a qué número de WhatsApp o correo te contactamos</b> para coordinar la demostración?', 'bot', 800, function () {
-        input.placeholder = 'WhatsApp o correo…';
-      });
-      return;
-    }
-    if (paso === 3) {
-      L.contacto = txt; paso = 4;
-      cierra();
-      return;
-    }
-    /* fuera del guion: intenta entender por palabras clave */
-    var k = detecta(txt);
-    if (k) { rubroElegido(txt); return; }
-    var t = txt.toLowerCase();
-    if (/precio|costo|cuanto|cuánto|vale|tarifa/.test(t)) {
-      bot('El precio depende de lo que tu operación necesite — por eso primero hacemos la demostración gratuita: sales sabiendo qué se puede automatizar y cuánto te cuesta hoy no hacerlo. ¿Te va bien si coordinamos esos 15 minutos?', 'bot', 900, function () {
-        opciones(['Sí, coordinemos', 'Antes tengo otra duda'], function (r) {
-          if (r.indexOf('Sí') === 0) { paso = 1; bot('Genial. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
-          else bot('Claro, dime — te leo.', 'bot', 500);
-        });
-      });
-      return;
-    }
-    if (/tiempo|cuanto tarda|demora|instalar|implement/.test(t)) {
-      bot('La instalación toma entre 7 y 14 días, y el primer mes incluye ajustes ilimitados. ¿Quieres que coordinemos la demostración para que lo veas con tus datos?', 'bot', 900, function () {
-        opciones(['Sí, coordinemos', 'Todavía no'], function (r) {
-          if (r.indexOf('Sí') === 0) { paso = 1; bot('Perfecto. ¿Cómo te llamas?', 'bot', 600, function(){ input.placeholder='Tu nombre…'; input.focus(); }); }
-          else bot('Sin problema. Aquí estaré cuando quieras.', 'bot', 500);
-        });
-      });
-      return;
-    }
-    L.notas.push('Dijo: ' + txt);
-    bot('Te entiendo. Para darte una respuesta concreta a eso y no marearte con generalidades, lo mejor es que lo veas aplicado a tu caso en la demostración de 15 minutos. ¿Cómo te llamas?', 'bot', 900, function () {
-      paso = 1; input.placeholder = 'Tu nombre…'; input.focus();
+    L.notas.push('Preguntó: '+txt);
+    bot('Buena pregunta. Para responderte con algo útil y no genérico, cuéntame: <b>¿a qué se dedica tu negocio?</b> Con eso te digo exactamente cómo aplicaría en tu caso.','bot',800,function(){
+      opciones(['Clínica o consultorio','Restaurante','Servicios del hogar','Otro tipo de negocio'], entrada);
     });
   }
-  function cierra() {
-    var resumen = 'Hola Isnel! Soy ' + (L.nombre || '—') + (L.negocio ? ', de ' + L.negocio : '') + '.'
-      + (L.rubro ? '\nRubro: ' + L.rubro + '.' : '')
-      + (L.rol ? '\nEn el negocio: ' + L.rol + '.' : '')
-      + (L.volumen ? '\nClientes nuevos al mes: ' + L.volumen + '.' : '')
-      + (L.dolor ? '\nHoy atendemos así: ' + L.dolor + '.' : '')
-      + (L.urgencia ? '\nQuiero tenerlo: ' + L.urgencia + '.' : '')
-      + (L.contacto ? '\nMi contacto: ' + L.contacto : '')
-      + (L.nivel === 'FRIO' ? '\nPor ahora solo quiero dejar mi contacto.' : '\nQuiero coordinar la demostración de 15 minutos.');
-    bot('Listo, ' + (L.nombre || '').split(' ')[0] + '. Ya tengo todo lo necesario ✅', 'bot', 800, function () {
-      bot(L.nivel === 'FRIO'
-          ? 'Toca el botón y le dejas tu contacto a Isnel — te escribirá cuando sea el momento.'
-          : 'Toca el botón y te llevo directo al WhatsApp de Isnel con el resumen escrito — solo le das enviar y coordinamos la hora.', 'bot', 900, function () {
-        var a = document.createElement('a');
-        a.className = 'cb-cta'; a.target = '_blank'; a.rel = 'noopener';
-        a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(resumen);
-        a.textContent = L.nivel === 'FRIO' ? 'Dejar mi contacto →' : 'Enviar y coordinar mi demostración →';
+
+  /* ============ IA REAL (cuando esté el Worker) ============ */
+  function preguntaIA(txt){
+    var e=document.createElement('div'); e.className='cb-esc'; e.innerHTML='<i></i><i></i><i></i>';
+    msgs.appendChild(e); abajo();
+    fetch(IA,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ mensajes:historial.slice(-12), lead:L })})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ e.remove();
+        var t=(d&&d.texto)||'Perdona, se me trabó la respuesta. ¿Me lo repites?';
+        burbuja(t,'bot'); historial.push({r:'a',t:t});
+        if(d&&d.cerrar&&paso===0){ setTimeout(function(){ bot('¿Te agendo la demostración de 15 minutos? ¿Cómo te llamas?','bot',600,function(){ paso=1; input.focus(); }); },700); }
+      })
+      .catch(function(){ e.remove();
+        var kb=buscaKB(txt);
+        burbuja(kb?kb.r:'Perdona, no te entendí bien. ¿Me cuentas de qué es tu negocio?','bot');
+      });
+  }
+
+  function cierra(){
+    var res='Hola Isnel! Soy '+(L.nombre||'—')+(L.negocio?', de '+L.negocio:'')+'.'
+      +(L.rubro?'\nRubro: '+L.rubro+'.':'')+(L.rol?'\nEn el negocio: '+L.rol+'.':'')
+      +(L.volumen?'\nClientes nuevos al mes: '+L.volumen+'.':'')+(L.dolor?'\nHoy atendemos así: '+L.dolor+'.':'')
+      +(L.urgencia?'\nQuiero tenerlo: '+L.urgencia+'.':'')+(L.contacto?'\nMi contacto: '+L.contacto:'')
+      +(L.temas.length?'\nPregunté por: '+L.temas.slice(0,4).join(', '):'')
+      +(L.nivel==='FRIO'?'\nPor ahora solo quiero dejar mi contacto.':'\nQuiero coordinar la demostración de 15 minutos.');
+    bot('Listo, '+(L.nombre||'').split(' ')[0]+'. Ya tengo todo lo necesario ✅','bot',800,function(){
+      bot(L.nivel==='FRIO'?'Toca el botón y le dejas tu contacto a Isnel — te escribirá cuando sea el momento.'
+        :'Toca el botón y te llevo directo al WhatsApp de Isnel con el resumen escrito — solo le das enviar y coordinamos la hora.','bot',900,function(){
+        var a=document.createElement('a'); a.className='cb-cta'; a.target='_blank'; a.rel='noopener';
+        a.href='https://wa.me/'+WA+'?text='+encodeURIComponent(res);
+        a.textContent=L.nivel==='FRIO'?'Dejar mi contacto →':'Enviar y coordinar mi demostración →';
         msgs.appendChild(a); abajo();
-        input.placeholder = 'Escribe si necesitas algo más…';
+        input.placeholder='Escribe si necesitas algo más…';
         guarda();
       });
     });
   }
-  function guarda() {
-    if (!CRM_ENDPOINT) return;
-    var icono = L.nivel === 'CALIENTE' ? '🔥' : (L.nivel === 'TIBIO' ? '🟡' : '⚪');
-    var d = { nombre:L.nombre, negocio:L.negocio, rubro:L.rubro, contacto:L.contacto,
-              dolor:L.dolor, origen:'chatbox web',
-              notas: icono + ' ' + (L.nivel || 'SIN CALIFICAR') + ' (' + L.score + '/10) · '
-                     + [L.rol, L.volumen, L.urgencia].filter(Boolean).join(' · ')
-                     + (L.notas.length ? ' · ' + L.notas.join(' | ') : '') };
-    /* GET con parámetros: el método que Apps Script sirve sin fricción de CORS */
-    var q = Object.keys(d).map(function (k) {
-      return encodeURIComponent(k) + '=' + encodeURIComponent((d[k] || '').toString().slice(0, 400));
-    }).join('&');
-    try { fetch(CRM_ENDPOINT + '?' + q, { method:'GET', mode:'no-cors', cache:'no-store' }); }
-    catch (e) { try { new Image().src = CRM_ENDPOINT + '?' + q; } catch (e2) {} }
+
+  function guarda(){
+    if(!CRM) return;
+    var icono=L.nivel==='CALIENTE'?'🔥':(L.nivel==='TIBIO'?'🟡':'⚪');
+    var d={ nombre:L.nombre, negocio:L.negocio, rubro:L.rubro, contacto:L.contacto, dolor:L.dolor,
+      origen:'chatbox web',
+      notas: icono+' '+(L.nivel||'SIN CALIFICAR')+' ('+L.score+'/10) · '
+        +[L.rol,L.volumen,L.urgencia].filter(Boolean).join(' · ')
+        +(L.temas.length?' · preguntó por: '+L.temas.slice(0,5).join(', '):'')
+        +(L.notas.length?' · '+L.notas.join(' | '):'') };
+    var q=Object.keys(d).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent((d[k]||'').toString().slice(0,450)); }).join('&');
+    try{ fetch(CRM+'?'+q,{method:'GET',mode:'no-cors',cache:'no-store'}); }
+    catch(e){ try{ new Image().src=CRM+'?'+q; }catch(e2){} }
   }
 
-  /* ---------- interacción ---------- */
-  function abre() {
-    caja.classList.add('abierto'); lanza.classList.add('oculto');
-    arranca(); setTimeout(function(){ if (window.innerWidth > 560) input.focus(); }, 350);
-  }
-  function tapa() { caja.classList.remove('abierto'); lanza.classList.remove('oculto'); }
-  lanza.addEventListener('click', abre);
-  document.getElementById('cb-cerrar').addEventListener('click', tapa);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && caja.classList.contains('abierto')) tapa(); });
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var v = input.value.trim(); if (!v) return;
-    burbuja(v, 'yo'); input.value = ''; chips.innerHTML = '';
-    setTimeout(function(){ libre(v); }, 220);
-  });
+  function abre(){ caja.classList.add('abierto'); lanza.classList.add('oculto'); arranca();
+    setTimeout(function(){ if(innerWidth>560) input.focus(); },350); }
+  function tapa(){ caja.classList.remove('abierto'); lanza.classList.remove('oculto'); }
+  lanza.addEventListener('click',abre);
+  document.getElementById('cb-cerrar').addEventListener('click',tapa);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&caja.classList.contains('abierto')) tapa(); });
+  form.addEventListener('submit',function(e){ e.preventDefault();
+    var v=input.value.trim(); if(!v) return;
+    burbuja(v,'yo'); historial.push({r:'u',t:v}); input.value=''; chips.innerHTML='';
+    setTimeout(function(){ libre(v); },200); });
 
-  /* invitación discreta: si el visitante llega al final sin abrirlo */
-  var invitado = false;
-  addEventListener('scroll', function () {
-    if (invitado || cerrado) return;
-    var h = document.documentElement;
-    if (h.scrollTop / (h.scrollHeight - h.clientHeight) > 0.55) {
-      invitado = true;
-      lanza.querySelector('.globo').innerHTML = '¿Te muestro cómo funciona? <b>Pregúntame</b>';
-    }
-  }, { passive:true });
+  var invitado=false;
+  addEventListener('scroll',function(){ if(invitado) return;
+    var h=document.documentElement;
+    if(h.scrollTop/(h.scrollHeight-h.clientHeight)>0.55){ invitado=true;
+      var g=lanza.querySelector('.globo'); if(g) g.innerHTML='¿Te muestro cómo funciona? <b>Pregúntame</b>'; }
+  },{passive:true});
 })();
 </script>
 
