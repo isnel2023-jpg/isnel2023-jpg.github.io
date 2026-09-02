@@ -362,30 +362,51 @@ if(window.speechSynthesis){
 if(selVoz) selVoz.onchange=aplicaVoz;
 
 document.getElementById('btnProbar').onclick=function(){
-  aplicaVoz();
+  desbloqueaAudio(); aplicaVoz();
   var neg=document.getElementById('fNeg').value.trim()||'la clínica';
   var r=RUBROS[document.getElementById('fRub').value];
   var nm=document.getElementById('fRec').value.trim()||r.rec;
   hablaTexto(neg+', buenas. Habla '+nm+'. ¿En qué le puedo ayudar?');
 };
 
-var VOZ_EL=null, elDisponible=false, audioActual=null;
+var VOZ_EL=null, elDisponible=false;
+/* Un solo <audio> reutilizado. Se "desbloquea" con el clic de Llamar y ya
+   queda autorizado para sonar después, aunque el audio llegue más tarde. */
+var reproductor=null, audioListo=false;
+function desbloqueaAudio(){
+  if(!reproductor){
+    reproductor=new Audio();
+    reproductor.setAttribute('playsinline','');
+    reproductor.preload='auto';
+  }
+  try{
+    reproductor.src='data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA';
+    var p=reproductor.play();
+    if(p&&p.then) p.then(function(){audioListo=true;}).catch(function(){});
+  }catch(e){}
+}
 
 /* pide a ElevenLabs (vía el Worker) el audio; si no hay, usa la del navegador */
 function hablaTexto(txt,luego){
   if(VOZ_EL && elDisponible){
-    if(audioActual){ try{audioActual.pause()}catch(e){} }
+    if(!reproductor) desbloqueaAudio();
+    try{ reproductor.pause(); }catch(e){}
     fetch(IA+'/voz',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({texto:txt,voz:VOZ_EL})})
-      .then(function(r){ if(!r.ok) throw new Error('voz'); return r.blob(); })
+      .then(function(r){ if(!r.ok) throw new Error('voz '+r.status); return r.blob(); })
       .then(function(b){
         var url=URL.createObjectURL(b);
-        audioActual=new Audio(url);
-        audioActual.onended=function(){ URL.revokeObjectURL(url); if(luego) luego(); };
-        audioActual.onerror=function(){ URL.revokeObjectURL(url); navegadorHabla(txt,luego); };
-        audioActual.play().catch(function(){ navegadorHabla(txt,luego); });
+        reproductor.onended=function(){ URL.revokeObjectURL(url); if(luego) luego(); };
+        reproductor.onerror=function(){ URL.revokeObjectURL(url); navegadorHabla(txt,luego); };
+        reproductor.src=url;
+        var p=reproductor.play();
+        if(p&&p.catch) p.catch(function(){ URL.revokeObjectURL(url); navegadorHabla(txt,luego); });
       })
-      .catch(function(){ navegadorHabla(txt,luego); });
+      .catch(function(err){
+        var hh=document.getElementById('hint');
+        if(hh) hh.textContent='Voz real no disponible — usando la del navegador';
+        navegadorHabla(txt,luego);
+      });
     return;
   }
   navegadorHabla(txt,luego);
@@ -618,8 +639,9 @@ document.getElementById('btnLlamar').onclick=function(){
   hint.textContent=''; teclado(false);
   ver('call');
 
-  /* desbloquea el audio con el gesto del usuario */
-  if(window.speechSynthesis){ var w=new SpeechSynthesisUtterance(' '); w.volume=0; speechSynthesis.speak(w); }
+  /* desbloquea el audio con el gesto del usuario — obligatorio en iPhone */
+  desbloqueaAudio();
+  if(window.speechSynthesis){ try{ var w=new SpeechSynthesisUtterance(' '); w.volume=0; speechSynthesis.speak(w); }catch(e){} }
 
   setTimeout(function(){
     est.className='est'; est.textContent='En llamada';
@@ -636,7 +658,7 @@ document.getElementById('btnLlamar').onclick=function(){
 
 document.getElementById('btnColgar').onclick=function(){
   enLlamada=false; paraEscucha();
-  if(audioActual){ try{audioActual.pause()}catch(e){} }
+  if(reproductor){ try{ reproductor.pause(); reproductor.onended=null; }catch(e){} }
   if(window.speechSynthesis) speechSynthesis.cancel();
   clearInterval(cronId);
   var s=Math.floor((Date.now()-t0)/1000);
