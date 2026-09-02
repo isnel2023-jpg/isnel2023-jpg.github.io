@@ -58,7 +58,12 @@ body{background:var(--ink);color:var(--bone);font-family:var(--sans);font-weight
   padding:17px;color:#06180E;font:500 .84rem var(--sans);letter-spacing:.14em;
   text-transform:uppercase;cursor:pointer;transition:.25s}
 .llamar:hover{filter:brightness(1.1)}
-.nota{margin-top:15px;font-size:.72rem;color:rgba(244,240,233,.38);line-height:1.6;text-align:center}
+.diag{margin-top:15px;font-size:.74rem;line-height:1.85;color:rgba(244,240,233,.55)}
+.diag b{color:var(--verde);font-weight:400}
+.diag u{color:#E4A08C;text-decoration:none}
+.err{background:rgba(196,69,58,.14);border:1px solid rgba(196,69,58,.35);border-radius:10px;
+  padding:12px 14px;margin-top:14px;font-size:.78rem;color:#F2C9C4;line-height:1.55;word-break:break-word}
+.nota{margin-top:11px;font-size:.72rem;color:rgba(244,240,233,.38);line-height:1.6;text-align:center}
 
 /* ---- llamada ---- */
 #call{padding:0;position:relative}
@@ -166,6 +171,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--sans);font-weight
     <button class="probar" id="btnProbar">▶ Escuchar cómo suena</button>
 
     <button class="llamar" id="btnLlamar">📞 Llamar ahora</button>
+    <div class="diag" id="diag"></div>
     <p class="nota">Va a pedirle permiso al micrófono. También puede escribir en vez de hablar.</p>
   </div>
 
@@ -209,7 +215,22 @@ body{background:var(--ink);color:var(--bone);font-family:var(--sans);font-weight
    Corre entera en el navegador. Sin cuentas, sin costo por minuto.
    ============================================================ */
 
-var IA = 'https://lion-ai.resonant-shroud-af6.workers.dev'; /* cerebro; si falla, usa el motor local */
+var IA = 'https://lion-ai.resonant-shroud-af6.workers.dev';
+
+/* si algo revienta, que se vea en pantalla y no en silencio */
+window.onerror=function(m,f,l){
+  var d=document.getElementById('diag');
+  if(d){ var e=document.createElement('div'); e.className='err';
+    e.textContent='Error: '+m+(l?' (línea '+l+')':''); d.appendChild(e); }
+  return false;
+};
+var ES_SAFARI=/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+function diag(txt,ok){
+  var d=document.getElementById('diag'); if(!d) return;
+  var p=document.createElement('div');
+  p.innerHTML=(ok?'<b>✓</b> ':'<u>·</u> ')+txt;
+  d.appendChild(p);
+} /* cerebro; si falla, usa el motor local */
 
 /* ---------- perfiles por rubro (sacados de los 75 leads reales) ---------- */
 var RUBROS = {
@@ -459,6 +480,14 @@ function cargaEleven(intento){
 }
 cargaEleven();
 
+/* estado, para que se vea qué hay y qué no */
+setTimeout(function(){
+  diag('Audio del navegador', true);
+  var hayMic = !!(window.SpeechRecognition||window.webkitSpeechRecognition);
+  diag(hayMic ? 'Micrófono disponible' : 'Este navegador no transcribe voz — use el teclado', hayMic);
+  if(ES_SAFARI) diag('Safari detectado: si el micrófono no responde, toque el botón «abc» y escriba', false);
+},600);
+
 function aplicaVoz(){
   var v=selVoz.value||'';
   if(v.indexOf('el:')===0){ VOZ_EL=v.slice(3); vozSel=null; }
@@ -503,7 +532,9 @@ function escucha(){
   if(!enLlamada||mudo||hablando||escuchando) return;
   try{
     rec=new SR();
-    rec.lang='es-US'; rec.continuous=true; rec.interimResults=true; rec.maxAlternatives=1;
+    rec.lang='es-US'; rec.maxAlternatives=1;
+    rec.continuous = !ES_SAFARI;        /* Safari ignora continuous y falla */
+    rec.interimResults = !ES_SAFARI;
 
     rec.onstart=function(){ escuchando=true; pintaOnda(true); hint.textContent='Le escucho…'; };
 
