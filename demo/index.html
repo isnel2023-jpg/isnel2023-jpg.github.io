@@ -578,7 +578,33 @@ function escucha(){
   }
 }
 
-/* el botón ahora solo silencia, no es para hablar */
+
+/* ---------- teclado: alternativa a hablar ---------- */
+function teclado(on){
+  var t=document.getElementById('tec');
+  if(!t) return;
+  t.classList.toggle('on',on);
+  if(on){ var i=document.getElementById('txt'); if(i) i.focus(); }
+}
+function enviaTexto(){
+  var i=document.getElementById('txt'); if(!i) return;
+  var v=i.value.trim(); if(!v) return;
+  i.value=''; manda(v);
+}
+(function(){
+  var be=document.getElementById('btnEsc');
+  if(be) be.onclick=function(){
+    var t=document.getElementById('tec');
+    teclado(!(t&&t.classList.contains('on')));
+  };
+  var bv=document.getElementById('btnEnv');
+  if(bv) bv.onclick=enviaTexto;
+  var tx=document.getElementById('txt');
+  if(tx) tx.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); enviaTexto(); } });
+})();
+
+/* el botón del micrófono silencia; no es para pulsar y hablar */
+
 btnMic.onclick=function(){
   mudo=!mudo;
   btnMic.classList.toggle('mudo',mudo);
