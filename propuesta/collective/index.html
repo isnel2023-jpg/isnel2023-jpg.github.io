@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Collective Aesthetics — Propuesta de presencia digital</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  --tinta:#100E0D; --tinta2:#181513; --tinta3:#221D1A;
+  --champan:#C9A88C; --champan-hi:#E3C9AE; --champan-lo:#8F7259;
+  --euca:#4A5A50;
+  --hueso:#F2ECE6; --muted:#9A8E85; --linea:rgba(201,168,140,.18);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --ui:'Jost',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--tinta);color:var(--hueso);font-family:var(--ui);font-weight:300;
+  line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+h1,h2,h3{font-family:var(--serif);font-weight:300;letter-spacing:.01em;margin:0;text-wrap:balance}
+a{color:inherit}
+
+/* ---------- cinta de propuesta ---------- */
+.cinta{position:relative;z-index:60;background:linear-gradient(90deg,#1C1815,#241E19);
+  border-bottom:1px solid var(--linea);padding:9px 20px;text-align:center;
+  font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--champan)}
+.cinta b{color:var(--champan-hi);font-weight:500}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(16,14,13,.82);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--linea);padding:14px 26px;display:flex;align-items:center;gap:22px}
+.marca{font-family:var(--serif);font-size:1.22rem;letter-spacing:.08em;color:var(--hueso);white-space:nowrap}
+.marca i{font-style:normal;color:var(--champan)}
+nav .lks{margin-left:auto;display:flex;gap:24px;font-size:.78rem;letter-spacing:.11em;text-transform:uppercase}
+nav .lks a{text-decoration:none;color:var(--muted);transition:color .3s}
+nav .lks a:hover{color:var(--champan-hi)}
+.idioma{display:flex;border:1px solid var(--linea);border-radius:99px;overflow:hidden}
+.idioma button{background:none;border:0;color:var(--muted);font:500 .68rem var(--ui);letter-spacing:.1em;
+  padding:6px 12px;cursor:pointer;transition:.25s}
+.idioma button.on{background:var(--champan);color:var(--tinta)}
+@media(max-width:900px){nav .lks{display:none}}
+
+/* ---------- hero ---------- */
+header{position:relative;min-height:88vh;display:flex;align-items:center;padding:90px 26px;overflow:hidden}
+.aura{position:absolute;inset:0;z-index:0;pointer-events:none}
+.aura i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:flota 22s ease-in-out infinite}
+.aura i:nth-child(1){width:52vw;height:52vw;background:#6B5340;top:-16%;right:-12%}
+.aura i:nth-child(2){width:38vw;height:38vw;background:#3A4A41;bottom:-14%;left:-8%;animation-delay:-8s}
+.aura i:nth-child(3){width:26vw;height:26vw;background:#8F7259;top:38%;left:32%;opacity:.28;animation-delay:-14s}
+@keyframes flota{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,-4%) scale(1.09)}}
+.hero{position:relative;z-index:1;max-width:1180px;margin:0 auto;width:100%}
+.eyebrow{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--champan);margin-bottom:26px}
+h1{font-size:clamp(2.9rem,7.4vw,5.6rem);line-height:1.02;max-width:15ch}
+h1 em{font-style:italic;color:var(--champan-hi)}
+.bajada{margin:28px 0 0;font-size:1.06rem;color:#C8BCB2;max-width:46ch;font-weight:300}
+.ctas{margin-top:44px;display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:99px;padding:15px 30px;
+  font:500 .8rem var(--ui);letter-spacing:.13em;text-transform:uppercase;text-decoration:none;
+  cursor:pointer;border:1px solid var(--champan);transition:.3s}
+.btn.p{background:var(--champan);color:var(--tinta)}
+.btn.p:hover{background:var(--champan-hi);transform:translateY(-2px)}
+.btn.s{background:transparent;color:var(--champan-hi)}
+.btn.s:hover{background:rgba(201,168,140,.11)}
+
+/* ---------- prueba ---------- */
+.prueba{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  display:grid;grid-template-columns:repeat(4,1fr);background:var(--tinta2)}
+.prueba div{padding:30px 22px;text-align:center;border-right:1px solid var(--linea)}
+.prueba div:last-child{border-right:0}
+.prueba b{display:block;font-family:var(--serif);font-size:2.1rem;color:var(--champan-hi);line-height:1}
+.prueba span{display:block;margin-top:8px;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:760px){.prueba{grid-template-columns:1fr 1fr}
+  .prueba div:nth-child(2){border-right:0}.prueba div:nth-child(-n+2){border-bottom:1px solid var(--linea)}}
+
+/* ---------- secciones ---------- */
+section{padding:96px 26px;max-width:1180px;margin:0 auto}
+.tit{font-size:clamp(2rem,4.4vw,3.2rem);margin-bottom:14px}
+.sub{color:var(--muted);max-width:54ch;margin:0 0 52px;font-size:.98rem}
+
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px}
+.card{background:var(--tinta2);border:1px solid var(--linea);border-radius:3px;padding:34px 30px;
+  transition:.4s;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;left:0;top:0;height:100%;width:2px;background:var(--champan);
+  transform:scaleY(0);transform-origin:top;transition:transform .45s ease}
+.card:hover{background:var(--tinta3);transform:translateY(-4px)}
+.card:hover::after{transform:scaleY(1)}
+.card h3{font-size:1.5rem;margin-bottom:12px;color:var(--hueso)}
+.card p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.7}
+.card .lista{margin:16px 0 0;padding:0;list-style:none;font-size:.86rem;color:#B5A99F}
+.card .lista li{padding:5px 0 5px 17px;position:relative}
+.card .lista li::before{content:'';position:absolute;left:0;top:14px;width:6px;height:1px;background:var(--champan)}
+.precio{margin-top:20px;padding-top:16px;border-top:1px solid var(--linea);
+  font-family:var(--serif);font-size:1.32rem;color:var(--champan-hi)}
+.precio small{display:block;font-family:var(--ui);font-size:.7rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* tecnología */
+.tec{background:var(--tinta2);border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+.tec-in{max-width:1180px;margin:0 auto;padding:96px 26px}
+.equipos{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;
+  background:var(--linea);border:1px solid var(--linea);margin-top:44px}
+.equipos div{background:var(--tinta);padding:34px 26px}
+.equipos b{display:block;font-family:var(--serif);font-size:1.75rem;color:var(--champan-hi);margin-bottom:9px}
+.equipos p{margin:0;font-size:.85rem;color:var(--muted);line-height:1.65}
+
+/* membresías */
+.memb{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:20px;margin-top:12px}
+.plan{border:1px solid var(--linea);border-radius:3px;padding:38px 30px;text-align:center;transition:.4s;background:var(--tinta2)}
+.plan.destaca{border-color:var(--champan);background:linear-gradient(180deg,rgba(201,168,140,.09),transparent)}
+.plan:hover{transform:translateY(-5px)}
+.plan h3{font-size:1.16rem;letter-spacing:.2em;text-transform:uppercase;font-family:var(--ui);
+  font-weight:400;color:var(--champan);margin-bottom:18px}
+.plan .p{font-family:var(--serif);font-size:3.3rem;color:var(--hueso);line-height:1}
+.plan .p sup{font-size:1.2rem;vertical-align:super;color:var(--champan)}
+.plan .p span{display:block;font-family:var(--ui);font-size:.68rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-top:8px}
+
+/* cierre */
+.cierre{text-align:center;padding:110px 26px}
+.cierre h2{font-size:clamp(2.1rem,5vw,3.6rem);max-width:19ch;margin:0 auto 22px}
+.cierre p{color:var(--muted);max-width:44ch;margin:0 auto 40px}
+
+footer{border-top:1px solid var(--linea);background:var(--tinta2);padding:60px 26px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:38px;max-width:1180px;margin:0 auto}
+footer h4{font-family:var(--ui);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--champan);margin:0 0 14px;font-weight:500}
+footer p,footer a{margin:0 0 7px;font-size:.88rem;color:var(--muted);text-decoration:none;display:block}
+footer a:hover{color:var(--champan-hi)}
+.legal{grid-column:1/-1;border-top:1px solid var(--linea);padding-top:26px;font-size:.72rem;color:#6E645C}
+
+
+/* ---------- diagnóstico ---------- */
+.diag{background:linear-gradient(180deg,#0C0A09,#141110);border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+.diag-in{max-width:1180px;margin:0 auto;padding:104px 26px}
+.reloj{margin:52px 0 0;border:1px solid var(--linea);background:var(--tinta);padding:34px 30px}
+.reloj .lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.reloj .lab b{font-family:var(--serif);font-size:1.5rem;color:var(--hueso)}
+.reloj .lab span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.horas{display:grid;grid-template-columns:repeat(28,1fr);gap:3px}
+.horas i{aspect-ratio:1;border-radius:1px;background:rgba(255,255,255,.055);transition:background .5s ease}
+.horas i.viva{background:var(--champan)}
+.horas.lleno i{background:var(--champan)}
+.horas.lleno i.viva{background:var(--champan-hi)}
+.leyenda{display:flex;gap:22px;margin-top:16px;flex-wrap:wrap;font-size:.76rem;color:var(--muted)}
+.leyenda span{display:flex;align-items:center;gap:7px}
+.leyenda u{width:11px;height:11px;border-radius:1px;text-decoration:none;display:inline-block}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:44px}
+@media(max-width:800px){.vs{grid-template-columns:1fr}.horas{grid-template-columns:repeat(14,1fr)}}
+.col{border:1px solid var(--linea);padding:30px 28px;background:var(--tinta2)}
+.col.buena{border-color:rgba(201,168,140,.42);background:linear-gradient(180deg,rgba(201,168,140,.07),transparent)}
+.col h4{font-family:var(--ui);font-size:.68rem;letter-spacing:.19em;text-transform:uppercase;margin:0 0 20px;font-weight:500}
+.col.mala h4{color:#B57A6A}.col.buena h4{color:var(--champan)}
+.col ul{margin:0;padding:0;list-style:none}
+.col li{padding:11px 0 11px 27px;position:relative;font-size:.9rem;color:#BFB3A9;border-bottom:1px solid rgba(255,255,255,.045);line-height:1.55}
+.col li:last-child{border:0}
+.col li::before{position:absolute;left:0;top:11px;font-size:.9rem}
+.col.mala li::before{content:'×';color:#B57A6A}
+.col.buena li::before{content:'✓';color:var(--champan)}
+.nota-humana{margin-top:44px;border-left:2px solid var(--champan);padding:6px 0 6px 26px;
+  font-family:var(--serif);font-size:1.3rem;font-style:italic;color:#DCCFC3;max-width:60ch;line-height:1.55}
+
+/* ---------- reveal ---------- */
+.rev{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.16,1,.3,1)}
+.rev.vis{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .rev{opacity:1;transform:none;transition:none}
+  .aura i{animation:none}
+  html{scroll-behavior:auto}
+}
+
+/* ---------- asistente ---------- */
+#burbuja{position:fixed;right:22px;bottom:22px;z-index:90;width:62px;height:62px;border-radius:50%;
+  border:0;cursor:pointer;background:linear-gradient(140deg,var(--champan),var(--champan-lo));
+  color:var(--tinta);font-size:1.5rem;box-shadow:0 12px 34px rgba(0,0,0,.5);transition:.35s;
+  display:flex;align-items:center;justify-content:center}
+#burbuja:hover{transform:scale(1.08)}
+#burbuja .ping{position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--champan);
+  animation:ping 2.4s ease-out infinite;pointer-events:none}
+@keyframes ping{0%{transform:scale(.9);opacity:.8}100%{transform:scale(1.35);opacity:0}}
+#chat{position:fixed;right:22px;bottom:22px;z-index:95;width:min(400px,calc(100vw - 32px));
+  height:min(620px,calc(100vh - 44px));background:var(--tinta2);border:1px solid var(--linea);
+  border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.66);display:none;flex-direction:column;overflow:hidden}
+#chat.on{display:flex;animation:sube .4s cubic-bezier(.16,1,.3,1)}
+@keyframes sube{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+#chat .top{padding:17px 19px;border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,#241E19,#1A1613)}
+#chat .top .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(140deg,var(--champan),var(--champan-lo));
+  display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--tinta);flex:none}
+#chat .top b{display:block;font-family:var(--serif);font-size:1.06rem;font-weight:400}
+#chat .top span{font-size:.68rem;color:#7FD4A8;letter-spacing:.06em}
+#chat .top .x{margin-left:auto;background:none;border:0;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1}
+#msgs{flex:1;overflow-y:auto;padding:19px;display:flex;flex-direction:column;gap:11px}
+.b{max-width:85%;padding:11px 15px;border-radius:14px;font-size:.89rem;line-height:1.55;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.b.bot{background:var(--tinta3);border:1px solid var(--linea);border-bottom-left-radius:4px;align-self:flex-start}
+.b.yo{background:var(--champan);color:var(--tinta);border-bottom-right-radius:4px;align-self:flex-end;font-weight:400}
+.esc{align-self:flex-start;display:flex;gap:4px;padding:12px 15px;background:var(--tinta3);
+  border:1px solid var(--linea);border-radius:14px;border-bottom-left-radius:4px}
+.esc i{width:6px;height:6px;border-radius:50%;background:var(--champan);animation:pt 1.3s infinite}
+.esc i:nth-child(2){animation-delay:.2s}.esc i:nth-child(3){animation-delay:.4s}
+@keyframes pt{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+#chips{padding:0 19px 11px;display:flex;flex-wrap:wrap;gap:7px}
+#chips button{background:rgba(201,168,140,.1);border:1px solid var(--linea);color:var(--champan-hi);
+  border-radius:99px;padding:8px 14px;font:400 .78rem var(--ui);cursor:pointer;transition:.25s}
+#chips button:hover{background:rgba(201,168,140,.2)}
+#form{display:flex;gap:9px;padding:14px 19px;border-top:1px solid var(--linea);background:var(--tinta)}
+#input{flex:1;background:var(--tinta3);border:1px solid var(--linea);border-radius:99px;
+  padding:11px 17px;color:var(--hueso);font:300 .89rem var(--ui);outline:none}
+#input:focus{border-color:var(--champan)}
+#form button{background:var(--champan);border:0;border-radius:50%;width:40px;height:40px;
+  color:var(--tinta);font-size:1rem;cursor:pointer;flex:none}
+.resumen{background:rgba(126,212,168,.08);border:1px solid rgba(126,212,168,.3);border-radius:11px;
+  padding:14px;font-size:.85rem;line-height:1.6;align-self:stretch}
+.resumen b{color:#7FD4A8}
+.resumen a{display:inline-block;margin-top:11px;background:#25D366;color:#08160E;text-decoration:none;
+  padding:10px 17px;border-radius:99px;font:500 .8rem var(--ui);letter-spacing:.04em}
+</style>
+</head>
+<body>
+
+<div class="cinta" data-es="Propuesta de presencia digital preparada por <b>Lion AI · Lion Systems Group LLC</b> para Collective Aesthetics" data-en="Digital presence proposal prepared by <b>Lion AI · Lion Systems Group LLC</b> for Collective Aesthetics">
+  Propuesta de presencia digital preparada por <b>Lion AI · Lion Systems Group LLC</b> para Collective Aesthetics
+</div>
+
+<nav>
+  <div class="marca">Collective <i>Aesthetics</i></div>
+  <div class="lks">
+    <a href="#servicios" data-es="Tratamientos" data-en="Treatments">Tratamientos</a>
+    <a href="#tecnologia" data-es="Tecnología" data-en="Technology">Tecnología</a>
+    <a href="#membresias" data-es="Membresías" data-en="Memberships">Membresías</a>
+    <a href="#contacto" data-es="Contacto" data-en="Contact">Contacto</a>
+  </div>
+  <div class="idioma">
+    <button id="bES" class="on">ES</button><button id="bEN">EN</button>
+  </div>
+</nav>
+
+<header>
+  <div class="aura"><i></i><i></i><i></i></div>
+  <div class="hero">
+    <div class="eyebrow rev" data-es="Miramar · Medicina estética" data-en="Miramar · Aesthetic medicine">Miramar · Medicina estética</div>
+    <h1 class="rev" data-es="Resultados naturales, <em>criterio clínico</em> real." data-en="Natural results, real <em>clinical judgment</em>.">Resultados naturales, <em>criterio clínico</em> real.</h1>
+    <p class="bajada rev" data-es="Amparo Robles, MSN, APRN, FNP-BC. Quince años de práctica médica detrás de cada tratamiento. Aquí no se compromete la calidad — ni la suya ni la de sus resultados." data-en="Amparo Robles, MSN, APRN, FNP-BC. Fifteen years of medical practice behind every treatment. Quality is never compromised — not hers, not your results.">Amparo Robles, MSN, APRN, FNP-BC. Quince años de práctica médica detrás de cada tratamiento. Aquí no se compromete la calidad — ni la suya ni la de sus resultados.</p>
+    <div class="ctas rev">
+      <button class="btn p" id="abrir1" data-es="Agendar mi consulta" data-en="Book my consultation">Agendar mi consulta</button>
+      <a class="btn s" href="#servicios" data-es="Ver tratamientos" data-en="See treatments">Ver tratamientos</a>
+    </div>
+  </div>
+</header>
+
+<div class="prueba">
+  <div><b>5.0</b><span data-es="98 reseñas · Google" data-en="98 reviews · Google">98 reseñas · Google</span></div>
+  <div><b>15+</b><span data-es="Años en medicina" data-en="Years in medicine">Años en medicina</span></div>
+  <div><b>24/7</b><span data-es="Atención por asistente" data-en="Assistant availability">Atención por asistente</span></div>
+  <div><b>ES · EN</b><span data-es="Atendemos en dos idiomas" data-en="We serve in both languages">Atendemos en dos idiomas</span></div>
+</div>
+
+
+<div class="diag">
+ <div class="diag-in">
+  <div class="eyebrow rev" data-es="El diagnóstico" data-en="The diagnosis">El diagnóstico</div>
+  <h2 class="tit rev" data-es="Su marketing trabaja 168 horas. Su teléfono, 35." data-en="Your marketing works 168 hours. Your phone, 35.">Su marketing trabaja 168 horas. Su teléfono, 35.</h2>
+  <p class="sub rev" data-es="Esto no es una opinión. Revisamos su sitio, su sitemap y su código antes de escribirle." data-en="This is not an opinion. We reviewed your site, your sitemap and your code before writing to you.">Esto no es una opinión. Revisamos su sitio, su sitemap y su código antes de escribirle.</p>
+
+  <div class="reloj rev">
+    <div class="lab">
+      <b data-es="Una semana suya, hora por hora" data-en="One week of yours, hour by hour">Una semana suya, hora por hora</b>
+      <span id="etiqueta" data-es="hoy · 35 de 168 horas" data-en="today · 35 of 168 hours">hoy · 35 de 168 horas</span>
+    </div>
+    <div class="horas" id="horas"></div>
+    <div class="leyenda">
+      <span><u style="background:var(--champan)"></u><em style="font-style:normal" data-es="Alguien puede contestar" data-en="Someone can answer">Alguien puede contestar</em></span>
+      <span><u style="background:rgba(255,255,255,.09)"></u><em style="font-style:normal" data-es="Nadie recoge — y su marketing sigue corriendo" data-en="Nobody picks up — and your marketing keeps running">Nadie recoge — y su marketing sigue corriendo</em></span>
+    </div>
+  </div>
+
+  <div class="vs">
+    <div class="col mala rev">
+      <h4 data-es="Lo que encontramos hoy" data-en="What we found today">Lo que encontramos hoy</h4>
+      <ul>
+        <li data-es="Su WhatsApp y su teléfono son el mismo número: el 305 528 3360. No hay una línea aparte." data-en="Your WhatsApp and your phone are the same number: 305 528 3360. There is no separate line.">Su WhatsApp y su teléfono son el mismo número: el 305 528 3360. No hay una línea aparte.</li>
+        <li data-es="El mensaje que trae su botón de WhatsApp dice “quiero agendar una consulta”. Cada persona que lo toca ya venía decidida." data-en="Your WhatsApp button's preset message says “I would like to book a consultation.” Everyone who taps it already decided.">El mensaje que trae su botón de WhatsApp dice “quiero agendar una consulta”. Cada persona que lo toca ya venía decidida.</li>
+        <li data-es="Su sitio está solo en inglés, con páginas hechas para Hialeah y Miami Gardens." data-en="Your site is English-only, with pages built for Hialeah and Miami Gardens.">Su sitio está solo en inglés, con páginas hechas para Hialeah y Miami Gardens.</li>
+        <li data-es="Su horario en Fresha no coincide con el de su web: hay quien la busca un día que sí abre y cree que está cerrada." data-en="Your Fresha hours do not match your website's: someone checks on a day you are open and thinks you are closed.">Su horario en Fresha no coincide con el de su web: hay quien la busca un día que sí abre y cree que está cerrada.</li>
+        <li data-es="No hay ningún chat ni respuesta automática en todo el sitio. Ni uno." data-en="There is no chat or automated response anywhere on the site. Not one.">No hay ningún chat ni respuesta automática en todo el sitio. Ni uno.</li>
+      </ul>
+    </div>
+    <div class="col buena rev">
+      <h4 data-es="Lo que cambia en dos semanas" data-en="What changes in two weeks">Lo que cambia en dos semanas</h4>
+      <ul>
+        <li data-es="Un asistente que contesta en segundos, las 24 horas, en español y en inglés — como el de esta página." data-en="An assistant that replies in seconds, 24 hours, in Spanish and English — like the one on this page.">Un asistente que contesta en segundos, las 24 horas, en español y en inglés — como el de esta página.</li>
+        <li data-es="Cada llamada que no alcance a contestar recibe un texto automático al instante, antes de que llamen a otra clínica." data-en="Every call you miss gets an instant text back, before they call another clinic.">Cada llamada que no alcance a contestar recibe un texto automático al instante, antes de que llamen a otra clínica.</li>
+        <li data-es="La cita queda agendada sola, sin que usted suelte lo que está haciendo." data-en="The appointment books itself, without you putting down what you are doing.">La cita queda agendada sola, sin que usted suelte lo que está haciendo.</li>
+        <li data-es="Confirmación automática el día antes: menos huecos, menos multas de $50 que cobrar." data-en="Automatic confirmation the day before: fewer gaps, fewer $50 fees to charge.">Confirmación automática el día antes: menos huecos, menos multas de $50 que cobrar.</li>
+        <li data-es="Un solo lugar para todo lo que entra, y usted vuelve a dedicarse a la silla." data-en="One place for everything coming in, and you go back to the chair.">Un solo lugar para todo lo que entra, y usted vuelve a dedicarse a la silla.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="nota-humana rev" data-es="“Sus 98 reseñas están en cinco estrellas, sin una sola queja. El problema nunca fue la gente que llega a su silla — esos salen encantados. Es la que nunca llegó. Y esa no deja reseña.”" data-en="“Your 98 reviews sit at five stars, without a single complaint. The problem was never the people who reach your chair — they leave delighted. It is the ones who never arrived. And those leave no review.”">“Sus 98 reseñas están en cinco estrellas, sin una sola queja. El problema nunca fue la gente que llega a su silla — esos salen encantados. Es la que nunca llegó. Y esa no deja reseña.”</p>
+ </div>
+</div>
+
+<section id="servicios">
+  <h2 class="tit rev" data-es="Tratamientos" data-en="Treatments">Tratamientos</h2>
+  <p class="sub rev" data-es="Cada procedimiento lo realiza una enfermera de práctica avanzada certificada, no una esteticista. Esa es la diferencia." data-en="Every procedure is performed by a board-certified advanced practice nurse, not an esthetician. That is the difference.">Cada procedimiento lo realiza una enfermera de práctica avanzada certificada, no una esteticista. Esa es la diferencia.</p>
+  <div class="rejilla">
+
+    <div class="card rev">
+      <h3 data-es="Inyectables" data-en="Injectables">Inyectables</h3>
+      <p data-es="Relajación de líneas de expresión y restauración de volumen con un criterio conservador: que se vea usted, descansada." data-en="Line relaxation and volume restoration with a conservative eye: you should look like yourself, rested.">Relajación de líneas de expresión y restauración de volumen con un criterio conservador: que se vea usted, descansada.</p>
+      <ul class="lista">
+        <li>Botox · Xeomin</li><li>Dermal fillers · Lip filler · Lip flip</li>
+        <li data-es="Relleno de ojera y mandíbula" data-en="Under-eye and jawline filler">Relleno de ojera y mandíbula</li><li>PRP · PRF · Cellenis</li>
+      </ul>
+      <div class="precio">$500 – $1,200<small data-es="por jeringa de filler de labios" data-en="per lip filler syringe">por jeringa de filler de labios</small></div>
+    </div>
+
+    <div class="card rev">
+      <h3 data-es="Piel" data-en="Skin">Piel</h3>
+      <p data-es="Renovación profunda de la textura, el poro y la cicatriz, con protocolos médicos y tiempos de recuperación reales." data-en="Deep renewal of texture, pores and scarring, with medical protocols and honest recovery times.">Renovación profunda de la textura, el poro y la cicatriz, con protocolos médicos y tiempos de recuperación reales.</p>
+      <ul class="lista">
+        <li>Microneedling · SkinPen</li><li>RF Microneedling</li>
+        <li data-es="Peeling médico · VI Peel" data-en="Medical peel · VI Peel">Peeling médico · VI Peel</li><li>Plasma IQ</li>
+      </ul>
+      <div class="precio">$766<small data-es="RF Microneedling — precio especial" data-en="RF Microneedling — special price">RF Microneedling — precio especial</small></div>
+    </div>
+
+    <div class="card rev">
+      <h3 data-es="Peso y metabolismo" data-en="Weight & metabolism">Peso y metabolismo</h3>
+      <p data-es="Programa médico con seguimiento mensual. No es una dieta: es tratamiento con control clínico." data-en="Medically supervised program with monthly follow-up. Not a diet: treatment with clinical oversight.">Programa médico con seguimiento mensual. No es una dieta: es tratamiento con control clínico.</p>
+      <ul class="lista">
+        <li>GLP-1 · Semaglutide</li><li>Wegovy · Saxenda</li>
+        <li>Mounjaro · Zepbound</li><li data-es="Inyecciones lipolíticas" data-en="Lipolytic injections">Inyecciones lipolíticas</li>
+      </ul>
+      <div class="precio">$300 – $600<small data-es="al mes · incluye seguimiento" data-en="per month · follow-up included">al mes · incluye seguimiento</small></div>
+    </div>
+
+    <div class="card rev">
+      <h3 data-es="Bienestar y hormonas" data-en="Wellness & hormones">Bienestar y hormonas</h3>
+      <p data-es="Para el cansancio que no se va durmiendo. Evaluación hormonal y terapias intravenosas con indicación médica." data-en="For the fatigue sleep does not fix. Hormone evaluation and IV therapies under medical indication.">Para el cansancio que no se va durmiendo. Evaluación hormonal y terapias intravenosas con indicación médica.</p>
+      <ul class="lista">
+        <li data-es="Terapia de reemplazo hormonal" data-en="Hormone replacement therapy">Terapia de reemplazo hormonal</li>
+        <li data-es="NAD · Glutatión · Vitamina C · B12" data-en="NAD · Glutathione · Vitamin C · B12">NAD · Glutatión · Vitamina C · B12</li>
+        <li data-es="Sueros intravenosos" data-en="IV drips">Sueros intravenosos</li>
+        <li data-es="Restauración capilar · Escleroterapia" data-en="Hair restoration · Sclerotherapy">Restauración capilar · Escleroterapia</li>
+      </ul>
+      <div class="precio" data-es="Consulta médica" data-en="Medical consultation">Consulta médica<small data-es="el plan se define en la evaluación" data-en="plan defined at evaluation">el plan se define en la evaluación</small></div>
+    </div>
+
+  </div>
+</section>
+
+<div class="tec" id="tecnologia">
+  <div class="tec-in">
+    <h2 class="tit rev" data-es="Tecnología BTL" data-en="BTL Technology">Tecnología BTL</h2>
+    <p class="sub rev" data-es="La plataforma completa, en una sola clínica de Miramar. Equipos que la mayoría de los med spas del sur de Florida no tiene." data-en="The complete platform, in one Miramar clinic. Equipment most South Florida med spas do not have.">La plataforma completa, en una sola clínica de Miramar. Equipos que la mayoría de los med spas del sur de Florida no tiene.</p>
+    <div class="equipos">
+      <div class="rev"><b>EMFACE</b><p data-es="Levanta y tonifica el rostro sin agujas ni tiempo de recuperación." data-en="Lifts and tones the face with no needles and no downtime.">Levanta y tonifica el rostro sin agujas ni tiempo de recuperación.</p></div>
+      <div class="rev"><b>Exion</b><p data-es="Radiofrecuencia para rostro y cuerpo: contorno, firmeza y textura." data-en="Radiofrequency for face and body: contour, firmness and texture.">Radiofrecuencia para rostro y cuerpo: contorno, firmeza y textura.</p></div>
+      <div class="rev"><b>Emtone</b><p data-es="Tratamiento de celulitis y flacidez, sin cirugía." data-en="Cellulite and laxity treatment, without surgery.">Tratamiento de celulitis y flacidez, sin cirugía.</p></div>
+      <div class="rev"><b>Emfemme 360</b><p data-es="Salud íntima femenina y control urinario. Una sesión, sin dolor." data-en="Feminine intimate health and urinary control. One session, painless.">Salud íntima femenina y control urinario. Una sesión, sin dolor.</p></div>
+    </div>
+  </div>
+</div>
+
+<section id="membresias">
+  <h2 class="tit rev" data-es="Membresías" data-en="Memberships">Membresías</h2>
+  <p class="sub rev" data-es="Para quien viene todo el año. Financiamiento disponible con Cherry y CareCredit." data-en="For those who come all year. Financing available through Cherry and CareCredit.">Para quien viene todo el año. Financiamiento disponible con Cherry y CareCredit.</p>
+  <div class="memb">
+    <div class="plan rev"><h3>Premium</h3><div class="p"><sup>$</sup>130<span data-es="al mes" data-en="per month">al mes</span></div></div>
+    <div class="plan destaca rev"><h3>Gold</h3><div class="p"><sup>$</sup>170<span data-es="al mes" data-en="per month">al mes</span></div></div>
+    <div class="plan rev"><h3>Platinum</h3><div class="p"><sup>$</sup>230<span data-es="al mes" data-en="per month">al mes</span></div></div>
+  </div>
+</section>
+
+<div class="cierre">
+  <h2 class="rev" data-es="Su consulta empieza con una conversación." data-en="Your consultation starts with a conversation.">Su consulta empieza con una conversación.</h2>
+  <p class="rev" data-es="Escriba a cualquier hora. El asistente responde en segundos, en español o en inglés, y le deja la cita agendada." data-en="Write any time. The assistant replies in seconds, in Spanish or English, and books your appointment.">Escriba a cualquier hora. El asistente responde en segundos, en español o en inglés, y le deja la cita agendada.</p>
+  <button class="btn p rev" id="abrir2" data-es="Hablar con el asistente" data-en="Talk to the assistant">Hablar con el asistente</button>
+</div>
+
+<footer id="contacto">
+  <div>
+    <h4 data-es="Clínica" data-en="Clinic">Clínica</h4>
+    <p>6229 Miramar Pkwy, Ste 7</p><p>Miramar, FL 33023</p>
+  </div>
+  <div>
+    <h4 data-es="Contacto" data-en="Contact">Contacto</h4>
+    <a href="tel:+13055283360">(305) 528-3360</a>
+    <a href="mailto:info@collective-aesthetics.com">info@collective-aesthetics.com</a>
+  </div>
+  <div>
+    <h4 data-es="Atención" data-en="Availability">Atención</h4>
+    <p data-es="Clínica: lunes a sábado" data-en="Clinic: Monday to Saturday">Clínica: lunes a sábado</p>
+    <p data-es="Asistente: 24 horas, todos los días" data-en="Assistant: 24 hours, every day">Asistente: 24 horas, todos los días</p>
+  </div>
+  <div class="legal" data-es="Maqueta de propuesta creada por Lion AI (Lion Systems Group LLC) para Collective Aesthetics. No es el sitio publicado de la clínica. Los servicios, precios y datos mostrados provienen de la información pública de Collective Aesthetics y deben confirmarse antes de publicarse." data-en="Proposal mockup created by Lion AI (Lion Systems Group LLC) for Collective Aesthetics. This is not the clinic's published website. Services, prices and data shown come from Collective Aesthetics' public information and must be confirmed before publishing.">Maqueta de propuesta creada por Lion AI (Lion Systems Group LLC) para Collective Aesthetics. No es el sitio publicado de la clínica. Los servicios, precios y datos mostrados provienen de la información pública de Collective Aesthetics y deben confirmarse antes de publicarse.</div>
+</footer>
+
+<button id="burbuja" aria-label="Abrir asistente"><span class="ping"></span>✦</button>
+
+<div id="chat">
+  <div class="top">
+    <div class="av">✦</div>
+    <div>
+      <b data-es="Asistente" data-en="Assistant">Asistente</b>
+      <span data-es="● En línea ahora" data-en="● Online now">● En línea ahora</span>
+    </div>
+    <button class="x" id="cerrar" aria-label="Cerrar">×</button>
+  </div>
+  <div id="msgs"></div>
+  <div id="chips"></div>
+  <form id="form" autocomplete="off">
+    <input id="input" placeholder="Escriba aquí…" aria-label="Mensaje">
+    <button type="submit" aria-label="Enviar">↑</button>
+  </form>
+</div>
+
+<script>
+/* ==================== IDIOMA ==================== */
+var IDIOMA='es';
+function pintaIdioma(){
+  document.documentElement.lang=IDIOMA;
+  document.querySelectorAll('[data-es]').forEach(function(el){
+    var v=el.getAttribute('data-'+IDIOMA); if(v!=null) el.innerHTML=v;
+  });
+  document.getElementById('input').placeholder = IDIOMA==='es'?'Escriba aquí…':'Type here…';
+  document.getElementById('bES').className = IDIOMA==='es'?'on':'';
+  document.getElementById('bEN').className = IDIOMA==='en'?'on':'';
+}
+document.getElementById('bES').onclick=function(){ IDIOMA='es'; pintaIdioma(); };
+document.getElementById('bEN').onclick=function(){ IDIOMA='en'; pintaIdioma(); };
+
+/* ==================== REVEAL ==================== */
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); } });
+},{threshold:.12});
+document.querySelectorAll('.rev').forEach(function(el,i){ el.style.transitionDelay=(i%4*70)+'ms'; io.observe(el); });
+
+/* ==================== ASISTENTE ==================== */
+(function(){
+  var WA='13055283360';
+  var chat=document.getElementById('chat'), burb=document.getElementById('burbuja'),
+      msgs=document.getElementById('msgs'), chips=document.getElementById('chips'),
+      form=document.getElementById('form'), input=document.getElementById('input');
+
+  var C={ nombre:'', servicio:'', cuando:'', tel:'' };
+  var paso=0, abierto=false;
+
+  var T={
+    es:{
+      saludo:'Buenas 👋 Soy el asistente de Collective Aesthetics. Estoy despierto a cualquier hora — también los domingos.',
+      saludo2:'¿En qué le puedo ayudar? Puede preguntarme por cualquier tratamiento, o le agendo la consulta ahora mismo.',
+      chips:['Quiero agendar','¿Cuánto cuesta el Botox?','¿Qué es EMFACE?','Bajar de peso'],
+      pideNombre:'Con gusto le agendo. ¿Cómo se llama?',
+      pideServicio:function(n){return 'Mucho gusto, '+n+'. ¿Qué tratamiento le interesa? Si no está segura, dígame qué le molesta y yo le sugiero.';},
+      pideCuando:'Perfecto. ¿Qué día y a qué hora le queda mejor? Puede decirme algo como "el jueves en la tarde".',
+      pideTel:'Último dato: ¿a qué número la contactamos para confirmar?',
+      listo:'Listo. Su cita queda solicitada:',
+      cierre:'Amparo o su equipo le confirman por este mismo medio. Si quiere adelantarlo, toque el botón y le llega directo.',
+      wa:'Enviar por WhatsApp',
+      noSe:'Esa no me la sé con certeza, y prefiero no inventarle nada — es un tema médico. Se lo consulto a Amparo y le respondo. ¿Le agendo mejor la consulta y lo ve con ella directamente?'
+    },
+    en:{
+      saludo:'Hi 👋 I am the Collective Aesthetics assistant. I am awake at any hour — Sundays included.',
+      saludo2:'How can I help? Ask me about any treatment, or I can book your consultation right now.',
+      chips:['I want to book','How much is Botox?','What is EMFACE?','Weight loss'],
+      pideNombre:'Happy to book you. What is your name?',
+      pideServicio:function(n){return 'Nice to meet you, '+n+'. Which treatment are you interested in? If you are not sure, tell me what bothers you and I will suggest one.';},
+      pideCuando:'Perfect. What day and time works best? You can say something like "Thursday afternoon".',
+      pideTel:'Last thing: what number should we use to confirm?',
+      listo:'Done. Your appointment request:',
+      cierre:'Amparo or her team will confirm right here. To speed it up, tap the button and it goes to them directly.',
+      wa:'Send via WhatsApp',
+      noSe:'I am not certain about that one, and I would rather not make something up — it is a medical matter. I will check with Amparo and get back to you. Shall I book the consultation so you can go over it with her?'
+    }
+  };
+  function t(){ return T[IDIOMA]; }
+
+  /* base de conocimiento real de la clínica */
+  var KB=[
+    {k:['botox','xeomin','arruga','arrugas','expresion','expresión','entrecejo','frente','wrinkle','forehead','frown'],
+     es:'Botox y Xeomin relajan la línea de expresión sin congelarle la cara — Amparo trabaja con criterio conservador. El precio depende de las unidades que necesite, y eso solo se define viéndola. Dura entre tres y cuatro meses. ¿Le agendo la valoración?',
+     en:'Botox and Xeomin relax expression lines without freezing your face — Amparo works conservatively. Pricing depends on the units you need, and that is only defined in person. It lasts three to four months. Shall I book your assessment?'},
+    {k:['filler','relleno','labio','labios','ojera','ojeras','mandibula','mandíbula','lip','under-eye','jawline','volumen'],
+     es:'Los fillers van de $500 a $1,200 por jeringa según la zona y el producto. Labios, ojera y mandíbula son los más pedidos. La mayoría necesita una sola jeringa la primera vez. ¿Quiere que le aparte una cita?',
+     en:'Fillers run $500 to $1,200 per syringe depending on the area and product. Lips, under-eye and jawline are the most requested. Most people need just one syringe the first time. Want me to hold an appointment?'},
+    {k:['microneedling','rf','poro','poros','cicatriz','acne','acné','textura','skinpen','peel','peeling','vi peel','scar','texture'],
+     es:'Tenemos un especial de RF Microneedling en $766. Es lo que mejor funciona para poro abierto, cicatriz de acné y textura. También hacemos SkinPen, peeling médico y VI Peel. ¿Se lo agendo?',
+     en:'We have an RF Microneedling special at $766. It is what works best for enlarged pores, acne scarring and texture. We also do SkinPen, medical peels and VI Peel. Shall I book it?'},
+    {k:['emface','face lift','levantar','flacidez facial','sin aguja','no needle'],
+     es:'EMFACE levanta y tonifica el rostro sin agujas y sin recuperación — se acuesta veinte minutos y se va a hacer su día. Es de las pocas clínicas de Miramar que lo tiene. ¿Quiere probarlo?',
+     en:'EMFACE lifts and tones the face with no needles and no downtime — twenty minutes lying down and you go on with your day. One of the few clinics in Miramar that has it. Want to try it?'},
+    {k:['exion','contorno','cuerpo','body','celulitis','emtone','piel de naranja','cellulite','firmeza'],
+     es:'Para cuerpo tenemos Exion (contorno y firmeza) y Emtone (celulitis y flacidez). Ninguno es cirugía y no requieren reposo. Se trabajan en series, así que en la consulta le arman el plan según su caso.',
+     en:'For the body we have Exion (contour and firmness) and Emtone (cellulite and laxity). Neither is surgery and neither requires downtime. They work in series, so your plan is built at the consultation.'},
+    {k:['emfemme','intima','íntima','vaginal','incontinencia','orina','postparto','intimate','urinary'],
+     es:'Emfemme 360 trata salud íntima femenina y control urinario. Es una sesión, sin dolor y sin recuperación. Es un tema delicado y Amparo lo maneja con total discreción — es enfermera de práctica avanzada, no una esteticista. ¿Le agendo con ella?',
+     en:'Emfemme 360 treats feminine intimate health and urinary control. One session, painless, no downtime. It is a sensitive topic and Amparo handles it with complete discretion — she is an advanced practice nurse, not an esthetician. Shall I book you with her?'},
+    {k:['peso','adelgazar','bajar','ozempic','wegovy','semaglutide','glp','mounjaro','zepbound','saxenda','gordura','weight','lose'],
+     es:'El programa médico de peso va de $300 a $600 al mes e incluye el seguimiento. Trabajamos con GLP-1: Wegovy, Saxenda, Mounjaro y Zepbound, según lo que le corresponda clínicamente. Requiere valoración médica primero. ¿Se la agendo?',
+     en:'The medical weight program runs $300 to $600 per month including follow-up. We work with GLP-1: Wegovy, Saxenda, Mounjaro and Zepbound, based on what fits you clinically. It requires a medical assessment first. Shall I book it?'},
+    {k:['hormona','hormonal','cansancio','energia','energía','menopausia','libido','testosterona','hormone','fatigue','menopause'],
+     es:'La terapia hormonal es para ese cansancio que no se arregla durmiendo. Se empieza con evaluación y laboratorios; a partir de ahí Amparo define el protocolo. También tenemos NAD, glutatión, vitamina C, B12 y sueros intravenosos.',
+     en:'Hormone therapy is for the fatigue that sleep does not fix. It starts with an evaluation and labs; from there Amparo defines the protocol. We also offer NAD, glutathione, vitamin C, B12 and IV drips.'},
+    {k:['prp','prf','pelo','cabello','calvicie','capilar','hair','caida','caída'],
+     es:'Para caída de cabello usamos PRP y PRF: se usa su propia sangre para estimular el folículo. Se hace en series y los resultados se ven en meses, no en semanas — se lo digo de frente para que no le vendan humo.',
+     en:'For hair loss we use PRP and PRF: your own blood is used to stimulate the follicle. It is done in series and results show in months, not weeks — I tell you straight so nobody sells you smoke.'},
+    {k:['membresia','membresía','mensualidad','plan','suscripcion','suscripción','membership','monthly'],
+     es:'Hay tres membresías: Premium $130, Gold $170 y Platinum $230 al mes. Convienen si viene durante todo el año. En la consulta le dicen cuál le sale mejor según lo que se haga.',
+     en:'There are three memberships: Premium $130, Gold $170 and Platinum $230 per month. They pay off if you come year-round. At the consultation they will tell you which fits what you actually do.'},
+    {k:['financiamiento','financiar','cuotas','pagos','cherry','carecredit','credito','crédito','financing','payment plan'],
+     es:'Trabajamos con Cherry y CareCredit, así que puede financiar el tratamiento en cuotas. La aprobación es rápida y se hace antes de la cita. ¿Quiere que le agende y lo ve ahí?',
+     en:'We work with Cherry and CareCredit, so you can finance your treatment in installments. Approval is quick and happens before your visit. Want me to book you and go over it there?'},
+    {k:['direccion','dirección','donde','dónde','ubicacion','ubicación','llegar','address','location','where'],
+     es:'Estamos en 6229 Miramar Pkwy, Suite 7, Miramar FL 33023. El teléfono es el (305) 528-3360. ¿Le agendo?',
+     en:'We are at 6229 Miramar Pkwy, Suite 7, Miramar FL 33023. The phone is (305) 528-3360. Shall I book you?'},
+    {k:['horario','abierto','cierran','abren','domingo','sabado','sábado','hours','open','closed','sunday'],
+     es:'La clínica atiende de lunes a sábado. Yo estoy disponible las 24 horas, todos los días — así que aunque escriba un domingo a las once de la noche, su cita queda tomada y se la confirman en la mañana.',
+     en:'The clinic is open Monday through Saturday. I am available 24 hours, every day — so even if you write on a Sunday at eleven at night, your appointment is taken and confirmed in the morning.'},
+    {k:['quien','quién','amparo','doctora','enfermera','experiencia','credencial','who','nurse'],
+     es:'Amparo Robles es MSN, APRN, FNP-BC: enfermera de práctica avanzada certificada, con máster por Barry University y más de quince años en medicina. Ese respaldo clínico es lo que sus pacientes más mencionan en las reseñas.',
+     en:'Amparo Robles is MSN, APRN, FNP-BC: a board-certified advanced practice nurse with a master\'s from Barry University and over fifteen years in medicine. That clinical background is what her patients mention most in reviews.'},
+    {k:['duele','dolor','anestesia','recuperacion','recuperación','downtime','hurt','pain','recovery'],
+     es:'Depende del tratamiento: los inyectables son molestia mínima y se usa anestesia tópica; el microneedling deja la piel roja uno o dos días; EMFACE y Exion no duelen ni requieren reposo. En la valoración le dicen exactamente qué esperar en su caso.',
+     en:'It depends on the treatment: injectables are minimal discomfort with topical numbing; microneedling leaves skin red for a day or two; EMFACE and Exion are painless with no downtime. At your assessment they tell you exactly what to expect.'},
+    {k:['hola','buenas','buenos dias','buenos días','buenas tardes','buenas noches','hey','hi','hello','que tal','qué tal'],
+     es:'¡Hola! ¿En qué le puedo ayudar? Pregúnteme por cualquier tratamiento o dígame "quiero agendar" y lo hacemos ahora.',
+     en:'Hello! How can I help? Ask me about any treatment or say "I want to book" and we will do it now.'},
+    {k:['gracias','thank you','thanks','vale','ok'],
+     es:'Con mucho gusto 😊 ¿Le agendo la consulta o tiene otra pregunta?',
+     en:'My pleasure 😊 Shall I book your consultation, or do you have another question?'}
+  ];
+
+  function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+  function busca(txt){
+    var n=norm(txt), mejor=null, alto=0;
+    KB.forEach(function(e){
+      var p=0;
+      e.k.forEach(function(k){ if(n.indexOf(norm(k))>-1) p+=norm(k).length; });
+      if(p>alto){ alto=p; mejor=e; }
+    });
+    return alto>=3?mejor:null;
+  }
+  function quiereAgendar(txt){
+    return /agend|cita|reserv|turno|appointment|book|schedule|apart/i.test(norm(txt));
+  }
+
+  function abajo(){ msgs.scrollTop=msgs.scrollHeight; }
+  function burbujaMsg(txt,cls){
+    var d=document.createElement('div'); d.className='b '+cls; d.textContent=txt;
+    msgs.appendChild(d); abajo(); return d;
+  }
+  function bot(txt,ms,luego){
+    var e=document.createElement('div'); e.className='esc'; e.innerHTML='<i></i><i></i><i></i>';
+    msgs.appendChild(e); abajo();
+    setTimeout(function(){ e.remove(); burbujaMsg(txt,'bot'); if(luego) luego(); }, ms||700);
+  }
+  function pintaChips(lista){
+    chips.innerHTML='';
+    (lista||[]).forEach(function(x){
+      var b=document.createElement('button'); b.textContent=x;
+      b.onclick=function(){ chips.innerHTML=''; manda(x); };
+      chips.appendChild(b);
+    });
+  }
+
+  function resumen(){
+    var d=document.createElement('div'); d.className='resumen';
+    var l=t();
+    var lineas = IDIOMA==='es'
+      ? ['<b>'+l.listo+'</b>','Nombre: '+C.nombre,'Tratamiento: '+C.servicio,'Cuándo: '+C.cuando,'Teléfono: '+C.tel]
+      : ['<b>'+l.listo+'</b>','Name: '+C.nombre,'Treatment: '+C.servicio,'When: '+C.cuando,'Phone: '+C.tel];
+    d.innerHTML=lineas.join('<br>');
+    var msg = IDIOMA==='es'
+      ? 'Hola! Soy '+C.nombre+'. Quiero agendar '+C.servicio+'. Me queda bien: '+C.cuando+'. Mi teléfono: '+C.tel
+      : 'Hi! I am '+C.nombre+'. I would like to book '+C.servicio+'. Works for me: '+C.cuando+'. My phone: '+C.tel;
+    var a=document.createElement('a');
+    a.href='https://wa.me/'+WA+'?text='+encodeURIComponent(msg);
+    a.target='_blank'; a.rel='noopener'; a.textContent=l.wa;
+    d.appendChild(a);
+    msgs.appendChild(d); abajo();
+  }
+
+  function manda(txt){
+    burbujaMsg(txt,'yo');
+    chips.innerHTML='';
+    var l=t();
+
+    if(paso===1){ C.nombre=txt.trim(); paso=2; bot(l.pideServicio(C.nombre),650); return; }
+    if(paso===2){ C.servicio=txt.trim(); paso=3; bot(l.pideCuando,650); return; }
+    if(paso===3){ C.cuando=txt.trim(); paso=4; bot(l.pideTel,650); return; }
+    if(paso===4){
+      C.tel=txt.trim(); paso=5;
+      bot(l.cierre,700,function(){ resumen(); });
+      return;
+    }
+
+    if(quiereAgendar(txt)){ paso=1; bot(l.pideNombre,650,function(){ input.focus(); }); return; }
+
+    var hit=busca(txt);
+    if(hit){
+      bot(hit[IDIOMA],750,function(){
+        pintaChips(IDIOMA==='es'?['Sí, agéndame','Tengo otra pregunta']:['Yes, book me','I have another question']);
+      });
+      return;
+    }
+    bot(l.noSe,800,function(){
+      pintaChips(IDIOMA==='es'?['Sí, agéndame','Ver tratamientos']:['Yes, book me','See treatments']);
+    });
+  }
+
+  form.onsubmit=function(e){
+    e.preventDefault();
+    var v=input.value.trim(); if(!v) return;
+    input.value=''; manda(v);
+  };
+
+  function abrir(){
+    chat.classList.add('on'); burb.style.display='none';
+    if(!abierto){
+      abierto=true;
+      var l=t();
+      bot(l.saludo,450,function(){
+        bot(l.saludo2,900,function(){ pintaChips(l.chips); });
+      });
+    }
+    setTimeout(function(){ input.focus(); },300);
+  }
+  burb.onclick=abrir;
+  document.getElementById('abrir1').onclick=abrir;
+  document.getElementById('abrir2').onclick=abrir;
+  document.getElementById('cerrar').onclick=function(){
+    chat.classList.remove('on'); burb.style.display='flex';
+  };
+})();
+
+
+/* ==================== RELOJ DE 168 HORAS ==================== */
+(function(){
+  var cont=document.getElementById('horas'); if(!cont) return;
+  /* 168 casillas = una semana. Marcamos las ~35 que hoy sí cubre. */
+  var abiertas={};
+  /* dia 0=lunes … 6=domingo, [desde,hasta) */
+  var H=[[0,9,17],[1,14,17],[2,9,17],[3,16,19],[4,9,16],[5,13,18]];
+  H.forEach(function(r){ for(var h=r[1];h<r[2];h++) abiertas[r[0]*24+h]=1; });
+  for(var i=0;i<168;i++){
+    var c=document.createElement('i');
+    if(abiertas[i]) c.className='viva';
+    cont.appendChild(c);
+  }
+  var et=document.getElementById('etiqueta'), lleno=false;
+  var obs=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      setTimeout(function(){
+        cont.classList.add('lleno'); lleno=true;
+        if(et){
+          et.setAttribute('data-es','con el asistente · 168 de 168 horas');
+          et.setAttribute('data-en','with the assistant · 168 of 168 hours');
+          et.textContent = IDIOMA==='es' ? 'con el asistente · 168 de 168 horas' : 'with the assistant · 168 of 168 hours';
+        }
+      },1900);
+      obs.disconnect();
+    });
+  },{threshold:.4});
+  obs.observe(cont);
+})();
+
+pintaIdioma();
+</script>
+</body>
+</html>
