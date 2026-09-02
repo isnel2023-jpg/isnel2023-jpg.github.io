@@ -357,23 +357,8 @@ function cargaVoces(){
              .filter(function(x){return x.p>=0;})
              .sort(function(a,b){return b.p-a.p;})
              .map(function(x){return x.v;});
-  if(!selVoz) return;
-  var prev=selVoz.value;
-  var g=selVoz.querySelector('optgroup[data-nav]');
-  if(!g){ g=document.createElement('optgroup'); g.setAttribute('data-nav','1');
-          g.label='Voces del navegador'; selVoz.appendChild(g); }
-  g.innerHTML='';
-  if(!voces.length){ g.label='Sin voces en español en este navegador'; }
-  else {
-    voces.forEach(function(v,i){
-      var o=document.createElement('option'); o.value=i;
-      o.textContent=v.name.replace(/^Microsoft |^Google /,'');
-      g.appendChild(o);
-    });
-  }
-  if(prev && selVoz.querySelector('option[value="'+prev+'"]')) selVoz.value=prev;
-  else if(!elDisponible && voces.length) selVoz.value='0';
-  aplicaVoz();
+  /* las del navegador ya no se ofrecen: solo ElevenLabs */
+  return;
 }
 cargaVoces();
 if(window.speechSynthesis){
@@ -393,7 +378,7 @@ document.getElementById('btnProbar').onclick=function(){
 var VOZ_EL=null, elDisponible=false;
 /* Un solo <audio> reutilizado. Se "desbloquea" con el clic de Llamar y ya
    queda autorizado para sonar después, aunque el audio llegue más tarde. */
-var reproductor=null, audioListo=false;
+var reproductor=null, audioListo=false, turno=0;
 function desbloqueaAudio(){
   if(!reproductor){
     reproductor=new Audio();
@@ -411,11 +396,14 @@ function desbloqueaAudio(){
 function hablaTexto(txt,luego){
   if(VOZ_EL && elDisponible){
     if(!reproductor) desbloqueaAudio();
-    try{ reproductor.pause(); }catch(e){}
+    if(window.speechSynthesis){ try{ speechSynthesis.cancel(); }catch(e){} }
+    try{ reproductor.pause(); reproductor.onended=null; reproductor.onerror=null; }catch(e){}
+    turno++; var miTurno=turno;
     fetch(IA+'/voz',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({texto:txt,voz:VOZ_EL})})
+      body:JSON.stringify({texto:txt,voz:VOZ_EL,modelo:'eleven_multilingual_v2',ritmo:1.12})})
       .then(function(r){ if(!r.ok) throw new Error('voz '+r.status); return r.blob(); })
       .then(function(b){
+        if(miTurno!==turno){ return; }          /* llegó tarde: ya hay otra frase sonando */
         var url=URL.createObjectURL(b);
         reproductor.onended=function(){ URL.revokeObjectURL(url); if(luego) luego(); };
         reproductor.onerror=function(){ URL.revokeObjectURL(url); navegadorHabla(txt,luego); };
@@ -433,15 +421,12 @@ function hablaTexto(txt,luego){
   navegadorHabla(txt,luego);
 }
 
+/* Solo se usan voces de ElevenLabs. Si fallan, se avisa en pantalla
+   pero NO se habla con la voz del navegador: sonaban las dos a la vez. */
 function navegadorHabla(txt,luego){
-  if(!window.speechSynthesis){ if(luego) luego(); return; }
-  speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(txt);
-  u.lang='es-US'; u.rate=1.0; u.pitch=1.0; u.volume=1;
-  if(vozSel){ u.voice=vozSel; u.lang=vozSel.lang; }
-  u.onend=function(){ if(luego) luego(); };
-  u.onerror=function(){ if(luego) luego(); };
-  speechSynthesis.speak(u);
+  var hh=document.getElementById('hint');
+  if(hh) hh.textContent='La voz no cargó — el texto sí llegó';
+  if(luego) setTimeout(luego,400);
 }
 
 /* ---------- ¿hay voces buenas disponibles? ---------- */
@@ -489,9 +474,9 @@ setTimeout(function(){
 },600);
 
 function aplicaVoz(){
-  var v=selVoz.value||'';
-  if(v.indexOf('el:')===0){ VOZ_EL=v.slice(3); vozSel=null; }
-  else { VOZ_EL=null; vozSel=voces[v]||voces[0]; }
+  var v=(selVoz&&selVoz.value)||'';
+  VOZ_EL = v.indexOf('el:')===0 ? v.slice(3) : null;
+  vozSel=null;
 }
 
 /* ---------- la IA habla (pausa el micrófono mientras) ---------- */
@@ -698,7 +683,7 @@ document.getElementById('btnLlamar').onclick=function(){
 
   /* desbloquea el audio con el gesto del usuario — obligatorio en iPhone */
   desbloqueaAudio();
-  if(window.speechSynthesis){ try{ var w=new SpeechSynthesisUtterance(' '); w.volume=0; speechSynthesis.speak(w); }catch(e){} }
+
 
   setTimeout(function(){
     est.className='est'; est.textContent='En llamada';
