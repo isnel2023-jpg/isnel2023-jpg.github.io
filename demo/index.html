@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Recepcionista IA — Demostración</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Kumbh+Sans:wght@200..700&display=swap">
+<style>
+:root{
+  --ink:#100E0C; --ink2:#1A1714; --bone:#F4F0E9; --sand:#E3DACB;
+  --bronze:#A8763C; --bronze-lit:#C9A06A; --verde:#2FA76B; --rojo:#C4453A;
+  --serif:'Instrument Serif',Georgia,serif; --sans:'Kumbh Sans',-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--ink);color:var(--bone);font-family:var(--sans);font-weight:300;
+  min-height:100svh;display:flex;align-items:center;justify-content:center;padding:16px;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.tel{width:min(400px,100%);background:linear-gradient(180deg,#191512,#0D0B0A);
+  border:1px solid rgba(201,168,140,.2);border-radius:32px;overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.7);display:flex;flex-direction:column;
+  height:min(760px,calc(100svh - 32px))}
+
+/* barra superior */
+.bar{padding:11px 22px;display:flex;justify-content:space-between;align-items:center;
+  font-size:.7rem;color:rgba(244,240,233,.5);letter-spacing:.04em;flex:none}
+.bar .sig{display:flex;gap:3px;align-items:flex-end}
+.bar .sig i{width:3px;background:rgba(244,240,233,.55);border-radius:1px}
+.bar .sig i:nth-child(1){height:4px}.bar .sig i:nth-child(2){height:7px}
+.bar .sig i:nth-child(3){height:10px}.bar .sig i:nth-child(4){height:13px}
+
+/* pantallas */
+.pan{flex:1;display:none;flex-direction:column;overflow:hidden}
+.pan.on{display:flex}
+
+/* ---- configuración ---- */
+#cfg{padding:22px 26px 26px;overflow-y:auto}
+#cfg h1{font-family:var(--serif);font-size:1.9rem;font-weight:400;line-height:1.1}
+#cfg h1 i{color:var(--bronze-lit)}
+#cfg .lead{color:rgba(244,240,233,.55);font-size:.86rem;margin-top:9px;line-height:1.55}
+.campo{margin-top:19px}
+.campo label{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--bronze);margin-bottom:8px}
+.campo input,.campo select{width:100%;background:rgba(244,240,233,.05);
+  border:1px solid rgba(201,168,140,.25);border-radius:10px;padding:13px 15px;
+  color:var(--bone);font:300 .95rem var(--sans);outline:none}
+.campo input:focus,.campo select:focus{border-color:var(--bronze)}
+.campo select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--bronze) 50%),linear-gradient(135deg,var(--bronze) 50%,transparent 50%);
+  background-position:calc(100% - 19px) 22px,calc(100% - 14px) 22px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.campo select option{background:#1A1714;color:var(--bone)}
+.probar{margin-top:11px;width:100%;background:transparent;border:1px solid rgba(201,168,140,.35);
+  border-radius:99px;padding:12px;color:var(--bronze-lit);font:400 .76rem var(--sans);
+  letter-spacing:.1em;cursor:pointer}
+.probar:hover{background:rgba(201,168,140,.1)}
+.llamar{margin-top:18px;width:100%;background:var(--verde);border:0;border-radius:99px;
+  padding:17px;color:#06180E;font:500 .84rem var(--sans);letter-spacing:.14em;
+  text-transform:uppercase;cursor:pointer;transition:.25s}
+.llamar:hover{filter:brightness(1.1)}
+.nota{margin-top:15px;font-size:.72rem;color:rgba(244,240,233,.38);line-height:1.6;text-align:center}
+
+/* ---- llamada ---- */
+#call{padding:0;position:relative}
+.cab{padding:34px 26px 22px;text-align:center;flex:none}
+.avatar{width:96px;height:96px;margin:0 auto 18px;border-radius:50%;
+  background:linear-gradient(140deg,var(--bronze),#6E5334);display:flex;align-items:center;
+  justify-content:center;font-family:var(--serif);font-size:2.4rem;color:var(--ink);position:relative}
+.avatar.hablando::after,.avatar.hablando::before{content:'';position:absolute;inset:-6px;
+  border-radius:50%;border:1.5px solid var(--bronze);animation:onda 1.8s ease-out infinite}
+.avatar.hablando::after{animation-delay:.6s}
+@keyframes onda{0%{transform:scale(.98);opacity:.75}100%{transform:scale(1.3);opacity:0}}
+.cab .nm{font-family:var(--serif);font-size:1.42rem}
+.cab .est{font-size:.76rem;color:var(--verde);margin-top:6px;letter-spacing:.05em}
+.cab .est.tim{color:var(--bronze-lit)}
+.cab .cron{font-size:.72rem;color:rgba(244,240,233,.42);margin-top:3px;font-variant-numeric:tabular-nums}
+
+/* transcripción */
+#tra{flex:1;overflow-y:auto;padding:8px 22px 14px;display:flex;flex-direction:column;gap:9px}
+.li{max-width:88%;padding:10px 14px;border-radius:15px;font-size:.88rem;line-height:1.5;
+  animation:ap .3s ease}
+@keyframes ap{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.li.ia{background:rgba(201,168,140,.13);border:1px solid rgba(201,168,140,.2);
+  align-self:flex-start;border-bottom-left-radius:5px}
+.li.yo{background:rgba(47,167,107,.15);border:1px solid rgba(47,167,107,.28);
+  align-self:flex-end;border-bottom-right-radius:5px}
+.li .q{display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  opacity:.5;margin-bottom:3px}
+.pensando{align-self:flex-start;display:flex;gap:4px;padding:12px 15px;
+  background:rgba(201,168,140,.1);border-radius:15px}
+.pensando i{width:5px;height:5px;border-radius:50%;background:var(--bronze-lit);animation:pt 1.3s infinite}
+.pensando i:nth-child(2){animation-delay:.2s}.pensando i:nth-child(3){animation-delay:.4s}
+@keyframes pt{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* controles */
+.ctrl{flex:none;padding:16px 26px 26px;border-top:1px solid rgba(244,240,233,.08)}
+.onda{display:flex;gap:3px;align-items:center;justify-content:center;height:26px;margin-bottom:10px;opacity:0;transition:opacity .3s}
+.onda.on{opacity:1}
+.onda i{width:3px;height:5px;background:var(--verde);border-radius:2px;transition:height .12s ease}
+.mic.mudo{background:rgba(244,240,233,.15);color:rgba(244,240,233,.5)}
+.hint{text-align:center;font-size:.74rem;color:rgba(244,240,233,.45);margin-bottom:14px;min-height:19px}
+.bts{display:flex;gap:14px;align-items:center;justify-content:center}
+.mic{width:74px;height:74px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--bone);color:var(--ink);font-size:1.6rem;transition:.2s;
+  display:flex;align-items:center;justify-content:center;flex:none}
+.mic.grab{background:var(--rojo);color:#fff;animation:lat 1.1s ease-in-out infinite}
+@keyframes lat{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.colgar{width:56px;height:56px;border-radius:50%;border:0;background:var(--rojo);color:#fff;
+  font-size:1.3rem;cursor:pointer;flex:none;transform:rotate(133deg)}
+.esc{width:56px;height:56px;border-radius:50%;border:1px solid rgba(244,240,233,.22);
+  background:transparent;color:var(--bone);font-size:.62rem;letter-spacing:.08em;cursor:pointer;flex:none}
+
+/* teclado alternativo */
+#tec{display:none;gap:8px;margin-top:13px}
+#tec.on{display:flex}
+#tec input{flex:1;background:rgba(244,240,233,.06);border:1px solid rgba(201,168,140,.22);
+  border-radius:99px;padding:12px 16px;color:var(--bone);font:300 .9rem var(--sans);outline:none}
+#tec button{background:var(--bronze);border:0;border-radius:50%;width:44px;color:var(--ink);
+  font-size:1rem;cursor:pointer;flex:none}
+
+/* fin */
+#fin{padding:34px 26px;text-align:center;justify-content:center}
+#fin .ic{font-size:2.6rem;margin-bottom:14px}
+#fin h2{font-family:var(--serif);font-size:1.75rem;font-weight:400}
+#fin .res{background:rgba(244,240,233,.05);border:1px solid rgba(201,168,140,.2);
+  border-radius:14px;padding:18px;margin-top:22px;text-align:left;font-size:.85rem;line-height:1.75}
+#fin .res b{color:var(--bronze-lit);font-weight:500}
+#fin .dur{font-size:.74rem;color:rgba(244,240,233,.4);margin-top:14px}
+#fin button{margin-top:22px;width:100%;background:transparent;border:1px solid var(--bronze);
+  border-radius:99px;padding:15px;color:var(--bronze-lit);font:400 .78rem var(--sans);
+  letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.aviso{background:rgba(196,69,58,.12);border:1px solid rgba(196,69,58,.3);border-radius:11px;
+  padding:13px 15px;margin-top:16px;font-size:.8rem;line-height:1.55;color:#F0C4BF}
+</style>
+</head>
+<body>
+
+<div class="tel">
+  <div class="bar">
+    <span id="hora">—</span>
+    <span class="sig"><i></i><i></i><i></i><i></i></span>
+  </div>
+
+  <!-- CONFIGURACIÓN -->
+  <div class="pan on" id="cfg">
+    <h1>Recepcionista <i>que nunca cuelga</i></h1>
+    <p class="lead">Configúrela con los datos del negocio y llame. Va a contestar como si fuera su recepcionista.</p>
+
+    <div class="campo">
+      <label>Nombre del negocio</label>
+      <input id="fNeg" placeholder="Ej: Collective Aesthetics" value="">
+    </div>
+    <div class="campo">
+      <label>Tipo de negocio</label>
+      <select id="fRub"></select>
+    </div>
+    <div class="campo">
+      <label>Cómo se llama quien contesta</label>
+      <input id="fRec" placeholder="Ej: Valentina" value="Valentina">
+    </div>
+
+    <div class="campo">
+      <label>Voz de la recepcionista</label>
+      <select id="fVoz"></select>
+    </div>
+    <button class="probar" id="btnProbar">▶ Escuchar cómo suena</button>
+
+    <button class="llamar" id="btnLlamar">📞 Llamar ahora</button>
+    <p class="nota">Va a pedirle permiso al micrófono. También puede escribir en vez de hablar.</p>
+  </div>
+
+  <!-- LLAMADA -->
+  <div class="pan" id="call">
+    <div class="cab">
+      <div class="avatar" id="av">✦</div>
+      <div class="nm" id="nmNeg">—</div>
+      <div class="est" id="est">Marcando…</div>
+      <div class="cron" id="cron"></div>
+    </div>
+    <div id="tra"></div>
+    <div class="ctrl">
+      <div class="hint" id="hint"></div>
+      <div class="onda" id="onda"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="bts">
+        <button class="esc" id="btnEsc">abc</button>
+        <button class="mic" id="btnMic" title="silenciar micrófono">🎙</button>
+        <button class="colgar" id="btnColgar">📞</button>
+      </div>
+      <div id="tec">
+        <input id="txt" placeholder="Escriba lo que diría…" autocomplete="off">
+        <button id="btnEnv">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIN -->
+  <div class="pan" id="fin">
+    <div class="ic">✓</div>
+    <h2>Llamada atendida</h2>
+    <div class="res" id="resumen"></div>
+    <div class="dur" id="dur"></div>
+    <button id="btnOtra">Hacer otra llamada</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DEMOSTRACIÓN — Recepcionista de IA
+   Corre entera en el navegador. Sin cuentas, sin costo por minuto.
+   ============================================================ */
+
+var IA = 'https://lion-ai.resonant-shroud-af6.workers.dev'; /* cerebro; si falla, usa el motor local */
+
+/* ---------- perfiles por rubro (sacados de los 75 leads reales) ---------- */
+var RUBROS = {
+  medspa:{n:'Med spa / Estética',rec:'Valentina',
+    serv:'Botox, rellenos, microneedling, láser, tratamientos corporales y programas de pérdida de peso',
+    pre:'la valoración es lo primero, porque el precio depende de lo que cada persona necesite',
+    urg:'una reacción a un tratamiento'},
+  dental:{n:'Odontología',rec:'Carolina',
+    serv:'limpiezas, coronas, carillas, implantes, ortodoncia y urgencias dentales',
+    pre:'la primera visita con examen y radiografía',
+    urg:'un dolor fuerte o un diente partido'},
+  legal:{n:'Abogados / Legal',rec:'Marcela',
+    serv:'accidentes, compensación laboral, inmigración y consultas legales',
+    pre:'la consulta inicial es gratis',
+    urg:'una detención o una audiencia mañana'},
+  hvac:{n:'Aire acondicionado',rec:'Daniela',
+    serv:'reparación, mantenimiento e instalación de aire acondicionado',
+    pre:'la visita de diagnóstico',
+    urg:'un equipo parado con calor'},
+  plomeria:{n:'Plomería',rec:'Daniela',
+    serv:'fugas, destape de tuberías, calentadores y reparaciones de emergencia',
+    pre:'la visita de diagnóstico',
+    urg:'una fuga activa inundando'},
+  techos:{n:'Techos',rec:'Daniela',
+    serv:'reparación de techos, goteras, reemplazo e inspecciones para seguro',
+    pre:'la inspección',
+    urg:'una gotera activa con lluvia'},
+  contador:{n:'Contador / CPA',rec:'Patricia',
+    serv:'impuestos personales y de empresa, contabilidad, nómina y cartas del IRS',
+    pre:'la preparación de la declaración',
+    urg:'una carta del IRS con fecha límite'},
+  veterinaria:{n:'Veterinaria',rec:'Camila',
+    serv:'consultas, vacunas, cirugías, baños y urgencias de mascotas',
+    pre:'la consulta general',
+    urg:'una mascota que no responde o sangra'},
+  funeraria:{n:'Funeraria',rec:'Rosa',
+    serv:'servicios funerarios, cremación, traslados y planes anticipados',
+    pre:'los servicios',
+    urg:'un fallecimiento en este momento'},
+  plagas:{n:'Control de plagas',rec:'Daniela',
+    serv:'fumigación, control de termitas, roedores y tratamientos preventivos',
+    pre:'la inspección',
+    urg:'una infestación activa'},
+  seguros:{n:'Seguros',rec:'Patricia',
+    serv:'seguros de auto, hogar, salud, vida y comercial',
+    pre:'la cotización',
+    urg:'un accidente que acaba de pasar'},
+  manejo:{n:'Escuela de manejo',rec:'Camila',
+    serv:'clases de manejo, examen vial y curso de tránsito',
+    pre:'el paquete de clases',
+    urg:'un examen mañana'},
+  cerrajeria:{n:'Cerrajería',rec:'Daniela',
+    serv:'apertura de puertas y autos, cambio de cerraduras y llaves',
+    pre:'el servicio',
+    urg:'alguien encerrado fuera de su casa o carro'},
+  mudanzas:{n:'Mudanzas',rec:'Camila',
+    serv:'mudanzas locales, empaque, bodegaje y transporte',
+    pre:'la cotización',
+    urg:'una mudanza que se cae mañana'},
+  remodelacion:{n:'Remodelación / Cocinas',rec:'Camila',
+    serv:'remodelación de cocinas y baños, gabinetes y trabajos generales',
+    pre:'la visita de medición',
+    urg:'un daño estructural'},
+  otro:{n:'Otro negocio',rec:'Valentina',
+    serv:'los servicios de la empresa',
+    pre:'la cotización',
+    urg:'una emergencia'}
+};
+
+var sel=document.getElementById('fRub');
+for(var k in RUBROS){ var o=document.createElement('option'); o.value=k; o.textContent=RUBROS[k].n; sel.appendChild(o); }
+sel.value='medspa';
+sel.onchange=function(){ document.getElementById('fRec').value=RUBROS[sel.value].rec; };
+
+/* ---------- reloj ---------- */
+function reloj(){
+  var d=new Date(), h=d.getHours(), m=String(d.getMinutes()).padStart(2,'0');
+  var ap=h>=12?'PM':'AM'; h=h%12||12;
+  document.getElementById('hora').textContent=h+':'+m+' '+ap;
+}
+reloj(); setInterval(reloj,20000);
+
+/* ---------- estado ---------- */
+var N={}, hist=[], t0=0, cronId=null, lead={nombre:'',motivo:'',cuando:'',tel:''}, hablando=false;
+var pan={cfg:document.getElementById('cfg'),call:document.getElementById('call'),fin:document.getElementById('fin')};
+function ver(x){ for(var k in pan) pan[k].classList.toggle('on',k===x); }
+
+var tra=document.getElementById('tra'), est=document.getElementById('est'),
+    av=document.getElementById('av'), hint=document.getElementById('hint'),
+    btnMic=document.getElementById('btnMic');
+
+function linea(txt,quien){
+  var d=document.createElement('div'); d.className='li '+(quien==='ia'?'ia':'yo');
+  d.innerHTML='<span class="q">'+(quien==='ia'?N.rec:'Usted')+'</span>';
+  d.appendChild(document.createTextNode(txt));
+  tra.appendChild(d); tra.scrollTop=tra.scrollHeight; return d;
+}
+function pensando(on){
+  var v=tra.querySelector('.pensando');
+  if(on&&!v){ var d=document.createElement('div'); d.className='pensando';
+    d.innerHTML='<i></i><i></i><i></i>'; tra.appendChild(d); tra.scrollTop=tra.scrollHeight; }
+  if(!on&&v) v.remove();
+}
+
+/* ---------- voz: elegir la mejor disponible ---------- */
+var voces=[], vozSel=null, selVoz=document.getElementById('fVoz');
+
+function puntuaVoz(v){
+  var n=(v.name||'').toLowerCase(), p=0;
+  if(/^es(-|_)?(us|419|mx)/i.test(v.lang)) p+=40;
+  else if(/^es/i.test(v.lang)) p+=25;
+  else return -1;                                  /* solo español */
+  if(/google/.test(n)) p+=50;                      /* las de Chrome suenan mejor */
+  if(/premium|enhanced|neural|siri/.test(n)) p+=45;
+  if(/paulina|monica|mónica|isabela|luciana/.test(n)) p+=20;
+  if(/grandma|grandpa|eddy|flo|reed|rocko|shelley|sandy|bubbles|jester|superstar|bells|boing|organ|cellos|trinoids|whisper|wobble|zarvox|albert|bad news|good news|junior|kathy|ralph/.test(n)) p-=70;
+  if(v.localService===false) p+=10;                /* de red = normalmente mejor */
+  return p;
+}
+function cargaVoces(){
+  if(!window.speechSynthesis) return;
+  var todas=speechSynthesis.getVoices()||[];
+  voces=todas.map(function(v){return {v:v,p:puntuaVoz(v)};})
+             .filter(function(x){return x.p>=0;})
+             .sort(function(a,b){return b.p-a.p;})
+             .map(function(x){return x.v;});
+  if(!selVoz) return;
+  var prev=selVoz.value;
+  var g=selVoz.querySelector('optgroup[data-nav]');
+  if(!g){ g=document.createElement('optgroup'); g.setAttribute('data-nav','1');
+          g.label='Voces del navegador'; selVoz.appendChild(g); }
+  g.innerHTML='';
+  if(!voces.length){ g.label='Sin voces en español en este navegador'; }
+  else {
+    voces.forEach(function(v,i){
+      var o=document.createElement('option'); o.value=i;
+      o.textContent=v.name.replace(/^Microsoft |^Google /,'');
+      g.appendChild(o);
+    });
+  }
+  if(prev && selVoz.querySelector('option[value="'+prev+'"]')) selVoz.value=prev;
+  else if(!elDisponible && voces.length) selVoz.value='0';
+  aplicaVoz();
+}
+cargaVoces();
+if(window.speechSynthesis){
+  speechSynthesis.onvoiceschanged=cargaVoces;
+  setTimeout(cargaVoces,400); setTimeout(cargaVoces,1200);
+}
+if(selVoz) selVoz.onchange=aplicaVoz;
+
+document.getElementById('btnProbar').onclick=function(){
+  aplicaVoz();
+  var neg=document.getElementById('fNeg').value.trim()||'la clínica';
+  var r=RUBROS[document.getElementById('fRub').value];
+  var nm=document.getElementById('fRec').value.trim()||r.rec;
+  hablaTexto(neg+', buenas. Habla '+nm+'. ¿En qué le puedo ayudar?');
+};
+
+var VOZ_EL=null, elDisponible=false, audioActual=null;
+
+/* pide a ElevenLabs (vía el Worker) el audio; si no hay, usa la del navegador */
+function hablaTexto(txt,luego){
+  if(VOZ_EL && elDisponible){
+    if(audioActual){ try{audioActual.pause()}catch(e){} }
+    fetch(IA+'/voz',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({texto:txt,voz:VOZ_EL})})
+      .then(function(r){ if(!r.ok) throw new Error('voz'); return r.blob(); })
+      .then(function(b){
+        var url=URL.createObjectURL(b);
+        audioActual=new Audio(url);
+        audioActual.onended=function(){ URL.revokeObjectURL(url); if(luego) luego(); };
+        audioActual.onerror=function(){ URL.revokeObjectURL(url); navegadorHabla(txt,luego); };
+        audioActual.play().catch(function(){ navegadorHabla(txt,luego); });
+      })
+      .catch(function(){ navegadorHabla(txt,luego); });
+    return;
+  }
+  navegadorHabla(txt,luego);
+}
+
+function navegadorHabla(txt,luego){
+  if(!window.speechSynthesis){ if(luego) luego(); return; }
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(txt);
+  u.lang='es-US'; u.rate=1.0; u.pitch=1.0; u.volume=1;
+  if(vozSel){ u.voice=vozSel; u.lang=vozSel.lang; }
+  u.onend=function(){ if(luego) luego(); };
+  u.onerror=function(){ if(luego) luego(); };
+  speechSynthesis.speak(u);
+}
+
+/* ---------- ¿hay voces buenas disponibles? ---------- */
+function cargaEleven(intento){
+  intento=intento||0;
+  fetch(IA+'/voces',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+    if(!d||!d.voces||!d.voces.length){ if(intento<2) setTimeout(function(){cargaEleven(intento+1);},1500); return; }
+    elDisponible=true;
+    var vieja=selVoz.querySelector('optgroup[data-el]');
+    if(vieja) vieja.remove();
+    /* primero las de español, que son las que sirven de recepcionista */
+    var lista=d.voces.slice().sort(function(a,b){
+      var A=(a.idioma==='es'||/ ES$/.test(a.nombre))?0:1, B=(b.idioma==='es'||/ ES$/.test(b.nombre))?0:1;
+      return A-B;
+    });
+    var g=document.createElement('optgroup');
+    g.setAttribute('data-el','1');
+    g.label='Voces reales · ElevenLabs';
+    lista.forEach(function(v){
+      var o=document.createElement('option');
+      o.value='el:'+v.id;
+      var et=[]; if(v.acento) et.push(v.acento); if(v.idioma) et.push(v.idioma.toUpperCase());
+      o.textContent=v.nombre+(et.length?'  ·  '+et.join(' '):'');
+      g.appendChild(o);
+    });
+    selVoz.insertBefore(g,selVoz.firstChild);
+    selVoz.value=g.firstChild.value;
+    aplicaVoz();
+    var n=document.querySelector('#cfg .nota');
+    if(n) n.innerHTML='✓ Voces reales conectadas ('+d.voces.length+'). Le va a pedir permiso al micrófono.';
+  }).catch(function(){
+    if(intento<2) setTimeout(function(){cargaEleven(intento+1);},1500);
+    else { var n=document.querySelector('#cfg .nota');
+           if(n) n.innerHTML='Sin conexión a las voces reales — usando la voz del navegador.'; }
+  });
+}
+cargaEleven();
+
+function aplicaVoz(){
+  var v=selVoz.value||'';
+  if(v.indexOf('el:')===0){ VOZ_EL=v.slice(3); vozSel=null; }
+  else { VOZ_EL=null; vozSel=voces[v]||voces[0]; }
+}
+
+/* ---------- la IA habla (pausa el micrófono mientras) ---------- */
+function habla(txt,luego){
+  hablando=true; av.classList.add('hablando'); est.textContent='Hablando…';
+  paraEscucha();
+  hablaTexto(txt,function(){
+    hablando=false; av.classList.remove('hablando'); est.textContent='En llamada';
+    if(enLlamada && !mudo) setTimeout(escucha,220);
+    if(luego) luego();
+  });
+}
+
+/* ---------- escucha continua, manos libres ---------- */
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+var rec=null, escuchando=false, mudo=false, enLlamada=false;
+var buffer='', silencio=null, ondaId=null;
+var onda=document.getElementById('onda');
+
+function pintaOnda(on){
+  if(!onda) return;
+  onda.classList.toggle('on',on);
+  clearInterval(ondaId);
+  if(!on){ [].forEach.call(onda.children,function(b){b.style.height='5px';}); return; }
+  ondaId=setInterval(function(){
+    [].forEach.call(onda.children,function(b){ b.style.height=(4+Math.random()*20)+'px'; });
+  },140);
+}
+
+function paraEscucha(){
+  escuchando=false; pintaOnda(false);
+  clearTimeout(silencio); buffer='';
+  if(rec){ try{ rec.onend=null; rec.stop(); }catch(e){} }
+}
+
+function escucha(){
+  if(!SR){ teclado(true); hint.textContent='Su navegador no oye. Escriba abajo.'; return; }
+  if(!enLlamada||mudo||hablando||escuchando) return;
+  try{
+    rec=new SR();
+    rec.lang='es-US'; rec.continuous=true; rec.interimResults=true; rec.maxAlternatives=1;
+
+    rec.onstart=function(){ escuchando=true; pintaOnda(true); hint.textContent='Le escucho…'; };
+
+    rec.onresult=function(e){
+      var interino='', firme='';
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var t=e.results[i][0].transcript;
+        if(e.results[i].isFinal) firme+=t; else interino+=t;
+      }
+      if(firme) buffer+=' '+firme;
+      clearTimeout(silencio);
+      var hay=(buffer.trim()+interino.trim()).length>1;
+      if(hay){
+        /* espera a que deje de hablar y entonces responde, como en una llamada */
+        silencio=setTimeout(function(){
+          var dicho=(buffer+' '+interino).replace(/\s+/g,' ').trim();
+          buffer='';
+          if(dicho.length>1){ paraEscucha(); manda(dicho); }
+        }, firme?900:1500);
+      }
+    };
+
+    rec.onerror=function(e){
+      escuchando=false; pintaOnda(false);
+      if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+        hint.textContent='Permiso de micrófono denegado — use el teclado.'; teclado(true); mudo=true;
+        btnMic.classList.add('mudo');
+      }
+    };
+
+    rec.onend=function(){
+      escuchando=false; pintaOnda(false);
+      /* el navegador corta solo cada tanto: se reanuda para que sea manos libres */
+      if(enLlamada&&!mudo&&!hablando) setTimeout(escucha,260);
+    };
+
+    rec.start();
+  }catch(err){
+    escuchando=false;
+    if(String(err).indexOf('already started')<0){ teclado(true); hint.textContent='Use el teclado.'; }
+  }
+}
+
+/* el botón ahora solo silencia, no es para hablar */
+btnMic.onclick=function(){
+  mudo=!mudo;
+  btnMic.classList.toggle('mudo',mudo);
+  if(mudo){ paraEscucha(); hint.textContent='Micrófono silenciado'; }
+  else { hint.textContent='Le escucho…'; escucha(); }
+};
+
+/* ---------- motor local (respaldo, siempre funciona) ---------- */
+function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function local(txt){
+  var t=norm(txt);
+  if(/precio|cuanto|cuesta|vale|tarifa|cobran/.test(t))
+    return 'Le entiendo, es lo primero que uno pregunta. Le soy honesta: el precio depende de lo que usted necesite, y por eso '+N.pre+' es el punto de partida. ¿Le aparto un espacio para que se lo digan exacto?';
+  if(/urgen|emergencia|ahora|rapido|hoy mismo|duele|dolor/.test(t))
+    return 'Entiendo que es urgente. Voy a marcarlo como prioritario para que le devuelvan la llamada de primero. ¿Me da su nombre y un número donde ubicarlo?';
+  if(/horario|abierto|cierran|abren|hasta que hora|domingo|sabado/.test(t))
+    return 'La oficina atiende en horario normal de semana, pero yo estoy disponible a toda hora. Por eso puedo tomarle la cita ahora aunque estén cerrados. ¿Se la agendo?';
+  if(/donde|direccion|ubicad|queda|llegar/.test(t))
+    return 'Con gusto le paso la dirección por mensaje de texto apenas colguemos. ¿Le sirve el número desde el que está llamando?';
+  if(/agend|cita|reserv|turno|espacio|separar/.test(t))
+    return 'Perfecto, se la agendo ahora mismo. ¿Cómo se llama?';
+  if(/seguro|insurance|cobertura|medicare/.test(t))
+    return 'Esa la verifican en la oficina con sus datos, porque depende del plan exacto que tenga. Se lo dejo anotado para que lo revisen antes de su cita. ¿Le agendo?';
+  if(/hola|buenas|buenos dias|buenas tardes|buenas noches|que tal/.test(t))
+    return '¡Hola! ¿En qué le puedo ayudar hoy?';
+  if(/gracias|ok|listo|perfecto|vale/.test(t))
+    return 'Con mucho gusto. ¿Le agendo entonces, o hay algo más que quiera preguntar?';
+  if(/quien|eres|robot|maquina|persona|humano|real/.test(t))
+    return 'Soy el asistente virtual de '+N.neg+'. Le contesto a cualquier hora para que no se quede esperando. Si prefiere hablar con alguien del equipo, le hago la nota y le devuelven la llamada apenas abran.';
+  return 'Le entiendo. Eso se lo confirman en la oficina con exactitud, y prefiero no decirle algo que no me consta. Lo que sí puedo hacer ahora es dejarle la cita apartada para que se lo resuelvan de una vez. ¿Le parece?';
+}
+
+/* ---------- cerebro ---------- */
+function responde(txt,luego){
+  pensando(true);
+  var cerrado=false;
+  function caer(){
+    if(cerrado) return; cerrado=true; pensando(false);
+    var r=local(txt); linea(r,'ia'); hist.push({r:'a',t:r}); habla(r,luego);
+  }
+  var reloj2=setTimeout(caer,9000);
+
+  var sistema='Eres '+N.rec+', la recepcionista de '+N.neg+', un negocio de '+N.rubroN+' en Miami. '+
+    'Estás contestando una llamada telefónica REAL. Habla como una recepcionista latina de Miami: cálida, natural, breve. '+
+    'MÁXIMO DOS FRASES por respuesta, esto es una llamada, no un chat. '+
+    'El negocio ofrece: '+N.serv+'. Sobre precios: '+N.pre+', nunca inventes cifras. '+
+    'Tu objetivo es tomar el nombre, el motivo y un teléfono, y dejar la cita apartada. '+
+    'Si preguntan si eres humana, di con naturalidad que eres el asistente virtual del negocio. '+
+    'Si es urgente ('+N.urg+'), dilo como prioritario y toma los datos rápido. '+
+    'Nunca des diagnósticos ni promesas de resultado. Responde SOLO en español.';
+
+  var turnos=[{r:'u',t:'[Instrucciones del negocio: '+sistema+'] Ahora contesta a lo que sigue como '+N.rec+'.'}]
+    .concat(hist.slice(-8));
+
+  fetch(IA,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({mensajes:turnos,lead:{negocio:N.neg+' — '+N.rubroN}})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(cerrado) return;
+      var t=(d&&d.texto)||'';
+      if(!t||/se me trab/i.test(t)||t.length>420){ caer(); return; }
+      cerrado=true; clearTimeout(reloj2); pensando(false);
+      linea(t,'ia'); hist.push({r:'a',t:t}); habla(t,luego);
+    })
+    .catch(function(){ clearTimeout(reloj2); caer(); });
+}
+
+function manda(txt){
+  hint.textContent='';
+  linea(txt,'yo'); hist.push({r:'u',t:txt});
+  var t=norm(txt);
+  if(!lead.nombre&&/me llamo|soy |mi nombre/.test(t)) lead.nombre=txt;
+  if(!lead.tel){ var m=txt.match(/\d[\d\s\-\(\)]{6,}/); if(m) lead.tel=m[0].trim(); }
+  if(!lead.motivo&&hist.length<=3) lead.motivo=txt;
+  responde(txt);
+}
+
+/* ---------- llamada ---------- */
+document.getElementById('btnLlamar').onclick=function(){
+  var neg=document.getElementById('fNeg').value.trim()||'la empresa';
+  var r=RUBROS[sel.value];
+  N={neg:neg, rubroN:r.n, rec:(document.getElementById('fRec').value.trim()||r.rec),
+     serv:r.serv, pre:r.pre, urg:r.urg};
+  hist=[]; lead={nombre:'',motivo:'',cuando:'',tel:''}; tra.innerHTML='';
+  enLlamada=true; mudo=false; btnMic.classList.remove('mudo');
+  aplicaVoz();
+  document.getElementById('nmNeg').textContent=neg;
+  est.className='est tim'; est.textContent='Llamando…'; document.getElementById('cron').textContent='';
+  hint.textContent=''; teclado(false);
+  ver('call');
+
+  /* desbloquea el audio con el gesto del usuario */
+  if(window.speechSynthesis){ var w=new SpeechSynthesisUtterance(' '); w.volume=0; speechSynthesis.speak(w); }
+
+  setTimeout(function(){
+    est.className='est'; est.textContent='En llamada';
+    t0=Date.now();
+    cronId=setInterval(function(){
+      var s=Math.floor((Date.now()-t0)/1000);
+      document.getElementById('cron').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    },1000);
+    var sal=N.neg+', buenas. Habla '+N.rec+'. ¿En qué le puedo ayudar?';
+    linea(sal,'ia'); hist.push({r:'a',t:sal});
+    habla(sal,function(){ hint.textContent='Le escucho…'; });
+  },2600);
+};
+
+document.getElementById('btnColgar').onclick=function(){
+  enLlamada=false; paraEscucha();
+  if(audioActual){ try{audioActual.pause()}catch(e){} }
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  clearInterval(cronId);
+  var s=Math.floor((Date.now()-t0)/1000);
+  document.getElementById('dur').textContent='Duración: '+Math.floor(s/60)+' min '+(s%60)+' seg · atendida por el asistente';
+  var f=[];
+  f.push('<b>Negocio:</b> '+N.neg);
+  f.push('<b>Atendió:</b> '+N.rec+' (asistente)');
+  if(lead.nombre) f.push('<b>Dijo llamarse:</b> '+lead.nombre);
+  if(lead.motivo) f.push('<b>Motivo:</b> '+lead.motivo);
+  if(lead.tel) f.push('<b>Teléfono:</b> '+lead.tel);
+  f.push('<b>Turnos de conversación:</b> '+hist.length);
+  f.push('<br>Así le llegaría este resumen al dueño por mensaje, apenas la persona cuelga.');
+  document.getElementById('resumen').innerHTML=f.join('<br>');
+  ver('fin');
+};
+document.getElementById('btnOtra').onclick=function(){ ver('cfg'); };
+</script>
+</body>
+</html>
