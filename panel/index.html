@@ -243,6 +243,7 @@ $('btnEntrar').onclick=async()=>{
   try{
     const r=await fetch(`${W}/acceso?cliente=${CLI}&clave=${encodeURIComponent(k)}`).then(x=>x.json());
     if(!r.ok){ $('errEntrar').textContent=r.error==='clave'?'Clave incorrecta':'No encontramos ese negocio'; return; }
+    if(r.slug) CLI=r.slug;                       /* usa el identificador real */
     $('nomNegocio').textContent=r.nombre||n;
     localStorage.setItem('lionPanel',JSON.stringify({c:CLI,k:CLV,n:r.nombre||n}));
     $('entrar').classList.add('oculto'); $('app').classList.remove('oculto');
