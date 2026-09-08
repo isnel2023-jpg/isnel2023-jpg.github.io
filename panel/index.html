@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel · Lion AI</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Kumbh+Sans:wght@300..700&display=swap">
+<style>
+:root{
+  --bg:#F7F4F0; --sup:#FFF; --sup2:#FBF9F6; --sup3:#F2EDE7;
+  --tinta:#332F2A; --tinta2:#5A544C; --mute:#948C82; --line:#E7E0D7;
+  --coral:#F2856B; --coral-sw:#FDE3DC; --menta:#4FBF95; --menta-sw:#DCF3EA;
+  --durazno:#F2A65A; --durazno-sw:#FDEBD6; --cielo:#5FA8D3; --cielo-sw:#DEEDF7;
+  --oro:#C2925A;
+  --serif:'Instrument Serif',Georgia,serif;
+  --ui:'Kumbh Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  --curva:cubic-bezier(.34,1.4,.5,1); --suave:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--tinta);font-family:var(--ui);font-weight:450;
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+
+header{background:rgba(247,244,240,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:30;box-shadow:0 1px 12px rgba(51,47,42,.04)}
+.top{max-width:1180px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-family:var(--serif);font-size:1.3rem;font-weight:500}
+.logo i{font-style:normal;color:var(--oro)}
+.negocio{margin-left:auto;font-size:.86rem;font-weight:600;color:var(--tinta2)}
+.negocio b{display:block;font-size:.66rem;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--mute)}
+.refrescar{background:var(--sup);border:1.5px solid var(--line);border-radius:9px;padding:9px 15px;
+  font-size:.79rem;font-weight:600;transition:.22s var(--curva)}
+.refrescar:hover{border-color:var(--coral);color:var(--coral);transform:translateY(-2px)}
+
+main{max-width:1180px;margin:0 auto;padding:24px 22px 60px}
+
+/* métricas */
+.mets{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:26px}
+.met{background:var(--sup);border:1px solid var(--line);border-radius:15px;padding:20px 22px;
+  transition:.3s var(--suave);animation:entra .45s var(--suave) both;box-shadow:0 1px 3px rgba(51,47,42,.04)}
+.met:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(51,47,42,.09)}
+.met b{display:block;font-family:var(--serif);font-size:2.6rem;line-height:1;color:var(--tinta)}
+.met.v b{color:var(--menta)} .met.a b{color:var(--durazno)} .met.c b{color:var(--coral)}
+.met span{display:block;margin-top:8px;font-size:.68rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--mute)}
+@keyframes entra{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+h2.sec{font-size:1.5rem;margin:0 0 16px}
+.vacio{background:var(--sup);border:1px dashed var(--line);border-radius:15px;padding:52px 24px;
+  text-align:center;color:var(--mute)}
+.vacio b{display:block;font-family:var(--serif);font-size:1.35rem;color:var(--tinta);margin-bottom:7px}
+
+/* llamadas */
+.lista{display:flex;flex-direction:column;gap:11px}
+.ll{background:var(--sup);border:1px solid var(--line);border-radius:15px;padding:18px 20px;
+  transition:.28s var(--suave);animation:entra .4s var(--suave) both;box-shadow:0 1px 3px rgba(51,47,42,.04)}
+.ll:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:0 8px 22px rgba(51,47,42,.08)}
+.ll .cab{display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap}
+.ll .quien{flex:1;min-width:190px}
+.ll .nm{font-size:1.06rem;font-weight:650;line-height:1.25}
+.ll .tel{font-size:.86rem;font-weight:600;color:var(--coral);font-variant-numeric:tabular-nums;margin-top:2px}
+.ll .cuando{font-size:.76rem;font-weight:550;color:var(--mute);margin-top:3px}
+.eti{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;
+  font-size:.7rem;font-weight:700;white-space:nowrap}
+.eti.cita{background:var(--menta-sw);color:#2E8B67}
+.eti.urg{background:var(--coral-sw);color:#C2503A}
+.eti.fuera{background:var(--durazno-sw);color:#B06B22}
+.ll .res{margin-top:12px;font-size:.9rem;font-weight:500;color:var(--tinta2);line-height:1.55}
+.ll .acc{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}
+.ll .acc a,.ll .acc button{border:1.5px solid var(--line);background:var(--sup2);border-radius:9px;
+  padding:9px 15px;font-size:.79rem;font-weight:650;text-decoration:none;color:var(--tinta);
+  transition:.22s var(--curva);display:inline-flex;align-items:center;gap:6px}
+.ll .acc a.dev{background:var(--menta);border-color:var(--menta);color:#fff}
+.ll .acc a.dev:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(79,191,149,.34)}
+.ll .acc button:hover{border-color:var(--coral);color:var(--coral);transform:translateY(-2px)}
+.ll .tr{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:none;
+  max-height:340px;overflow-y:auto;flex-direction:column;gap:8px}
+.ll .tr.on{display:flex}
+.tl{max-width:86%;padding:10px 14px;border-radius:13px;font-size:.86rem;line-height:1.5}
+.tl.a{background:var(--coral-sw);align-self:flex-start}
+.tl.u{background:var(--cielo-sw);align-self:flex-end}
+.tl b{display:block;font-size:.6rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  opacity:.6;margin-bottom:3px}
+
+/* entrada */
+#entrar{max-width:420px;margin:14vh auto;background:var(--sup);border:1px solid var(--line);
+  border-radius:20px;padding:38px 34px;text-align:center;box-shadow:0 20px 60px rgba(51,47,42,.1)}
+#entrar h1{font-size:1.9rem;margin-bottom:8px}
+#entrar p{color:var(--mute);font-size:.9rem;margin-bottom:24px}
+#entrar input{width:100%;background:var(--sup2);border:1.5px solid var(--line);border-radius:10px;
+  padding:13px 16px;font-weight:550;outline:none;margin-bottom:11px;font-family:inherit;font-size:15px}
+#entrar input:focus{border-color:var(--coral);box-shadow:0 0 0 4px var(--coral-sw)}
+#entrar button{width:100%;background:var(--coral);border:0;color:#fff;border-radius:99px;
+  padding:15px;font-weight:700;letter-spacing:.06em;transition:.24s var(--curva)}
+#entrar button:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(242,133,107,.34)}
+.err{color:#C2503A;font-size:.85rem;font-weight:600;margin-top:11px;min-height:20px}
+.oculto{display:none!important}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="entrar">
+  <h1>Su panel</h1>
+  <p>Vea todas las llamadas que su asistente contestó por usted.</p>
+  <input id="cli" placeholder="Nombre de su negocio" autocomplete="off">
+  <input id="clv" type="password" placeholder="Su clave" autocomplete="current-password">
+  <button id="btnEntrar">Entrar</button>
+  <div class="err" id="errEntrar"></div>
+</div>
+
+<div id="app" class="oculto">
+  <header>
+    <div class="top">
+      <div class="logo">LION <i>AI</i></div>
+      <div class="negocio"><b>Panel de</b><span id="nomNegocio">—</span></div>
+      <button class="refrescar" id="btnRef">↻ Actualizar</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="mets" id="mets"></div>
+    <h2 class="sec">Llamadas que contestó su asistente</h2>
+    <div class="lista" id="lista"></div>
+  </main>
+</div>
+
+<script>
+const W='https://lion-ai.resonant-shroud-af6.workers.dev';
+const $=id=>document.getElementById(id);
+let CLI='', CLV='';
+
+const slug=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+const esc=t=>{const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML;};
+const tel=t=>{const n=String(t||'').replace(/\D/g,'').slice(-10);
+  return n.length===10?`(${n.slice(0,3)}) ${n.slice(3,6)}-${n.slice(6)}`:(t||'—');};
+
+function cuando(ms){
+  if(!ms) return '';
+  const d=new Date(ms), h=new Date(); h.setHours(0,0,0,0);
+  const dif=Math.floor((h-new Date(d).setHours(0,0,0,0))/86400000);
+  const hora=d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+  if(dif===0) return 'Hoy · '+hora;
+  if(dif===1) return 'Ayer · '+hora;
+  return d.toLocaleDateString('es',{day:'numeric',month:'short'})+' · '+hora;
+}
+function dur(s){ return s>=60 ? Math.floor(s/60)+' min '+(s%60)+' s' : (s||0)+' s'; }
+
+async function cargar(){
+  try{
+    const [r,l]=await Promise.all([
+      fetch(`${W}/resumen?cliente=${CLI}`).then(x=>x.json()),
+      fetch(`${W}/datos?cliente=${CLI}&tipo=llamada&limite=60`).then(x=>x.json())
+    ]);
+    pintaMets(r); pintaLista(l.items||[]);
+  }catch(e){ console.error(e); }
+}
+
+function pintaMets(r){
+  const m=[
+    ['',  r.llamadas_mes||0,   'Llamadas este mes'],
+    ['v', r.citas||0,          'Citas agendadas'],
+    ['a', r.fuera_horario||0,  'Fuera de horario'],
+    ['c', r.minutos||0,        'Minutos usados']
+  ];
+  const c=$('mets'); c.innerHTML='';
+  m.forEach((x,i)=>{
+    const d=document.createElement('div');
+    d.className='met '+x[0]; d.style.animationDelay=(i*60)+'ms';
+    d.innerHTML=`<b>0</b><span>${x[2]}</span>`;
+    c.appendChild(d);
+    const b=d.querySelector('b'); let t0=null;
+    const paso=t=>{ if(!t0)t0=t; const p=Math.min(1,(t-t0)/700), e=1-Math.pow(1-p,3);
+      b.textContent=Math.round(x[1]*e); if(p<1) requestAnimationFrame(paso); };
+    setTimeout(()=>requestAnimationFrame(paso),80+i*60);
+  });
+}
+
+function pintaLista(items){
+  const c=$('lista'); c.innerHTML='';
+  if(!items.length){
+    c.innerHTML='<div class="vacio"><b>Todavía no hay llamadas</b>En cuanto alguien llame y usted no alcance a contestar, aparecerá aquí.</div>';
+    return;
+  }
+  items.forEach((it,i)=>{
+    const d=it.datos||{};
+    const h=new Date(it.inicio||0).getHours();
+    const fuera=(h<9||h>=18);
+    const el=document.createElement('article');
+    el.className='ll'; el.style.animationDelay=Math.min(i*45,400)+'ms';
+    const etis=[
+      it.agendo?'<span class="eti cita">✓ Agendó cita</span>':'',
+      d.urgente?'<span class="eti urg">Urgente</span>':'',
+      fuera?'<span class="eti fuera">Fuera de horario</span>':''
+    ].join('');
+    const numero=d.telefono||it.de||'';
+    el.innerHTML=`
+      <div class="cab">
+        <div class="quien">
+          <div class="nm">${esc(d.nombre||'Sin nombre')}</div>
+          <div class="tel">${tel(numero)}</div>
+          <div class="cuando">${cuando(it.inicio)} · ${dur(it.segundos)}</div>
+        </div>
+        <div>${etis}</div>
+      </div>
+      ${it.resumen?`<div class="res">${esc(it.resumen)}</div>`:''}
+      <div class="acc">
+        ${numero?`<a class="dev" href="tel:+1${String(numero).replace(/\D/g,'').slice(-10)}">📞 Devolver la llamada</a>`:''}
+        ${numero?`<a href="sms:+1${String(numero).replace(/\D/g,'').slice(-10)}">Enviar texto</a>`:''}
+        ${it.transcripcion?'<button class="ver">Ver la conversación</button>':''}
+      </div>
+      <div class="tr"></div>`;
+    const btn=el.querySelector('.ver'), tr=el.querySelector('.tr');
+    if(btn) btn.onclick=()=>{
+      if(tr.classList.contains('on')){ tr.classList.remove('on'); btn.textContent='Ver la conversación'; return; }
+      tr.innerHTML='';
+      String(it.transcripcion||'').split('\n').filter(Boolean).forEach(li=>{
+        const esAg=/^(agent|agente|val)\s*:/i.test(li);
+        const txt=li.replace(/^[^:]{0,12}:\s*/,'');
+        const b=document.createElement('div');
+        b.className='tl '+(esAg?'a':'u');
+        b.innerHTML=`<b>${esAg?'Su asistente':'Quien llamó'}</b>`;
+        b.appendChild(document.createTextNode(txt));
+        tr.appendChild(b);
+      });
+      tr.classList.add('on'); btn.textContent='Ocultar';
+    };
+    c.appendChild(el);
+  });
+}
+
+$('btnEntrar').onclick=async()=>{
+  const n=$('cli').value.trim(), k=$('clv').value.trim();
+  if(!n){ $('errEntrar').textContent='Escriba el nombre de su negocio'; return; }
+  $('errEntrar').textContent='';
+  CLI=slug(n); CLV=k;
+  try{
+    const r=await fetch(`${W}/acceso?cliente=${CLI}&clave=${encodeURIComponent(k)}`).then(x=>x.json());
+    if(!r.ok){ $('errEntrar').textContent=r.error==='clave'?'Clave incorrecta':'No encontramos ese negocio'; return; }
+    $('nomNegocio').textContent=r.nombre||n;
+    localStorage.setItem('lionPanel',JSON.stringify({c:CLI,k:CLV,n:r.nombre||n}));
+    $('entrar').classList.add('oculto'); $('app').classList.remove('oculto');
+    cargar();
+  }catch(e){ $('errEntrar').textContent='No se pudo conectar. Intente de nuevo.'; }
+};
+$('clv').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnEntrar').click(); });
+$('cli').addEventListener('keydown',e=>{ if(e.key==='Enter') $('clv').focus(); });
+$('btnRef').onclick=cargar;
+
+/* si ya entró antes, no vuelve a pedir clave */
+try{
+  const g=JSON.parse(localStorage.getItem('lionPanel')||'null');
+  if(g&&g.c){ CLI=g.c; CLV=g.k; $('nomNegocio').textContent=g.n;
+    $('entrar').classList.add('oculto'); $('app').classList.remove('oculto'); cargar(); }
+}catch(e){}
+setInterval(()=>{ if(CLI&&!$('app').classList.contains('oculto')) cargar(); },60000);
+</script>
+</body>
+</html>
