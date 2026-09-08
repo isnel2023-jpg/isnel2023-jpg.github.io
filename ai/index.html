@@ -964,7 +964,19 @@
       .catch(function(){ clearTimeout(reloj); local(); });
   }
 
+  function guardaLeadWorker(){
+    try{
+      fetch('https://lion-ai.resonant-shroud-af6.workers.dev/lead',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({cliente:'lion',origen:'chat web',
+          nombre:L.nombre||'',telefono:L.contacto||'',negocio:L.negocio||L.rubro||'',
+          motivo:L.dolor||'',nota:(L.notas||[]).join(' · ').slice(0,600)})
+      }).catch(function(){});
+    }catch(e){}
+  }
+
   function cierra(){
+    guardaLeadWorker();
     var res='Hola Isnel! Soy '+(L.nombre||'—')+(L.negocio?', de '+L.negocio:'')+'.'
       +(L.rubro?'\nRubro: '+L.rubro+'.':'')+(L.rol?'\nEn el negocio: '+L.rol+'.':'')
       +(L.volumen?'\nClientes nuevos al mes: '+L.volumen+'.':'')+(L.dolor?'\nHoy atendemos así: '+L.dolor+'.':'')
