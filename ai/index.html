@@ -18,12 +18,12 @@
     --marfil:#F3EDE2; --humo:#A8A296; --sombra:#6E6A60; --max:1180px;
   }
   * { box-sizing:border-box; margin:0; }
-  html { scroll-behavior:smooth; }
+  html { scroll-behavior:smooth; overflow-x:clip; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior:auto; }
     *,*::before,*::after { animation:none !important; transition:none !important; }
   }
-  body { background:var(--negro); color:var(--marfil); font-family:"Helvetica Neue",-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.55; font-size:17px; overflow-x:hidden; }
+  body { overflow-x:clip; overflow-anchor:none; background:var(--negro); color:var(--marfil); font-family:"Helvetica Neue",-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.55; font-size:17px; overflow-x:hidden; }
   ::selection { background:var(--oro); color:#141005; }
   .serif { font-family:Didot,"Bodoni 72","Playfair Display",Georgia,serif; font-weight:400; }
   .mono { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.7rem; letter-spacing:.22em; text-transform:uppercase; color:var(--oro); font-weight:600; }
@@ -48,12 +48,12 @@
   @supports (animation-timeline: scroll()) {
     .progreso { animation: crecer linear both; animation-timeline: scroll(root); }
     @keyframes crecer { to { transform:scaleX(1); } }
-    .hero video { animation: heroZoom linear both; animation-timeline: scroll(root); animation-range: 0 100vh; }
+    .hero video { animation: heroZoom linear both; animation-timeline: scroll(root); animation-range: 0 100vh; will-change:transform,opacity; }
     @keyframes heroZoom { to { transform:scale(1.18); opacity:.25; } }
-    .phone { animation: flotar linear both; animation-timeline: view(); animation-range: entry 0% cover 60%; }
-    .card, .stat, .fase { animation: flotarSuave linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
-    @keyframes flotar { from { transform:translateY(46px); } to { transform:translateY(-12px); } }
-    @keyframes flotarSuave { from { transform:translateY(30px); } to { transform:translateY(0); } }
+    .phone { animation: flotar linear both; animation-timeline: view(); animation-range: entry 10% cover 40%; will-change:transform; }
+    .card, .stat, .fase { animation: flotarSuave linear both; animation-timeline: view(); animation-range: entry 15% cover 35%; will-change:transform; }
+    @keyframes flotar { from { transform:translateY(24px); } to { transform:translateY(0); } }
+    @keyframes flotarSuave { from { transform:translateY(18px); } to { transform:translateY(0); } }
   }
   @media (prefers-reduced-motion:reduce){ .progreso, .hero video, .fundador .foto img, .phone { animation:none !important; } }
 
@@ -363,6 +363,15 @@
 .pq-auto .ejem span{background:var(--panel);border:1px solid var(--linea);border-radius:99px;
   padding:8px 16px;font-size:.82rem;color:var(--marfil)}
 
+
+/* ═══ estabilidad del scroll ═══ */
+section, .sec-line{ overflow-x:clip }
+.vivo::after,.orbe::after,.orbe::before,.val-orbe::after,.val-orbe::before{ pointer-events:none }
+/* nada de lo que se anima altera el alto del documento */
+.phone,.card,.stat,.fase{ contain:layout }
+@media (prefers-reduced-motion:reduce){
+  .hero video,.phone,.card,.stat,.fase{ animation:none!important; transform:none!important }
+}
 </style>
 </head>
 <body>
