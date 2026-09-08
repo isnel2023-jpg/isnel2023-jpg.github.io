@@ -310,6 +310,57 @@
 #valPie{margin-top:18px;padding-top:15px;border-top:1px solid var(--linea);
   font-size:.72rem;color:var(--sombra);line-height:1.6}
 
+
+/* ═══ PAQUETES ═══ */
+#paquetes{padding:clamp(70px,9vh,120px) 0}
+.pq-cab{max-width:640px;margin:0 auto 46px;text-align:center}
+.pq-cab .eyebrow{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--oro);margin-bottom:18px}
+.pq-cab h2{font-family:Georgia,serif;font-size:clamp(2rem,4.6vw,3.1rem);font-weight:400;line-height:1.1;margin-bottom:16px}
+.pq-cab h2 i{color:var(--oro);font-style:italic}
+.pq-cab p{color:var(--humo);font-size:1.02rem;line-height:1.65}
+.pq-rej{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;max-width:1120px;margin:0 auto}
+.pq{background:var(--panel);border:1px solid var(--linea);border-radius:18px;padding:32px 28px;
+  display:flex;flex-direction:column;transition:.35s cubic-bezier(.16,1,.3,1);position:relative}
+.pq:hover{transform:translateY(-6px);border-color:rgba(214,178,94,.5);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.pq.destaca{border-color:var(--oro);background:linear-gradient(180deg,rgba(214,178,94,.07),var(--panel))}
+.pq.destaca::before{content:'MÁS ELEGIDO';position:absolute;top:-11px;left:28px;background:var(--oro);
+  color:#1A1405;font-size:.6rem;font-weight:700;letter-spacing:.15em;padding:4px 12px;border-radius:99px}
+.pq h3{font-family:Georgia,serif;font-size:1.5rem;font-weight:400;margin-bottom:6px}
+.pq .para{font-size:.79rem;color:var(--sombra);margin-bottom:22px;line-height:1.5}
+.pq .precio{font-family:Georgia,serif;font-size:2.9rem;line-height:1;color:var(--marfil)}
+.pq .precio sup{font-size:1.1rem;vertical-align:super;color:var(--oro)}
+.pq .precio span{display:block;font-family:inherit;font-size:.78rem;color:var(--humo);margin-top:8px;
+  padding-bottom:20px;border-bottom:1px solid var(--linea)}
+.pq ul{list-style:none;margin:20px 0 0;padding:0;flex:1}
+.pq li{padding:8px 0 8px 24px;position:relative;font-size:.88rem;color:var(--marfil);line-height:1.5}
+.pq li::before{content:'✓';position:absolute;left:0;top:8px;color:var(--oro);font-weight:700}
+.pq li.no{color:var(--sombra)}
+.pq li.no::before{content:'—';color:var(--sombra)}
+.pq .cta{margin-top:24px;display:block;text-align:center;background:transparent;border:1.5px solid var(--oro);
+  color:var(--oro2);border-radius:99px;padding:14px;font-weight:700;font-size:.79rem;letter-spacing:.13em;
+  text-transform:uppercase;text-decoration:none;cursor:pointer;transition:.25s cubic-bezier(.34,1.4,.5,1)}
+.pq .cta:hover{background:var(--oro);color:#1A1405;transform:translateY(-2px);box-shadow:0 10px 26px rgba(214,178,94,.32)}
+.pq.destaca .cta{background:var(--oro);color:#1A1405}
+.pq.destaca .cta:hover{background:var(--oro2)}
+.pq-extra{max-width:1120px;margin:20px auto 0;background:var(--panel2);border:1px solid var(--linea);
+  border-radius:16px;padding:26px 30px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.pq-extra .t{flex:1;min-width:250px}
+.pq-extra h4{font-family:Georgia,serif;font-size:1.28rem;font-weight:400;margin-bottom:6px}
+.pq-extra p{font-size:.88rem;color:var(--humo);line-height:1.55}
+.pq-extra .pr{font-family:Georgia,serif;font-size:1.8rem;color:var(--oro);white-space:nowrap}
+.pq-extra .pr small{display:block;font-family:inherit;font-size:.74rem;color:var(--humo);margin-top:3px}
+.pq-nota{max-width:760px;margin:34px auto 0;text-align:center;font-size:.85rem;color:var(--sombra);line-height:1.7}
+.pq-nota b{color:var(--oro)}
+/* automatizamos cualquier cosa */
+.pq-auto{max-width:1120px;margin:44px auto 0;background:linear-gradient(135deg,rgba(214,178,94,.09),rgba(19,19,22,.6));
+  border:1px solid rgba(214,178,94,.32);border-radius:18px;padding:34px 32px;text-align:center}
+.pq-auto h3{font-family:Georgia,serif;font-size:1.7rem;font-weight:400;margin-bottom:12px}
+.pq-auto h3 i{color:var(--oro);font-style:italic}
+.pq-auto p{color:var(--humo);max-width:60ch;margin:0 auto 22px;line-height:1.7;font-size:.96rem}
+.pq-auto .ejem{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-bottom:24px}
+.pq-auto .ejem span{background:var(--panel);border:1px solid var(--linea);border-radius:99px;
+  padding:8px 16px;font-size:.82rem;color:var(--marfil)}
+
 </style>
 </head>
 <body>
@@ -449,6 +500,90 @@
         Empresa nueva, con hambre — y tecnología probada. Instalo y opero sistemas de automatización con IA todos los días, y tengo una sola obsesión: que tu negocio no pierda ni un cliente más.
       </div>
     </div>
+  </div>
+</section>
+
+
+<section class="sec-line" id="paquetes">
+  <div class="wrap">
+    <div class="pq-cab">
+      <div class="eyebrow">Lo que instalamos</div>
+      <h2>Deje de perder <i>lo que ya tiene</i></h2>
+      <p>Sin cambiar de número, sin instalar nada y sin contrato. Su teléfono sigue siendo su teléfono — solo que ahora, cuando usted no puede contestar, contesta alguien.</p>
+    </div>
+
+    <div class="pq-rej">
+      <div class="pq destaca">
+        <h3>La Puerta</h3>
+        <div class="para">Para el negocio que vive del teléfono y pierde llamadas todos los días.</div>
+        <div class="precio"><sup>$</sup>557<span>de instalación · luego $317 al mes</span></div>
+        <ul>
+          <li>Recepcionista de IA que contesta 24/7</li>
+          <li>Habla español o inglés según le hablen</li>
+          <li>Conoce sus servicios, precios y horarios</li>
+          <li>Agenda la cita y toma los datos</li>
+          <li>Pasa las urgencias a una persona real</li>
+          <li>Chat de inteligencia artificial en su web</li>
+          <li>Su panel con todas las llamadas y citas</li>
+          <li>Se conecta al sistema que ya usa</li>
+          <li class="no">Sitio web nuevo</li>
+        </ul>
+        <button class="cta" data-val>Probarlo ahora mismo</button>
+      </div>
+
+      <div class="pq">
+        <h3>Puerta + Web</h3>
+        <div class="para">Para quien además tiene una página que no está a la altura de su trabajo.</div>
+        <div class="precio"><sup>$</sup>1,257<span>de instalación · luego $417 al mes</span></div>
+        <ul>
+          <li>Todo lo de La Puerta</li>
+          <li>Sitio nuevo, completo en español e inglés</li>
+          <li>Diseñado con su marca y sus fotos</li>
+          <li>Optimizado para que Google lo encuentre</li>
+          <li>Horarios sincronizados en todas partes</li>
+          <li>Mantenimiento y cambios incluidos</li>
+        </ul>
+        <a class="cta" href="#hablemos">Hablar de mi caso</a>
+      </div>
+
+      <div class="pq">
+        <h3>Solo la web</h3>
+        <div class="para">Si por ahora solo quiere arreglar su presencia en internet.</div>
+        <div class="precio"><sup>$</sup>700<span>de instalación · luego $100 al mes</span></div>
+        <ul>
+          <li>Sitio nuevo bilingüe</li>
+          <li>Con su marca y sus fotos</li>
+          <li>Optimizado para buscadores</li>
+          <li>Mantenimiento mensual</li>
+          <li class="no">Recepcionista de IA</li>
+          <li class="no">Panel de llamadas</li>
+        </ul>
+        <a class="cta" href="#hablemos">Hablar de mi caso</a>
+      </div>
+    </div>
+
+    <div class="pq-extra">
+      <div class="t">
+        <h4>Correos que trabajan solos</h4>
+        <p>Siete secuencias que se montan una vez y corren para siempre: recordatorio de cita, reactivación de clientes dormidos, seguimiento, solicitud de reseña, cumpleaños. Se suma a cualquier paquete.</p>
+      </div>
+      <div class="pr">$450<small>+ $150 al mes</small></div>
+    </div>
+
+    <div class="pq-auto">
+      <h3>¿Y si lo suyo es <i>otra cosa</i>?</h3>
+      <p>Facturas que pasa a mano. Pedidos que se pierden. El mismo reporte cada lunes. Dos programas que no se hablan entre sí. Si hay una tarea repetitiva en su negocio, probablemente se puede automatizar.</p>
+      <div class="ejem">
+        <span>Conectar sistemas</span><span>Sacar datos de documentos</span><span>Reportes automáticos</span>
+        <span>Avisos cuando pasa algo</span><span>Seguimiento de clientes</span><span>Formularios que se llenan solos</span>
+      </div>
+      <button class="cta" data-val style="display:inline-block;max-width:340px;margin:0 auto">Cuéntele su caso a Val — es gratis</button>
+    </div>
+
+    <p class="pq-nota">
+      Instalación en 7 a 14 días · Primer mes con ajustes ilimitados · <b>Sin contrato de permanencia</b><br>
+      Sus datos son suyos: si algún día nos separamos, se los lleva completos.
+    </p>
   </div>
 </section>
 
