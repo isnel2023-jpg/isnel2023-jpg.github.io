@@ -51,6 +51,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 22px 60px}
 @keyframes entra{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
 h2.sec{font-size:1.5rem;margin:0 0 16px}
+.ll .acc{gap:9px}
 .vacio{background:var(--sup);border:1px dashed var(--line);border-radius:15px;padding:52px 24px;
   text-align:center;color:var(--mute)}
 .vacio b{display:block;font-family:var(--serif);font-size:1.35rem;color:var(--tinta);margin-bottom:7px}
@@ -86,6 +87,19 @@ h2.sec{font-size:1.5rem;margin:0 0 16px}
 .tl.u{background:var(--cielo-sw);align-self:flex-end}
 .tl b{display:block;font-size:.6rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
   opacity:.6;margin-bottom:3px}
+
+/* pedido */
+.pedido{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.pedido .fila{background:var(--sup2);padding:11px 14px}
+.pedido .fila b{display:block;font-size:.62rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+.pedido .fila span{font-size:.92rem;font-weight:600;color:var(--tinta);line-height:1.4}
+.eti.promo{background:#FFF0C9;color:#9A6B12}
+.eti.chat{background:var(--cielo-sw);color:#2E6E96}
+.eti.sorp{background:var(--lavanda-sw,#EAE4F7);color:#6B52A8}
+.ll .acc a.wa{background:#25D366;border-color:#25D366;color:#05230F}
+.ll .acc a.wa:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(37,211,102,.36)}
 
 /* entrada */
 #entrar{max-width:420px;margin:14vh auto;background:var(--sup);border:1px solid var(--line);
@@ -125,7 +139,7 @@ h2.sec{font-size:1.5rem;margin:0 0 16px}
 
   <main>
     <div class="mets" id="mets"></div>
-    <h2 class="sec">Llamadas que contestó su asistente</h2>
+    <h2 class="sec">Pedidos y llamadas</h2>
     <div class="lista" id="lista"></div>
   </main>
 </div>
@@ -200,6 +214,48 @@ function pintaLista(items){
       fuera?'<span class="eti fuera">Fuera de horario</span>':''
     ].join('');
     const numero=d.telefono||it.de||'';
+    const esPedido=!!(d.producto||d.color);
+    const wa=String(numero).replace(/\D/g,'').slice(-10);
+    if(esPedido){
+      const filas=[
+        ['Ramo', d.producto],
+        ['Color', d.color],
+        ['Para', d.fecha_entrega],
+        ['Entrega', d.entrega_o_recoge==='recoge'?'Recoge en el local':(d.entrega_o_recoge==='entrega'?'A domicilio':'')],
+        ['Dirección', d.direccion_completa],
+        ['Tarjeta', d.mensaje_tarjeta],
+        ['Banda', d.banda_personalizada?'Sí, personalizada':''],
+        ['Extras', d.extras]
+      ].filter(x=>x[1]&&String(x[1]).trim()&&String(x[1]).toLowerCase()!=='null');
+      el.innerHTML=`
+        <div class="cab">
+          <div class="quien">
+            <div class="nm">${esc(d.nombre||'Sin nombre')}</div>
+            <div class="tel">${tel(numero)}</div>
+            <div class="cuando">${cuando(it.inicio)} · ${dur(it.segundos)}</div>
+          </div>
+          <div>
+            ${d.promocion?'<span class="eti promo">★ Promo septiembre · $150</span>':''}
+            ${d.espera_chat?'<span class="eti chat">Manda datos por chat</span>':''}
+            ${d.urgente?'<span class="eti urg">Urgente</span>':''}
+            ${d.es_sorpresa?'<span class="eti sorp">Sorpresa</span>':''}
+          </div>
+        </div>
+        <div class="pedido">
+          ${filas.map(f=>`<div class="fila"><b>${f[0]}</b><span>${esc(f[1])}</span></div>`).join('')}
+        </div>
+        ${it.resumen?`<div class="res">${esc(it.resumen)}</div>`:''}
+        <div class="acc">
+          ${wa?`<a class="wa" href="https://wa.me/1${wa}" target="_blank" rel="noopener">💬 Escribirle por WhatsApp</a>`:''}
+          ${wa?`<a class="dev" href="tel:+1${wa}">📞 Llamar</a>`:''}
+          ${it.transcripcion?'<button class="ver">Ver la conversación</button>':''}
+        </div>
+        <div class="tr"></div>`;
+      const b2=el.querySelector('.ver'), t2=el.querySelector('.tr');
+      if(b2) b2.onclick=()=>verTr(it,b2,t2);
+      c.appendChild(el);
+      return;
+    }
     el.innerHTML=`
       <div class="cab">
         <div class="quien">
@@ -217,7 +273,13 @@ function pintaLista(items){
       </div>
       <div class="tr"></div>`;
     const btn=el.querySelector('.ver'), tr=el.querySelector('.tr');
-    if(btn) btn.onclick=()=>{
+    if(btn) btn.onclick=()=>verTr(it,btn,tr);
+    c.appendChild(el);
+  });
+}
+
+function verTr(it,btn,tr){
+  {
       if(tr.classList.contains('on')){ tr.classList.remove('on'); btn.textContent='Ver la conversación'; return; }
       tr.innerHTML='';
       String(it.transcripcion||'').split('\n').filter(Boolean).forEach(li=>{
@@ -230,9 +292,7 @@ function pintaLista(items){
         tr.appendChild(b);
       });
       tr.classList.add('on'); btn.textContent='Ocultar';
-    };
-    c.appendChild(el);
-  });
+  }
 }
 
 $('btnEntrar').onclick=async()=>{
