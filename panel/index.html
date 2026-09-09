@@ -178,21 +178,22 @@ async function cargar(){
 }
 
 function pintaMets(r){
-  const m=[
-    ['',  r.llamadas_mes||0,   'Llamadas este mes'],
-    ['v', r.citas||0,          'Citas agendadas'],
-    ['a', r.fuera_horario||0,  'Fuera de horario'],
-    ['c', r.minutos||0,        'Minutos usados']
+  /* el Worker manda las métricas que le tocan a este negocio.
+     Una floristería mide pedidos; una clínica, citas. */
+  const m = (r.mets && r.mets.length) ? r.mets : [
+    {v:r.llamadas_mes||0, t:'Llamadas este mes'},
+    {v:r.minutos||0,      t:'Minutos usados', c:'c'}
   ];
   const c=$('mets'); c.innerHTML='';
   m.forEach((x,i)=>{
     const d=document.createElement('div');
-    d.className='met '+x[0]; d.style.animationDelay=(i*60)+'ms';
-    d.innerHTML=`<b>0</b><span>${x[2]}</span>`;
+    d.className='met '+(x.c||''); d.style.animationDelay=(i*60)+'ms';
+    d.innerHTML='<b>0</b><span></span>';
+    d.querySelector('span').textContent=x.t;
     c.appendChild(d);
     const b=d.querySelector('b'); let t0=null;
     const paso=t=>{ if(!t0)t0=t; const p=Math.min(1,(t-t0)/700), e=1-Math.pow(1-p,3);
-      b.textContent=Math.round(x[1]*e); if(p<1) requestAnimationFrame(paso); };
+      b.textContent=Math.round((x.v||0)*e); if(p<1) requestAnimationFrame(paso); };
     setTimeout(()=>requestAnimationFrame(paso),80+i*60);
   });
 }
@@ -209,13 +210,14 @@ function pintaLista(items){
     const fuera=(h<9||h>=18);
     const el=document.createElement('article');
     el.className='ll'; el.style.animationDelay=Math.min(i*45,400)+'ms';
+    const esPedido=!!(d.producto||d.color);
     const etis=[
-      it.agendo?'<span class="eti cita">✓ Agendó cita</span>':'',
+      (it.agendo && !esPedido)?'<span class="eti cita">✓ Agendó cita</span>':'',
+      (esPedido && d.promocion)?'<span class="eti cita">Promoción</span>':'',
       d.urgente?'<span class="eti urg">Urgente</span>':'',
-      fuera?'<span class="eti fuera">Fuera de horario</span>':''
+      (fuera && !esPedido)?'<span class="eti fuera">Fuera de horario</span>':''
     ].join('');
     const numero=d.telefono||it.de||'';
-    const esPedido=!!(d.producto||d.color);
     const wa=String(numero).replace(/\D/g,'').slice(-10);
     if(esPedido){
       const filas=[
