@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Su expediente · Lion AI</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Kumbh+Sans:wght@300..700&display=swap">
+<style>
+:root{
+  --ink:#0C0A09; --ink2:#151210; --ink3:#1F1A16; --ink4:#2A231C;
+  --bone:#F4F0E9; --mute:#8B8177; --line:rgba(240,205,128,.16);
+  --oro:#F0CD80; --oro2:#C99A4E; --verde:#4FBF95; --rojo:#C4544A;
+  --serif:'Instrument Serif',Georgia,serif;
+  --ui:'Kumbh Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--bone);font-family:var(--ui);font-weight:400;
+  min-height:100svh;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
+.aura{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aura i{position:absolute;border-radius:50%;filter:blur(110px);opacity:.28}
+.aura i:nth-child(1){width:58vw;height:58vw;background:#7A5C2E;top:-24%;right:-18%}
+.aura i:nth-child(2){width:46vw;height:46vw;background:#3A4A41;bottom:-20%;left:-14%}
+
+/* barra de avance */
+.barra{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(240,205,128,.1);z-index:50}
+.barra i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--oro2),var(--oro));
+  transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+.envoltura{position:relative;z-index:1;width:min(760px,100%);margin:0 auto;padding:44px 20px 90px}
+
+.marca{font-family:var(--serif);font-size:1.15rem;letter-spacing:.03em;color:var(--mute)}
+.marca b{color:var(--oro);font-weight:400}
+
+/* portada */
+.portada{padding:34px 0 8px;border-bottom:1px solid var(--line);margin-bottom:38px}
+.sello{display:inline-flex;align-items:center;gap:9px;margin:22px 0 18px;padding:7px 15px;
+  border:1px solid var(--line);border-radius:99px;font-size:.68rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--oro)}
+.sello::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--verde);
+  box-shadow:0 0 10px var(--verde)}
+h1{font-family:var(--serif);font-size:clamp(2.3rem,7vw,3.6rem);font-weight:400;
+  line-height:1.06;letter-spacing:-.01em;text-wrap:balance;margin-bottom:16px}
+h1 i{font-style:italic;color:var(--oro)}
+.entrada{color:var(--mute);font-size:1.02rem;max-width:56ch;margin-bottom:26px}
+.entrada b{color:var(--bone);font-weight:500}
+
+/* pasos */
+.paso{display:none;animation:entra .45s cubic-bezier(.2,.8,.3,1)}
+.paso.on{display:block}
+@keyframes entra{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.num{font-family:var(--serif);font-size:.9rem;color:var(--oro2);letter-spacing:.2em;
+  text-transform:uppercase;margin-bottom:10px}
+h2{font-family:var(--serif);font-size:clamp(1.7rem,4.6vw,2.3rem);font-weight:400;
+  line-height:1.14;margin-bottom:10px;text-wrap:balance}
+.guia{color:var(--mute);font-size:.95rem;max-width:54ch;margin-bottom:30px}
+
+/* campos */
+.campo{margin-bottom:26px}
+label{display:block;font-size:.76rem;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--bone);margin-bottom:7px}
+label s{display:block;text-decoration:none;font-weight:400;letter-spacing:0;
+  text-transform:none;color:var(--mute);font-size:.86rem;margin-top:4px}
+input,textarea,select{width:100%;background:var(--ink2);color:var(--bone);
+  border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  font:400 1rem var(--ui);transition:border-color .25s,box-shadow .25s,background .25s}
+textarea{min-height:130px;resize:vertical;line-height:1.65}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--oro2);
+  background:var(--ink3);box-shadow:0 0 0 4px rgba(240,205,128,.09)}
+input::placeholder,textarea::placeholder{color:#5E564E}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.duo{grid-template-columns:1fr}}
+
+/* opciones */
+.ops{display:flex;flex-wrap:wrap;gap:9px}
+.op{position:relative}
+.op input{position:absolute;opacity:0;pointer-events:none}
+.op span{display:block;padding:11px 17px;border:1px solid var(--line);border-radius:99px;
+  font-size:.9rem;cursor:pointer;transition:all .22s cubic-bezier(.34,1.4,.5,1);color:var(--mute)}
+.op span:hover{border-color:var(--oro2);color:var(--bone)}
+.op input:checked+span{background:rgba(240,205,128,.13);border-color:var(--oro);
+  color:var(--oro);transform:translateY(-1px)}
+.op input:focus-visible+span{box-shadow:0 0 0 3px rgba(240,205,128,.3)}
+
+/* nota de ayuda */
+.ojo{border-left:2px solid var(--oro2);padding:2px 0 2px 15px;margin:-14px 0 26px;
+  color:var(--mute);font-size:.88rem;line-height:1.6}
+.ojo b{color:var(--oro);font-weight:500}
+
+/* navegación */
+.pies{display:flex;gap:12px;align-items:center;margin-top:40px;padding-top:26px;
+  border-top:1px solid var(--line)}
+button{border:0;border-radius:99px;padding:15px 30px;font:600 .8rem var(--ui);
+  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  transition:transform .22s cubic-bezier(.34,1.4,.5,1),box-shadow .25s,background .25s}
+button:active{transform:scale(.97)}
+.sig{background:linear-gradient(135deg,#F0CD80,#C99A4E);color:#1A1206;margin-left:auto}
+.sig:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(240,205,128,.3)}
+.atr{background:transparent;color:var(--mute);border:1px solid var(--line);padding:15px 24px}
+.atr:hover{color:var(--bone);border-color:var(--oro2)}
+.guardado{font-size:.76rem;color:var(--mute);transition:opacity .4s;opacity:0}
+.guardado.on{opacity:1}
+.guardado b{color:var(--verde);font-weight:400}
+
+/* cierre */
+.listo{display:none;text-align:center;padding:40px 0}
+.listo.on{display:block;animation:entra .6s cubic-bezier(.2,.8,.3,1)}
+.marca-lista{width:96px;height:96px;margin:0 auto 30px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#F5D89A,#C99A4E 46%,#6B4E24 100%);
+  display:flex;align-items:center;justify-content:center;font-size:2.6rem;color:#231A0C;
+  animation:brote .7s cubic-bezier(.34,1.5,.5,1)}
+@keyframes brote{from{transform:scale(.5);opacity:0}to{transform:none;opacity:1}}
+.listo p{color:var(--mute);max-width:44ch;margin:0 auto 14px}
+
+.pie{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:.76rem;color:var(--mute);line-height:1.75}
+.pie b{color:var(--oro);font-weight:400}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="aura"><i></i><i></i></div>
+<div class="barra"><i id="avance"></i></div>
+
+<div class="envoltura">
+
+  <div class="portada">
+    <div class="marca">LION <b>AI</b> · Miami</div>
+    <div class="sello">Expediente abierto</div>
+    <h1>Cuéntenos de <i id="quien">su negocio</i>.</h1>
+    <p class="entrada">Todo lo que escriba aquí es lo que su recepcionista va a saber. Mientras
+      más específico sea, mejor va a contestar. <b>Se guarda solo</b> — puede irse y volver
+      cuando quiera.</p>
+  </div>
+
+  <form id="f" autocomplete="on">
+
+  <!-- 1 -->
+  <section class="paso on" data-p="1">
+    <div class="num">Uno de cinco</div>
+    <h2>Lo básico</h2>
+    <p class="guia">Cómo se llama, quién manda, y a qué número le vamos a conectar todo esto.</p>
+
+    <div class="campo"><label for="negocio">Nombre del negocio</label>
+      <input id="negocio" name="negocio" placeholder="Como aparece en su letrero" required></div>
+
+    <div class="duo">
+      <div class="campo"><label for="contacto">Quién nos va a contestar</label>
+        <input id="contacto" name="contacto" placeholder="Nombre y apellido"></div>
+      <div class="campo"><label for="telefono">Su celular</label>
+        <input id="telefono" name="telefono" type="tel" placeholder="(305) 555-1234"></div>
+    </div>
+
+    <div class="duo">
+      <div class="campo"><label for="email">Correo</label>
+        <input id="email" name="email" type="email" placeholder="usted@sunegocio.com"></div>
+      <div class="campo"><label for="linea">La línea del negocio<s>La que contesta a los clientes</s></label>
+        <input id="linea" name="linea" type="tel" placeholder="(305) 555-9876"></div>
+    </div>
+
+    <div class="campo"><label for="direccion">Dirección<s>O la zona que atiende, si va usted a donde el cliente</s></label>
+      <input id="direccion" name="direccion" placeholder="1234 W 49th St, Hialeah, FL 33012"></div>
+
+    <div class="campo"><label>¿En qué idioma le hablan sus clientes?</label>
+      <div class="ops">
+        <label class="op"><input type="radio" name="idiomas" value="Español e inglés" checked><span>Los dos</span></label>
+        <label class="op"><input type="radio" name="idiomas" value="Español"><span>Casi todo español</span></label>
+        <label class="op"><input type="radio" name="idiomas" value="Inglés"><span>Casi todo inglés</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="paso" data-p="2">
+    <div class="num">Dos de cinco</div>
+    <h2>Cuándo está abierto</h2>
+    <p class="guia">Su recepcionista trabaja las 24 horas, pero necesita saber cuándo puede
+      prometer que hay alguien.</p>
+
+    <div class="campo"><label for="horario">Su horario</label>
+      <textarea id="horario" name="horario" placeholder="Lunes a viernes de 9 a 6&#10;Sábados de 10 a 3&#10;Domingos cerrado&#10;&#10;Escríbalo como se lo diría a un cliente."></textarea></div>
+
+    <div class="ojo"><b>Ojo con esto:</b> si un cliente llama un domingo, ella no va a decir
+      "estamos cerrados" y colgar. Le toma los datos y le dice cuándo lo llaman. Nunca se
+      pierde a nadie por la hora.</div>
+
+    <div class="campo"><label for="agenda">Cuando alguien quiere una cita, ¿qué hace?</label>
+      <div class="ops">
+        <label class="op"><input type="radio" name="agenda" value="agendar" checked><span>Que la agende ella misma</span></label>
+        <label class="op"><input type="radio" name="agenda" value="datos"><span>Que tome los datos y yo llamo</span></label>
+        <label class="op"><input type="radio" name="agenda" value="mixto"><span>Depende del caso</span></label>
+      </div>
+    </div>
+
+    <div class="campo"><label for="transferir">¿Cuándo debe pasarle la llamada a una persona?<s>Y a qué número</s></label>
+      <textarea id="transferir" name="transferir" placeholder="Ejemplo: si es una emergencia o si el cliente insiste en hablar con alguien, que me pase la llamada al (305) 555-1234. En horario de oficina nada más."></textarea></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="paso" data-p="3">
+    <div class="num">Tres de cinco</div>
+    <h2>Qué vende, y en cuánto</h2>
+    <p class="guia">Esta es la parte que más importa. Si un precio queda mal aquí, ella lo va
+      a decir mal cien veces.</p>
+
+    <div class="campo"><label for="que_hace">En una frase, ¿qué hace su negocio?</label>
+      <input id="que_hace" name="que_hace" placeholder="Vendemos ramos de rosas a domicilio en todo Miami"></div>
+
+    <div class="campo"><label for="servicios">Sus servicios o productos, con precio<s>Uno por línea. Si el precio varía, dígalo así</s></label>
+      <textarea id="servicios" name="servicios" style="min-height:210px" placeholder="Limpieza dental — 120 dólares&#10;Blanqueamiento — desde 350&#10;Corona — de 900 a 1,400 según el caso&#10;Consulta de valoración — gratis&#10;&#10;Ponga todo lo que la gente pregunta por teléfono."></textarea></div>
+
+    <div class="duo">
+      <div class="campo"><label for="incluye">Qué SÍ va incluido</label>
+        <textarea id="incluye" name="incluye" placeholder="La consulta inicial&#10;Las radiografías&#10;El estacionamiento"></textarea></div>
+      <div class="campo"><label for="no_incluye">Qué NO va incluido</label>
+        <textarea id="no_incluye" name="no_incluye" placeholder="El envío se cobra aparte&#10;Los materiales especiales&#10;La garantía extendida"></textarea></div>
+    </div>
+
+    <div class="ojo"><b>Sea duro con esta parte.</b> El error más caro que comete una
+      recepcionista de IA es prometer algo gratis que usted cobra. Escriba aquí todo lo que
+      un cliente podría asumir que va incluido y no lo está.</div>
+
+    <div class="campo"><label for="promocion">¿Tiene alguna promoción ahora?<s>Con sus condiciones y hasta cuándo</s></label>
+      <textarea id="promocion" name="promocion" placeholder="Primera consulta gratis durante septiembre. Solo para clientes nuevos y hay que mencionarla al llamar."></textarea></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="paso" data-p="4">
+    <div class="num">Cuatro de cinco</div>
+    <h2>Lo que preguntan siempre</h2>
+    <p class="guia">Piense en el teléfono de un martes cualquiera. ¿Qué es lo que la gente
+      pregunta una y otra vez?</p>
+
+    <div class="campo"><label for="preguntas">Las preguntas de siempre, con su respuesta</label>
+      <textarea id="preguntas" name="preguntas" style="min-height:230px" placeholder="¿Aceptan seguro? — Aceptamos Aetna, Cigna y Delta Dental. Medicaid no.&#10;&#10;¿Hay parqueadero? — Sí, gratis en la parte de atrás.&#10;&#10;¿Atienden niños? — Desde los 5 años.&#10;&#10;¿Cuánto se demora? — Una limpieza normal, unos 45 minutos.&#10;&#10;Escriba todas las que se le ocurran. Cada una es una llamada que ella resuelve sin molestarlo."></textarea></div>
+
+    <div class="campo"><label for="nunca">Qué NO debe decir ni hacer nunca</label>
+      <textarea id="nunca" name="nunca" placeholder="Nunca dar un diagnóstico&#10;Nunca prometer una fecha sin confirmarme&#10;Nunca hablar mal de la competencia&#10;Nunca dar descuentos por su cuenta"></textarea></div>
+
+    <div class="ojo"><b>Esta lista lo protege.</b> Todo lo que escriba aquí queda prohibido
+      para ella, sin excepción. Si hay algo que le da miedo que un empleado nuevo diga,
+      escríbalo aquí.</div>
+  </section>
+
+  <!-- 5 -->
+  <section class="paso" data-p="5">
+    <div class="num">Cinco de cinco</div>
+    <h2>Cómo debe sonar</h2>
+    <p class="guia">Ella va a ser la primera voz que escuche un cliente suyo. Vamos a hacer
+      que suene como usted.</p>
+
+    <div class="campo"><label>El trato con sus clientes es más bien…</label>
+      <div class="ops">
+        <label class="op"><input type="radio" name="tono" value="cercano" checked><span>Cercano, de tú</span></label>
+        <label class="op"><input type="radio" name="tono" value="respetuoso"><span>De usted, respetuoso</span></label>
+        <label class="op"><input type="radio" name="tono" value="profesional"><span>Profesional y directo</span></label>
+        <label class="op"><input type="radio" name="tono" value="calido"><span>Muy cálido, familiar</span></label>
+      </div>
+    </div>
+
+    <div class="campo"><label for="saludo">¿Cómo quiere que conteste el teléfono?<s>La primera frase, palabra por palabra</s></label>
+      <input id="saludo" name="saludo" placeholder="Gaby Flowers, buenas tardes, ¿en qué le puedo ayudar?"></div>
+
+    <div class="campo"><label for="competencia">¿Contra quién compite?<s>Nombres o páginas, si los sabe</s></label>
+      <textarea id="competencia" name="competencia" placeholder="Nos comparan con la floristería de la 49 y con una que trabaja por Instagram."></textarea></div>
+
+    <div class="campo"><label for="algo_mas">¿Algo más que debamos saber?</label>
+      <textarea id="algo_mas" name="algo_mas" placeholder="Lo que sea. Manías, historias, cosas que solo usted sabe de su negocio."></textarea></div>
+  </section>
+
+  </form>
+
+  <div class="pies" id="pies">
+    <button type="button" class="atr" id="atras" style="visibility:hidden">Atrás</button>
+    <span class="guardado" id="guardado"><b>✓</b> guardado</span>
+    <button type="button" class="sig" id="siguiente">Siguiente</button>
+  </div>
+
+  <div class="listo" id="listo">
+    <div class="marca-lista">🦁</div>
+    <h2>Listo. Ya tenemos lo que necesitábamos.</h2>
+    <p>Su recepcionista entra en construcción hoy mismo.</p>
+    <p>En los próximos días lo llamamos para que la escuche antes que nadie — y si algo no
+      suena como usted, se cambia ahí mismo.</p>
+  </div>
+
+  <div class="pie">
+    <b>LION SYSTEMS GROUP LLC</b> · Miami, Florida<br>
+    ¿Alguna duda mientras llena esto? WhatsApp <b>+1 (346) 823-1378</b><br>
+    Lo que escriba aquí es suyo y no sale de aquí.
+  </div>
+</div>
+
+<script>
+(function(){
+  var W='https://lion-ai.resonant-shroud-af6.workers.dev';
+  var params=new URLSearchParams(location.search);
+  var CLI=(params.get('c')||'').toLowerCase().replace(/[^a-z0-9-]/g,'');
+  var LS='expedienteLion:'+(CLI||'demo');
+  var pasos=[].slice.call(document.querySelectorAll('.paso'));
+  var n=0, tGuarda=null;
+  var $=function(i){return document.getElementById(i);};
+
+  if(params.get('n')) $('quien').textContent=params.get('n');
+
+  /* ---- recordar lo escrito ---- */
+  function datos(){
+    var d={cliente:CLI};
+    [].slice.call(document.querySelectorAll('#f [name]')).forEach(function(e){
+      if(e.type==='radio'){ if(e.checked) d[e.name]=e.value; }
+      else d[e.name]=e.value;
+    });
+    return d;
+  }
+  function repone(){
+    var g; try{ g=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ g={}; }
+    Object.keys(g).forEach(function(k){
+      var e=document.querySelector('#f [name="'+k+'"]');
+      if(!e) return;
+      if(e.type==='radio'){
+        var r=document.querySelector('#f [name="'+k+'"][value="'+g[k]+'"]');
+        if(r) r.checked=true;
+      } else e.value=g[k];
+    });
+    if(g.negocio) $('quien').textContent=g.negocio;
+  }
+  function avisa(){
+    var g=$('guardado'); g.classList.add('on');
+    clearTimeout(avisa.t); avisa.t=setTimeout(function(){ g.classList.remove('on'); },2200);
+  }
+  function guarda(completo){
+    var d=datos();
+    try{ localStorage.setItem(LS,JSON.stringify(d)); }catch(e){}
+    if(!CLI) { avisa(); return Promise.resolve(); }
+    d.completo=!!completo;
+    return fetch(W+'/expediente',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(d)}).then(function(){ avisa(); }).catch(function(){ avisa(); });
+  }
+
+  document.getElementById('f').addEventListener('input',function(e){
+    if(e.target.name==='negocio'&&e.target.value.trim()) $('quien').textContent=e.target.value.trim();
+    clearTimeout(tGuarda); tGuarda=setTimeout(function(){ guarda(false); },1400);
+  });
+  document.getElementById('f').addEventListener('change',function(){
+    clearTimeout(tGuarda); tGuarda=setTimeout(function(){ guarda(false); },600);
+  });
+
+  /* ---- avanzar ---- */
+  function pinta(){
+    pasos.forEach(function(p,i){ p.classList.toggle('on',i===n); });
+    $('avance').style.width=((n+1)/pasos.length*100)+'%';
+    $('atras').style.visibility = n===0 ? 'hidden' : 'visible';
+    $('siguiente').textContent = n===pasos.length-1 ? 'Entregar expediente' : 'Siguiente';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  $('siguiente').onclick=function(){
+    if(n===0){
+      var neg=document.getElementById('negocio');
+      if(!neg.value.trim()){ neg.focus(); neg.style.borderColor='#C4544A'; return; }
+    }
+    if(n<pasos.length-1){ n++; guarda(false); pinta(); return; }
+    /* último paso */
+    var b=this; b.disabled=true; b.textContent='Entregando…';
+    guarda(true).then(function(){
+      document.getElementById('f').style.display='none';
+      $('pies').style.display='none';
+      $('listo').classList.add('on');
+      $('avance').style.width='100%';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  };
+  $('atras').onclick=function(){ if(n>0){ n--; pinta(); } };
+
+  repone(); pinta();
+})();
+</script>
+</body>
+</html>
