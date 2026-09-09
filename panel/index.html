@@ -134,6 +134,7 @@ h2.sec{font-size:1.5rem;margin:0 0 16px}
       <div class="logo">LION <i>AI</i></div>
       <div class="negocio"><b>Panel de</b><span id="nomNegocio">—</span></div>
       <button class="refrescar" id="btnRef">↻ Actualizar</button>
+      <button class="refrescar" id="btnSalir">Salir</button>
     </div>
   </header>
 
@@ -313,6 +314,14 @@ $('btnEntrar').onclick=async()=>{
 $('clv').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnEntrar').click(); });
 $('cli').addEventListener('keydown',e=>{ if(e.key==='Enter') $('clv').focus(); });
 $('btnRef').onclick=cargar;
+$('btnSalir').onclick=()=>{ localStorage.removeItem('lionPanel'); location.href=location.pathname; };
+
+/* enlace directo: /panel/?c=gaby-flowers deja el negocio puesto */
+(function paramCliente(){
+  const p=new URLSearchParams(location.search), c=p.get('c'), k=p.get('k');
+  if(c){ $('cli').value=c.replace(/-/g,' ').replace(/\b\w/g,m=>m.toUpperCase()); $('clv').focus(); }
+  if(c&&k){ $('clv').value=k; setTimeout(()=>$('btnEntrar').click(),200); }
+})();
 
 /* si ya entró antes, no vuelve a pedir clave */
 try{
