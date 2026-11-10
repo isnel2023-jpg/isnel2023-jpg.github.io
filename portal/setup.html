@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; connect-src 'self' https://lion-portal.lionsystems.workers.dev; worker-src 'self' blob:; base-uri 'none'; form-action 'self'; object-src 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Crear administrador · Portal Lion</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<section class="login">
+  <form id="f" class="login-card" autocomplete="on">
+    <div class="login-brand"><span class="lion-mark" aria-hidden="true">LION</span><span class="lbl">Lion Systems Group</span></div>
+    <h1>Crear administrador</h1>
+    <p class="muted">Solo funciona una vez. Después, esta página deja de servir.</p>
+    <input type="text" name="username" autocomplete="username" value="admin" hidden aria-hidden="true">
+    <div class="fld"><label for="n">Tu nombre</label><input id="n" value="Isnel Garcia" required maxlength="80"></div>
+    <div class="fld"><label for="t">Código de activación</label><input id="t" required maxlength="100" autocomplete="off"></div>
+    <div class="fld"><label for="p">Contraseña de admin (mínimo 12)</label><input id="p" type="password" autocomplete="new-password" required minlength="12" maxlength="200"></div>
+    <div class="fld"><label for="p2">Repite la contraseña</label><input id="p2" type="password" autocomplete="new-password" required minlength="12" maxlength="200"></div>
+    <button class="btn pri" type="submit" id="b">Crear administrador</button>
+    <p class="login-err" id="e" role="alert"></p>
+  </form>
+</section>
+<script src="config.js"></script>
+<script src="setup.js"></script>
+</body>
+</html>
