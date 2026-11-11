@@ -764,7 +764,7 @@ No inventes datos que no aparezcan.${txt?"\n\nTexto de la orden:\n"+txt.slice(0,
     const total=nz($("Total").value);let paid=nz($("Paid").value);
     const orderNo=$("No").value.trim().replace(/^#/,"");
     if(!orderNo){toast("Pon el número de orden");$("No").focus();return}
-    if(orders().some(o=>String(o.orderNo||"").toLowerCase()===orderNo.toLowerCase())){toast("Ya hay una orden con el número "+orderNo);$("No").focus();return}
+    if(Object.values(S.sales).some(o=>String(o.orderNo||"").toLowerCase()===orderNo.toLowerCase())){toast("Ya hay una orden con el número "+orderNo);$("No").focus();return}
     if(total<=0){toast("Pon el total de la orden");$("Total").focus();return}
     paid=Math.min(paid,total);
     const btn=$("Save");btn.disabled=true;btn.textContent="Subiendo…";
@@ -1349,7 +1349,7 @@ function vResumenCerrado(x){
 const CO_MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 const coFecha = (k)=>{if(!k||!/^\d{4}-\d{2}-\d{2}$/.test(k))return "";const [y,m,d]=k.split("-").map(Number);return d+" "+CO_MES[m-1]+" "+y+(k===today()?" (hoy)":k===addDays(today(),1)?" (mañana)":"")};
 function coState(){if(!S.co)S.co={txt:"",d:null,pdf:null,preview:null,pdfText:"",rec:null};return S.co}
-function coNextNo(){const ns=orders().map(o=>parseInt(String(o.orderNo||"").replace(/\D/g,""),10)).filter(n=>n>0&&n<100000);return String((ns.length?Math.max(...ns):0)+1).padStart(3,"0")}
+function coNextNo(){const ns=Object.values(S.sales).map(o=>parseInt(String(o.orderNo||"").replace(/\D/g,""),10)).filter(n=>n>0&&n<100000);return String((ns.length?Math.max(...ns):0)+1).padStart(3,"0")}
 const coLines = (t)=>String(t||"").split("\n").map(x=>x.trim()).filter(Boolean);
 const coItems = (t)=>coLines(t).map(l=>{const i=l.lastIndexOf("|");return i<0?{desc:l,precio:0}:{desc:l.slice(0,i).trim(),precio:nz(l.slice(i+1).replace(/[$,\s]/g,""))}});
 const coTotal = (d)=>coItems(d.lineasTxt).reduce((a,x)=>a+x.precio,0);
@@ -1544,7 +1544,7 @@ function bindCrear(){
   on("coReset",()=>{if(st.rec){try{st.rec.stop()}catch(e){}}S.co=null;render()});
   on("coPdf",async()=>{
     const d=st.d;if(!d.no||!String(d.no).trim()){toast("Pon el número de orden");return}
-    if(orders().some(o=>String(o.orderNo||"").toLowerCase()===String(d.no).replace(/^#/,"").toLowerCase())){toast("Ya hay una orden con el número "+d.no);return}
+    if(Object.values(S.sales).some(o=>String(o.orderNo||"").toLowerCase()===String(d.no).replace(/^#/,"").toLowerCase())){toast("Ya hay una orden con el número "+d.no);return}
     if(coTotal(d)<=0){toast("Pon los precios en el desglose");return}
     const b=view.querySelector('[data-act="coPdf"]');b.disabled=true;b.textContent="Armando el PDF…";
     try{st.pdf=await coBuildPdf(d);const r=await readPdf(new File([st.pdf],"orden.pdf",{type:"application/pdf"}));st.preview=r.preview;st.pdfText=r.text;render()}
