@@ -1412,7 +1412,7 @@ function vCrear(){
       ${f("fecha","Fecha","date")}${f("hora","Hora","text",{ph:"2:00 pm"})}
       ${f("lineasTxt","Desglose (una línea por cada cosa: descripción | precio)","area",{full:true,rows:5,ph:"100 rosas rojas naturales ($1.50 c/u) | 150\nCinta personalizada | 15\nDelivery | 20"})}
       <div class="fld"><label>Total</label><b class="num" id="coTot" style="font-size:1.2rem">${money(total)}</b></div>
-      ${f("abonado","Ya pagó (USD)","number")}${f("metodo","Cómo paga","text",{ph:"CASH, Zelle, tarjeta"})}
+      ${f("abonado","Ya pagó (USD)","number")}${f("metodoAbono","Cómo pagó eso","text",{ph:"Zelle"})}${f("metodo","Cómo paga lo que falta","text",{ph:"CASH al recoger"})}
       ${f("canal","Canal","text",{ph:"Meta Ads → Messenger"})}
       <div class="sep lbl">Para el conteo del portal</div>
       ${f("nat","Rosas naturales","number")}${f("dye","Rosas tinturadas","number")}
@@ -1434,7 +1434,7 @@ async function coAi(){
   if(!S.sample){msg.textContent="La IA no está disponible ahora. Inténtalo en un rato.";return}
   const brand=(st.d&&st.d.brand)||BRANDS_SELL[0];
   msg.textContent="La IA está armando la orden…";
-  const prev=st.d?`\n\nORDEN ACTUAL (actualízala con lo nuevo del dictado y con las respuestas; conserva lo que no cambie):\n${JSON.stringify({cliente:st.d.cliente,telefono:st.d.telefono,titulo:st.d.titulo,detalles:coLines(st.d.detallesTxt),tarjeta:st.d.tarjeta,cinta:st.d.cinta,entrega:st.d.entrega,recibe_nombre:st.d.recibe_nombre,recibe_telefono:st.d.recibe_telefono,direccion:st.d.direccion,fecha:st.d.fecha,hora:st.d.hora,lineas:coItems(st.d.lineasTxt),rosas_naturales:nz(st.d.nat),rosas_tinturadas:nz(st.d.dye),abonado:nz(st.d.abonado),pago_dicho:!!st.d.pagoDicho,metodo_pago:st.d.metodo,canal:st.d.canal})}`:"";
+  const prev=st.d?`\n\nORDEN ACTUAL (actualízala con lo nuevo del dictado y con las respuestas; conserva lo que no cambie):\n${JSON.stringify({cliente:st.d.cliente,telefono:st.d.telefono,titulo:st.d.titulo,detalles:coLines(st.d.detallesTxt),tarjeta:st.d.tarjeta,cinta:st.d.cinta,entrega:st.d.entrega,recibe_nombre:st.d.recibe_nombre,recibe_telefono:st.d.recibe_telefono,direccion:st.d.direccion,fecha:st.d.fecha,hora:st.d.hora,lineas:coItems(st.d.lineasTxt),rosas_naturales:nz(st.d.nat),rosas_tinturadas:nz(st.d.dye),abonado:nz(st.d.abonado),pago_dicho:!!st.d.pagoDicho,metodo_abono:st.d.metodoAbono,metodo_pago:st.d.metodo,canal:st.d.canal})}`:"";
   const prompt=`Eres el asistente de órdenes de ${brand}, una floristería en Miami. Un vendedor dictó una orden por voz; el dictado puede tener errores (palabras mal oídas, números en letras): corrígelos con sentido común, pero NUNCA inventes datos que no dijo. Hoy es ${today()} (AAAA-MM-DD); convierte "hoy", "mañana", "el viernes", etc. a fecha.
 Arma la ORDEN DE TALLER de la tienda, con todo bien desglosado.
 
@@ -1458,7 +1458,8 @@ Responde SOLO un objeto JSON con estas claves:
 "fecha": "AAAA-MM-DD"|null, "hora": string|null (ej. "2:00 pm"),
 "lineas": [{"desc": string, "tipo": "rosas_naturales"|"rosas_tinturadas"|"extra"|"delivery", "cantidad": number (cantidad de rosas o de unidades), "precio": number (precio TOTAL de esa línea)}],
 "pago_dicho": boolean (true si el vendedor dijo cuánto pagó ya, aunque sea $0), "abonado": number,
-"metodo_pago": string|null (ej. "CASH", "Zelle", "Tarjeta"),
+"metodo_abono": string|null (cómo pagó lo que YA pagó, ej. "Zelle"; null si no ha pagado nada),
+"metodo_pago": string|null (cómo va a pagar LO QUE FALTA, ej. "CASH", "Zelle", "Tarjeta"; null si ya pagó todo),
 "canal": string|null (por dónde llegó el cliente, ej. "Meta Ads → Messenger", "WhatsApp", "Instagram", "Llamada"),
 "faltan": [string]}${prev}
 
@@ -1478,7 +1479,7 @@ ${txt.slice(0,8000)}`;
       entrega:r.entrega==="domicilio"?"domicilio":"recoge",recibe_nombre:r.recibe_nombre||"",recibe_telefono:r.recibe_telefono||"",direccion:r.direccion||"",
       fecha:/^\d{4}-\d{2}-\d{2}$/.test(r.fecha||"")?r.fecha:(o.fecha||""),hora:r.hora||"",
       lineasTxt:L.length?L.map(lineTxt).join("\n"):(o.lineasTxt||""),
-      pagoDicho:!!r.pago_dicho||!!o.pagoDicho,abonado:nz(r.abonado),metodo:r.metodo_pago||"",canal:r.canal||"",
+      pagoDicho:!!r.pago_dicho||!!o.pagoDicho,abonado:nz(r.abonado),metodoAbono:r.metodo_abono||"",metodo:r.metodo_pago||"",canal:r.canal||"",
       nat:L.length?cntT("rosas_naturales"):(o.nat||0),dye:L.length?cntT("rosas_tinturadas"):(o.dye||0),
       extrasTxt:ex.map(e=>e.desc).join(", "),extrasAmt:sumT("extra"),deliveryAmt:sumT("delivery"),
       faltan:(Array.isArray(r.faltan)?r.faltan:[]).filter(x=>typeof x==="string"&&x.trim()).slice(0,12)};
@@ -1554,7 +1555,7 @@ async function coBuildPdf(d){
   for(const it of items){const ls=wrap(it.desc,F.h,11,R-M-90);ls.forEach((l,i)=>{need(18);t(l,M,y,F.h,11);if(i===0)tr(money2(it.precio),y,F.h,11);y-=16});y-=2}
   need(nz(d.abonado)>0?80:62);pg.drawLine({start:{x:M,y:y+8},end:{x:R,y:y+8},thickness:2,color:C.ac});y-=12;
   t("TOTAL",M,y,F.hb,15);tr(money2(total),y,F.hb,15);y-=12;
-  if(ab>0){y-=8;t("YA PAGÓ",M,y,F.h,11);tr("-"+money2(ab),y,F.h,11);y-=10}
+  if(ab>0){y-=8;t("YA PAGÓ"+(d.metodoAbono?" ("+d.metodoAbono+")":""),M,y,F.h,11);tr("-"+money2(ab),y,F.h,11);y-=10}
   pg.drawLine({start:{x:M,y},end:{x:R,y},thickness:2,color:C.ac});y-=24;
   const cuando=d.entrega==="domicilio"?"al entregar":"al recoger";
   if(cob>0){t("COBRAR AL ENTREGAR / RECOGER",M,y,F.hb,14,C.red);tr(money2(cob),y,F.hb,14,C.red)}else{t("PAGADO COMPLETO",M,y,F.hb,14,C.ac);tr(money2(0)+" por cobrar",y,F.hb,12,C.ac)}
@@ -1610,7 +1611,7 @@ function bindCrear(){
   on("coDl",()=>{const u=URL.createObjectURL(new Blob([st.pdf],{type:"application/pdf"}));const a=document.createElement("a");a.href=u;a.download=`orden-${st.d.no}.pdf`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)});
   on("coSubir",()=>{
     const d=st.d,file=new File([st.pdf],`orden-${d.no}.pdf`,{type:"application/pdf"});
-    const notes=[String(d.tarjeta||"").trim()?"Tarjeta: "+String(d.tarjeta).replace(/\s*\n\s*/g," / "):"",String(d.cinta||"").trim()?"Cinta: "+String(d.cinta).replace(/\s*\n\s*/g," / "):"",d.entrega==="domicilio"?"Domicilio: "+[d.direccion,d.recibe_nombre].filter(Boolean).join(" · "):"Recoge en tienda",d.hora?"Hora: "+d.hora:"",d.canal?"Canal: "+d.canal:"",d.metodo?"Paga: "+d.metodo:""].filter(Boolean).join(" · ");
+    const notes=[String(d.tarjeta||"").trim()?"Tarjeta: "+String(d.tarjeta).replace(/\s*\n\s*/g," / "):"",String(d.cinta||"").trim()?"Cinta: "+String(d.cinta).replace(/\s*\n\s*/g," / "):"",d.entrega==="domicilio"?"Domicilio: "+[d.direccion,d.recibe_nombre].filter(Boolean).join(" · "):"Recoge en tienda",d.hora?"Hora: "+d.hora:"",d.canal?"Canal: "+d.canal:"",d.metodoAbono&&nz(d.abonado)>0?"Abonó "+money2(d.abonado)+" por "+d.metodoAbono:"",d.metodo?"Falta pagar por: "+d.metodo:""].filter(Boolean).join(" · ");
     S.draft={p:"of",file,pdfImg:null,pdfText:st.pdfText,preview:st.preview,fileName:file.name,orderText:st.txt.slice(0,4000),orderNo:String(d.no).replace(/^#/,""),client:d.cliente||d.recibe_nombre||"",phone:d.telefono||"",brand:d.brand||BRANDS_SELL[0],product:d.titulo,
       natQty:String(d.nat||0),dyeQty:String(d.dye||0),extrasTxt:d.extrasTxt||"",extrasAmt:String(d.extrasAmt||0),deliveryAmt:String(d.deliveryAmt||0),total:String(coTotal(d)),paid:String(Math.min(nz(d.abonado),coTotal(d))),deliveryDay:d.fecha||today(),notes:notes.slice(0,400),leadId:""};
     S.co=null;S.tab="ordenes";render();
