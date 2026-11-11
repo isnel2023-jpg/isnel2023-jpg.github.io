@@ -99,7 +99,7 @@
     }));
     q("[data-pw]").forEach((b) => (b.onclick = async () => {
       const w = W.find((x) => x.id === b.dataset.pw);
-      const pw = prompt(`Nueva contraseña para ${w.name} (mínimo ${w.role === "admin" ? 12 : 8} caracteres). Déjalo vacío para generar una.`, "");
+      const pw = prompt(`Nueva contraseña para ${w.name} (mínimo ${w.role === "admin" ? 10 : 8} caracteres). Déjalo vacío para generar una.`, "");
       if (pw === null) return;
       const np = pw.trim() || genPw();
       try { await post("/admin/workers/" + encodeURIComponent(w.id), { password: np }, "PATCH"); flash(`Contraseña de ${w.name} cambiada: ${np}  (cópiala y pásasela por privado; su sesión anterior se cerró)`); }

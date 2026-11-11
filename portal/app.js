@@ -20,6 +20,8 @@ const ME = CFG.__member||null, LEGO = CFG.legacyOwner||null;
 const MINE = x=>!ME||(((x&&x.by)||LEGO)===ME);
 const PT = CFG.portalTitle || ("Portal de "+(CFG.shortName||CFG.displayName));
 const PCT = (Math.round(COMMISSION*1000)/10)+"%";
+const BONUS = CFG.bonus && CFG.bonus.amount ? CFG.bonus : null;
+const bonusOf = (t)=>BONUS && t>=BONUS.goal ? BONUS.amount : 0;
 const NAME = CFG.displayName, SHORT = CFG.shortName||CFG.displayName;
 const fmtGoal = n=>"$"+Number(n).toLocaleString("en-US");
 const contentLine = (ct,mult)=>CONTENT.map(x=>`${x.n} ${ct[x.k]||0}/${x.goal*(mult||1)}`).join(" · ");
@@ -313,7 +315,7 @@ shiftBtn.onclick=async()=>{
     if(!shiftBtn.dataset.confirm){shiftBtn.dataset.confirm="1";shiftBtn.textContent="Toca otra vez para cerrar";setTimeout(()=>{delete shiftBtn.dataset.confirm;paintClock()},4000);return}
     delete shiftBtn.dataset.confirm;d.end=Date.now();await saveDay(d);toast("Turno cerrado. Revisa y envía tu reporte.");S.tab="reporte";render()
   }
-  else if(!d.start){d.start=Date.now();d.checkins=[...(d.checkins||[]),{t:Date.now(),slot:"inicio",text:"Empecé turno"}];await saveDay(d);toast("Turno iniciado. Hoy toca: "+THEMES[dow(today())].w)}
+  else if(!d.start){d.start=Date.now();d.checkins=[...(d.checkins||[]),{t:Date.now(),slot:"inicio",text:"Empecé turno"}];await saveDay(d);toast("Turno iniciado."+(CONTENT.length?" Hoy toca: "+THEMES[dow(today())].w:""))}
   paintClock();
 };
 setInterval(()=>{paintClock();checkinTick()},30000);
@@ -332,7 +334,7 @@ function checkinTick(){
 function progressText(){
   const k=today(),c=callsOn(k),d=dayDoc(k),ct=d.content||{};
   const ws=weekStart(k),wk=sumTotal(salesBetween(ws,addDays(ws,6)));
-  return `Tema de contenido de hoy: ${THEMES[dow(k)].w}. Llamadas nuevas ${c.nw}/${GOAL_NEW}, follow-ups ${c.fu}/${GOAL_FU}, chats con clientes en inglés ${c.chats}/${GOAL_CHAT} (aparte de las llamadas), ${LEGACY?`historias Gaby ${ct.gabyStories||0}/3, post Gaby ${ct.gabyPost||0}/1, historias Ruiz ${ct.ruizStories||0}/3, post Ruiz ${ct.ruizPost||0}/1, versículo ABBA ${ct.abbaVerse||0}/1, videos ABBA ${ct.abbaVideos||0}`:contentLine(ct)}. Ventas de la semana ${money(wk)} de una meta de ${fmtGoal(SALES_GOALS.week[0])} (meta alta ${fmtGoal(SALES_GOALS.week[1])}). Follow-ups pendientes ${fuQueue().length}, leads sin llamar ${newQueue().length}.`;
+  return `${CONTENT.length?`Tema de contenido de hoy: ${THEMES[dow(k)].w}. `:""}Llamadas nuevas ${c.nw}/${GOAL_NEW}, follow-ups ${c.fu}/${GOAL_FU}, chats con clientes en inglés ${c.chats}/${GOAL_CHAT} (aparte de las llamadas), ${LEGACY?`historias Gaby ${ct.gabyStories||0}/3, post Gaby ${ct.gabyPost||0}/1, historias Ruiz ${ct.ruizStories||0}/3, post Ruiz ${ct.ruizPost||0}/1, versículo ABBA ${ct.abbaVerse||0}/1, videos ABBA ${ct.abbaVideos||0}`:contentLine(ct)}. Ventas de la semana ${money(wk)} de una meta de ${fmtGoal(SALES_GOALS.week[0])} (meta alta ${fmtGoal(SALES_GOALS.week[1])}). Follow-ups pendientes ${fuQueue().length}, leads sin llamar ${newQueue().length}.`;
 }
 function openCheckin(slot){
   ciOpen=true;
@@ -356,7 +358,7 @@ function openCheckin(slot){
     if(!S.sample){done();toast("Check-in guardado");return}
     const box=document.getElementById("ciAi");box.hidden=false;box.textContent="Pensando…";
     try{
-      const prompt=`${CFG.coachIntro||`Eres el coach de ventas de ${SHORT}. Metas diarias: ${GOAL_NEW} llamadas a leads nuevos, ${GOAL_FU} follow-ups y ${contentLine({},1)}. Meta de ventas: ${fmtGoal(SALES_GOALS.week[0])} por semana (meta alta ${fmtGoal(SALES_GOALS.week[1])}). Su ingreso es mayormente comisión del ${PCT} sobre ventas pagadas.`}\nHora: ${hhmm()} (${CFG.tzLabel}). Progreso: ${progressText()}\nSu check-in: "${text}"\nResponde en español de Colombia, de tú, máximo 2 frases cortas: reconoce lo hecho con un número concreto y dile exactamente qué priorizar la próxima hora para llegar a las metas. Sin emojis ni saludos.`;
+      const prompt=`${CFG.coachIntro||`Eres el coach de ventas de ${SHORT}. Metas diarias: ${GOAL_NEW} llamadas a leads nuevos, ${GOAL_FU} follow-ups y ${CONTENT.length?contentLine({},1):"chats en inglés "+GOAL_CHAT}. Meta de ventas: ${fmtGoal(SALES_GOALS.week[0])} por semana (meta alta ${fmtGoal(SALES_GOALS.week[1])}). Su ingreso es mayormente comisión del ${PCT} sobre ventas pagadas.`}\nHora: ${hhmm()} (${CFG.tzLabel}). Progreso: ${progressText()}\nSu check-in: "${text}"\nResponde en español de Colombia, de tú, máximo 2 frases cortas: reconoce lo hecho con un número concreto y dile exactamente qué priorizar la próxima hora para llegar a las metas. Sin emojis ni saludos.`;
       const {text:ai}=await S.sample(prompt,{modelTier:"quick",cache:false,onText:({text})=>{box.textContent=text}});
       const d2={...dayDoc(today())};d2.checkins=(d2.checkins||[]).map(c=>c.t===entry.t?{...c,ai}:c);await saveDay(d2);
     }catch(e){box.textContent="Check-in guardado."}
@@ -442,13 +444,13 @@ function vHoy(){
   const ws=weekStart(k),wk=sumTotal(salesBetween(ws,addDays(ws,6)));
   const ci=(d.checkins||[]).slice().sort((a,b)=>a.t-b.t);
   return `
-  <section class="theme"><div class="day">${th.d}</div><div class="what">${dow(k)===0?th.w:"Contenido de hoy: "+th.w}</div><div class="how">${th.h}</div></section>
+  ${CONTENT.length?`<section class="theme"><div class="day">${th.d}</div><div class="what">${dow(k)===0?th.w:"Contenido de hoy: "+th.w}</div><div class="how">${th.h}</div></section>`:""}
   <section class="panel">${salesMeter("Ventas de esta semana",wk,SALES_GOALS.week,`Semana del ${fmtDay(ws)} al ${fmtDay(addDays(ws,6))} · ${salesBetween(ws,addDays(ws,6)).length} órdenes`)}</section>
   <section class="summary">
     <div class="stat"><span class="lbl">Llamadas hoy</span><b>${c.nw+c.fu}</b><span class="muted">${c.ans} contestaron</span></div>
     <div class="stat"><span class="lbl">Chats hoy (inglés)</span><b>${c.chats}/${GOAL_CHAT}</b><span class="muted">${c.cans} respondieron</span></div>
     <div class="stat"><span class="lbl">Vendido hoy</span><b>${money(sumTotal(created))}</b><span class="muted">${created.filter(s=>!s._addonOnly).length} orden${created.filter(s=>!s._addonOnly).length===1?"":"es"}${created.some(s=>s._addonOnly)?" + extras":""}</span></div>
-    <div class="stat hl"><span class="lbl">Comisión ganada hoy</span><b>${money(comm)}</b><span class="muted">pagos completos de hoy</span></div>
+    ${COMMISSION?`<div class="stat hl"><span class="lbl">Comisión ganada hoy</span><b>${money(comm)}</b><span class="muted">pagos completos de hoy</span></div>`:""}
     <div class="stat"><span class="lbl">Entregas mañana</span><b>${tom.length}</b><span class="muted">${tom.filter(s=>s.status!=="pagada").length} por cobrar</span></div>
   </section>
   <div class="grid2">
@@ -459,7 +461,7 @@ function vHoy(){
         ${goalRow("Follow-ups por llamada",c.fu,GOAL_FU,"Leads que ya contactaste antes · solo cuentan con “Ya lo llamé”")}
         ${goalRow("Chats con clientes en inglés",c.chats,GOAL_CHAT,`Se cuentan aparte, no suman a las llamadas · ${c.cn} nuevos · ${c.cf} follow-ups`)}
         ${CONTENT.map(x=>goalRow(x.n,ct[x.k]||0,x.goal,x.sub,x.k)).join("")}
-        ${goalRow("Mensajes ABBA respondidos",d.abbaAnswered||0,Math.max(1,d.abbaAnswered||0),"Toca + por cada lead de ABBA que respondas","abbaAnswered")}
+        ${CONTENT.length?goalRow("Mensajes ABBA respondidos",d.abbaAnswered||0,Math.max(1,d.abbaAnswered||0),"Toca + por cada lead de ABBA que respondas","abbaAnswered"):""}
       </div>
       <div class="lock">Lo que marcas queda guardado y no se puede restar. Si te equivocas, avísale a Isnel.</div>
     </section>
@@ -769,7 +771,7 @@ No inventes datos que no aparezcan.${txt?"\n\nTexto de la orden:\n"+txt.slice(0,
     if(leadId&&S.leads[leadId]){const l=S.leads[leadId];const n={...l,stage:full?"vendido":"pendiente_pago",nextFU:null,amount:total,history:[...(l.history||[]),{t:Date.now(),day:k,kind:"note",text:`Orden ${money(total)} · entrega ${fmtDay(s.deliveryDay)}${full?" · pagada completa":` · abonó ${money(paid)}`}`}]};if((n.fuStep||0)===0)n.fuStep=1;S.leads[n.id]=n;await save("leads",n)}
     if(S.openLead)closeLead();
     render();await save("sales",s);
-    toast(full?`Orden subida y pagada · comisión ${money(commissionOf(s))}`:`Orden subida · por cobrar ${money(total-paid)} · te aviso el ${fmtDay(s.deliveryDay)}`);
+    toast(full?`Orden subida y pagada${COMMISSION?" · comisión "+money(commissionOf(s)):""}`:`Orden subida · por cobrar ${money(total-paid)} · te aviso el ${fmtDay(s.deliveryDay)}`);
   };
 }
 function vOrdenes(){
@@ -787,7 +789,7 @@ function vOrdenes(){
   ${cq.length?`<section class="panel" style="border-color:var(--warn)"><div class="panel-h"><h2>Confirma el pago</h2><span class="pill warn">${cq.length}</span></div>
     <p class="muted" style="margin:0">Estas órdenes ya llegaron a su fecha de entrega y no están pagadas completas. Cuando confirmes el pago completo, la comisión cuenta hoy.</p>
     <div class="list">${cq.map(s=>`<div class="row due"><div class="main"><div class="t">Orden ${esc(ordNo(s))} · ${esc(s.client)} · ${money(s.total)}</div><div class="s">Entrega ${relDay(s.deliveryDay)} · total ${money(s.total)} · pagó ${money(s.paid)} · falta ${money(s.total-s.paid)}</div></div><div class="acts"><button class="btn ok sm" type="button" data-paidfull="${s.id}">Pagaron completo</button><button class="btn sm" type="button" data-pay="${s.id}">Abono parcial</button><button class="btn sm ghost" type="button" data-snooze="${s.id}">Todavía no</button></div></div>`).join("")}</div></section>`:""}
-  <div class="rule"><b>Comisión:</b> el ${PCT} se gana el día que el cliente paga el <b>total</b>. Si abonan hoy y pagan el resto el día de la entrega, la comisión cuenta ese día.</div>
+  ${COMMISSION?`<div class="rule"><b>Comisión:</b> el ${PCT} se gana el día que el cliente paga el <b>total</b>. Si abonan hoy y pagan el resto el día de la entrega, la comisión cuenta ese día.</div>`:""}
   <section class="panel"><div class="panel-h"><h2>Subir orden</h2><span class="muted">Cada venta = una orden</span></div>${orderForm("of")}</section>
   <section class="panel">
     <div class="panel-h"><h2>Para producción · ${fmtDay(tom)}</h2><span class="muted">${ordersFor(tom).length} orden${ordersFor(tom).length===1?"":"es"}</span></div>
@@ -806,7 +808,7 @@ async function markPaidFull(s){
   S.sales[n.id]=n;
   if(n.leadId&&S.leads[n.leadId]){const l=S.leads[n.leadId];const nl={...l,stage:"vendido",nextFU:null,history:[...(l.history||[]),{t:Date.now(),day:k,kind:"note",text:"Pago completo recibido"}]};S.leads[nl.id]=nl;await save("leads",nl)}
   render();await save("sales",n);
-  toast(`Pagada completa · comisión ${money(paidBetween(k,k).filter(x=>x.id===n.id).reduce((a,x)=>a+commissionOf(x),0))} ganada hoy`);
+  toast(COMMISSION?`Pagada completa · comisión ${money(paidBetween(k,k).filter(x=>x.id===n.id).reduce((a,x)=>a+commissionOf(x),0))} ganada hoy`:"Pagada completa");
 }
 function payModal(s){
   if(!s)return;
@@ -972,10 +974,10 @@ function dailyReport(k){
   const lines=[
     `REPORTE DIARIO — ${fmtDay(k)} — ${NAME}`,
     d.start?`Turno: ${hhmm(d.start)} a ${d.end?hhmm(d.end):"(abierto)"}${d.end?` (${dur(d.end-d.start)})`:""}`:"Turno: no marcado",
-    ``,`CONTENIDO (tema: ${THEMES[dow(k)].w})`,
+    ...(CONTENT.length?[``,`CONTENIDO (tema: ${THEMES[dow(k)].w})`,
     ...(LEGACY?[`- Gaby Flowers: ${ct.gabyStories||0}/3 historias · ${ct.gabyPost||0}/1 post`,
     `- Ruiz Creationz: ${ct.ruizStories||0}/3 historias · ${ct.ruizPost||0}/1 post`,
-    `- ABBA Roses: versículo ${ct.abbaVerse?"sí":"no"} · ${ct.abbaVideos||0} videos · ${d.abbaAnswered||0} mensajes respondidos`]:CONTENT.map(x=>`- ${x.n}: ${ct[x.k]||0}/${x.goal}`)),
+    `- ABBA Roses: versículo ${ct.abbaVerse?"sí":"no"} · ${ct.abbaVideos||0} videos · ${d.abbaAnswered||0} mensajes respondidos`]:CONTENT.map(x=>`- ${x.n}: ${ct[x.k]||0}/${x.goal}`))]:[]),
     ``,`LLAMADAS`,
     `- Leads nuevos: ${c.nw}/${GOAL_NEW}`,
     `- Follow-ups: ${c.fu}/${GOAL_FU}`,
@@ -1009,7 +1011,7 @@ function weeklyReport(ws){
     `QUÉ SE VENDIÓ`,...statsLines(st),``,
     `PAGOS COMPLETOS ESTA SEMANA: ${paid.length} · comisión ${money(paid.reduce((a,s)=>a+commissionOf(s),0))}`,``,
     `LLAMADAS: ${calls} (nuevos ${nw}/${GOAL_NEW*5} · follow-ups ${fu}/${GOAL_FU*5}) · contestaron ${ans} · ${close}% de cierre por llamada`,`CHATS con clientes en inglés: ${chs}/${GOAL_CHAT*5}`,``,
-    LEGACY?`CONTENIDO: Gaby ${content.gabyStories||0}/15 historias, ${content.gabyPost||0}/5 posts · Ruiz ${content.ruizStories||0}/15 historias, ${content.ruizPost||0}/5 posts · ABBA versículo ${content.abbaVerse||0}/5, videos ${content.abbaVideos||0}/5–10`:`CONTENIDO: ${contentLine(content,5)}`,``,
+    LEGACY?`CONTENIDO: Gaby ${content.gabyStories||0}/15 historias, ${content.gabyPost||0}/5 posts · Ruiz ${content.ruizStories||0}/15 historias, ${content.ruizPost||0}/5 posts · ABBA versículo ${content.abbaVerse||0}/5, videos ${content.abbaVideos||0}/5–10`:CONTENT.length?`CONTENIDO: ${contentLine(content,5)}`:"",CONTENT.length?``:"",
     `MES (${fmtMonth(m)}): ${money(ms)} de ${money(SALES_GOALS.month[0])} (meta alta ${money(SALES_GOALS.month[1])})`,
     `POR COBRAR: ${pend.length} órdenes · ${money(pend.reduce((a,s)=>a+s.total-s.paid,0))}`,
     ...(cancelled(ws,we).length?[``,`CANCELADAS ESTA SEMANA: ${cancelled(ws,we).length} · se restaron ${money(cancelled(ws,we).reduce((a,s)=>a+s.total,0))}`,...cancelled(ws,we).map(s=>`- Orden ${ordNo(s)} · ${s.client} — ${money(s.total)} (vendida ${fmtDay(s.saleDay)}, cancelada ${fmtDay(s.cancelDay)})${s.cancelReason?" · "+s.cancelReason:""}`)]:[])
@@ -1071,12 +1073,13 @@ function vResumen(){
   <section class="panel">
     <div class="panel-h"><h2>Pago de ${esc(SHORT)}</h2><span class="muted">${fmtMonth(m)}</span></div>
     <div class="summary">
-      <div class="stat"><span class="lbl">Pagado completo ${esc(COMMISSION_BRANDS.join(", "))} (hasta hoy)</span><b>${money(comm/COMMISSION)}</b><span class="muted">${paid.filter(s=>commissionOf(s)).length} órdenes pagadas completas · los abonos cuentan cuando terminen de pagar</span></div>
+      ${COMMISSION?`<div class="stat"><span class="lbl">Pagado completo ${esc(COMMISSION_BRANDS.join(", "))} (hasta hoy)</span><b>${money(comm/COMMISSION)}</b><span class="muted">${paid.filter(s=>commissionOf(s)).length} órdenes pagadas completas · los abonos cuentan cuando terminen de pagar</span></div>
       <div class="stat"><span class="lbl">Por cobrar (${esc(COMMISSION_BRANDS.join(", "))})</span><b>${money(commPend/COMMISSION)}</b><span class="muted">total de ${pend.length} órdenes sin pagar completo (ya abonaron ${money(commPend/COMMISSION-pend.reduce((x,s)=>x+(s.total-s.paid),0))})</span></div>
       <div class="stat hl"><span class="lbl">${PCT} ganado</span><b>${money(comm)}</b></div>
-      <div class="stat"><span class="lbl">${PCT} por cobrar</span><b>${money(commPend)}</b><span class="muted">cuando paguen completo</span></div>
+      <div class="stat"><span class="lbl">${PCT} por cobrar</span><b>${money(commPend)}</b><span class="muted">cuando paguen completo</span></div>`:""}
       <div class="stat"><span class="lbl">Sueldo base</span><b>${money(BASE_PAY)}</b></div>
-      <div class="stat hl"><span class="lbl">Total a pagar</span><b>${money(BASE_PAY+comm)}</b><span class="muted">sueldo base + ${PCT} ganado</span></div>
+      ${BONUS?`<div class="stat${st.total>=BONUS.goal?" hl":""}"><span class="lbl">Bono por llegar a ${money(BONUS.goal)}</span><b>${money(bonusOf(st.total))}</b><span class="muted">${st.total>=BONUS.goal?"¡Meta lograda!":"Te faltan "+money(BONUS.goal-st.total)+" para ganar "+money(BONUS.amount)}</span></div>`:""}
+      <div class="stat hl"><span class="lbl">Total a pagar</span><b>${money(BASE_PAY+comm+bonusOf(st.total))}</b><span class="muted">sueldo base${COMMISSION?" + "+PCT+" ganado":""}${BONUS?" + bono si llegas a la meta":""}</span></div>
     </div>
   </section>
   ${monthsCompare()}
@@ -1116,6 +1119,7 @@ function vGuia(){
     <table class="t"><thead><tr><th>Qué</th><th class="r">Día</th><th class="r">Semana</th></tr></thead><tbody>
     <tr><td>Llamadas a leads nuevos</td><td class="r">${GOAL_NEW}</td><td class="r">${GOAL_NEW*5}</td></tr>
     <tr><td>Follow-ups</td><td class="r">${GOAL_FU}</td><td class="r">${GOAL_FU*5}</td></tr>
+    <tr><td>Chats con clientes en inglés</td><td class="r">${GOAL_CHAT}</td><td class="r">${GOAL_CHAT*5}</td></tr>
     ${LEGACY?`<tr><td>Historias + post Gaby</td><td class="r">3 + 1</td><td class="r">15 + 5</td></tr>
     <tr><td>Historias + post Ruiz</td><td class="r">3 + 1</td><td class="r">15 + 5</td></tr>
     <tr><td>Versículo ABBA</td><td class="r">1</td><td class="r">5</td></tr>
@@ -1123,9 +1127,9 @@ function vGuia(){
   </section>
   </div>
   <div class="grid2">
-  <section class="panel"><h2>Plan de contenido semanal</h2>
+  ${CONTENT.length?`<section class="panel"><h2>Plan de contenido semanal</h2>
     <table class="t"><tbody>${[1,2,3,4,5,6,0].map(i=>`<tr style="${i===t?"background:var(--accent-soft)":""}"><td><b>${THEMES[i].d}</b></td><td>${THEMES[i].w}</td></tr>`).join("")}</tbody></table>
-  </section>
+  </section>`:""}
   <section class="panel"><h2>La base de 900 leads de Gaby</h2>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>Importa la lista desde Leads → “Importar lista”, con origen “Base antigua”.</li>
@@ -1138,8 +1142,8 @@ function vGuia(){
   </div>
   <div class="grid2">
   <section class="panel"><h2>Pago</h2>
-    <p style="margin:0">Sueldo base <b class="num">${fmtGoal(BASE_PAY)}</b> al mes + <b>${PCT}</b> del total de cada venta de ${esc(COMMISSION_BRANDS.join(", "))}. Se paga mensual.</p>
-    <div class="rule">La comisión se gana el día que el cliente paga el total.</div>
+    ${CFG.payNote?`<p style="margin:0">${esc(CFG.payNote)}</p>`:`<p style="margin:0">Sueldo base <b class="num">${fmtGoal(BASE_PAY)}</b> al mes + <b>${PCT}</b> del total de cada venta de ${esc(COMMISSION_BRANDS.join(", "))}. Se paga mensual.</p>`}
+    ${COMMISSION?`<div class="rule">La comisión se gana el día que el cliente paga el total.</div>`:""}
   </section>
   <section class="panel"><h2>Reglas</h2>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
@@ -1307,10 +1311,11 @@ function vResumenCerrado(x){
     </div></section>
   <section class="panel"><div class="panel-h"><h2>Pago de ${esc(SHORT)}</h2><span class="muted">${fmtMonth(x.month)}</span></div>
     <div class="summary">
-      <div class="stat hl"><span class="lbl">${Math.round((p.rate||COMMISSION)*1000)/10}% ganado</span><b>${money(p.commission)}</b></div>
+      ${p.rate?`<div class="stat hl"><span class="lbl">${Math.round(p.rate*1000)/10}% ganado</span><b>${money(p.commission)}</b></div>`:""}
       <div class="stat"><span class="lbl">Sueldo base</span><b>${money(p.basePay)}</b></div>
+      ${p.bonusGoal?`<div class="stat${p.bonus?" hl":""}"><span class="lbl">Bono por llegar a ${money(p.bonusGoal)}</span><b>${money(p.bonus||0)}</b><span class="muted">${p.bonus?"meta lograda":"no se llegó a la meta"}</span></div>`:""}
       <div class="stat hl"><span class="lbl">Total del mes</span><b>${money(p.total)}</b></div>
-      <div class="stat"><span class="lbl">Comisión pendiente al cierre</span><b>${money(p.commissionPendingAtClose)}</b><span class="muted">se gana cuando paguen</span></div>
+      ${p.rate?`<div class="stat"><span class="lbl">Comisión pendiente al cierre</span><b>${money(p.commissionPendingAtClose)}</b><span class="muted">se gana cuando paguen</span></div>`:""}
     </div></section>
   <section class="panel"><div class="panel-h"><h2>Actividad del mes</h2></div>
     <div class="summary">
