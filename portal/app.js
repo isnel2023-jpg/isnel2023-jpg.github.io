@@ -1098,12 +1098,12 @@ function vGuia(){
       <li>Cada hora (5, 6, 7 y 8 p. m.) el portal te pide un check-in corto y la IA te dice qué priorizar.</li>
       <li><b>Deja el portal abierto todo el turno.</b> Si lo cierras, no te aparece el check-in y a Isnel le llega una alerta de que no lo hiciste. Si pasa, ábrelo y usa “Hacer check-in ahora”.</li>
       <li>Entra siempre con tu contraseña personal (no la compartas). Si sale un aviso rojo de “NO SE GUARDÓ”, avísale a Isnel de inmediato.</li>
-      <li>Revisa el tema de contenido del día y publica según ese tema.</li>
+      ${CONTENT.length?`<li>Revisa el tema de contenido del día y publica según ese tema.</li>`:""}
       <li>Registra o importa los leads. Llama cada lead máximo 2 veces el mismo día.</li>
       <li>Después de llamar a un lead toca <b>“Ya lo llamé”</b> y escoge cómo te fue. Solo eso suma a la meta de llamadas; agregar el lead no cuenta como llamada. El follow-up se agenda solo (día 1, 3 y 7). Si no le interesa, va a “No interesado / frío”.</li>
       <li>Los clientes en inglés se marcan con idioma “Inglés” y se contactan por chat: toca <b>“Le escribí por chat”</b>. Los chats se cuentan aparte, no suman a las llamadas.</li>
       <li>Cada venta: sube el PDF de la orden (el mismo que mandas a producción) con su <b>número de orden</b>. La IA llena todo; tú revisas y subes.</li>
-      <li>Si no pagó todo, el día de la entrega el portal te pide confirmar el pago. Ahí se gana la comisión.</li>
+      <li>Si no pagó todo, el día de la entrega el portal te pide confirmar el pago.${COMMISSION?" Ahí se gana la comisión.":""}</li>
       <li>Antes de las 8:00 p. m.: manda a producción la lista de entregas de mañana y copia tu reporte diario para Isnel.</li>
       <li><b>Todos los domingos, a cualquier hora, mandas el reporte semanal.</b></li>
     </ol>
@@ -1130,7 +1130,7 @@ function vGuia(){
   ${CONTENT.length?`<section class="panel"><h2>Plan de contenido semanal</h2>
     <table class="t"><tbody>${[1,2,3,4,5,6,0].map(i=>`<tr style="${i===t?"background:var(--accent-soft)":""}"><td><b>${THEMES[i].d}</b></td><td>${THEMES[i].w}</td></tr>`).join("")}</tbody></table>
   </section>`:""}
-  <section class="panel"><h2>La base de 900 leads de Gaby</h2>
+  ${BRANDS_SELL.includes("Gaby Flowers")?`<section class="panel"><h2>La base de 900 leads de Gaby</h2>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>Importa la lista desde Leads → “Importar lista”, con origen “Base antigua”.</li>
       <li>Las llamadas a la base cuentan como llamadas a leads nuevos.</li>
@@ -1138,7 +1138,7 @@ function vGuia(){
       <li>Filtra: si no le interesa, arrástralo a “No interesado / frío”.</li>
       <li>Al principio agrega a mano solo los leads importantes que van entrando.</li>
     </ul>
-  </section>
+  </section>`:""}
   </div>
   <div class="grid2">
   <section class="panel"><h2>Pago</h2>
