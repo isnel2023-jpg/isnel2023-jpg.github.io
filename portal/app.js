@@ -380,7 +380,7 @@ function openCheckin(slot){
 }
 
 // ---------- tabs ----------
-const TABS=[["hoy","Hoy"],["leads","Leads"],["ordenes","Órdenes"],["tareas","Tareas"],["reporte","Reporte"],["resumen","Resumen"],["historial","Historial"],["guia","Guía"]];
+const TABS=[["hoy","Hoy"],["leads","Leads"],["ordenes","Órdenes"],...(CFG.orderCreator?[["crear","Crear orden"]]:[]),["tareas","Tareas"],["reporte","Reporte"],["resumen","Resumen"],["historial","Historial"],["guia","Guía"]];
 function paintTabs(){
   const k=today();
   const badges={hoy:fuQueue().length,ordenes:confirmQueue().length,tareas:tasksDue().length,reporte:(dow(k)===0&&!weeklySentFor(weekStart(k)))?1:0,historial:Object.keys(H.alerts).length};
@@ -395,7 +395,7 @@ function render(){
   paintTabs();paintClock();
   sortables.forEach(s=>{try{s.destroy()}catch(e){}});sortables=[];
   const banner=S.offline?`<div class="banner">No se pudo conectar con la base de datos todavía. Lo que ves puede estar desactualizado.</div>`:"";
-  const fn={hoy:vHoy,leads:vLeads,ordenes:vOrdenes,tareas:vTareas,reporte:vReporte,resumen:vResumen,historial:vHistorial,guia:vGuia}[S.tab]||vHoy;
+  const fn={hoy:vHoy,leads:vLeads,ordenes:vOrdenes,crear:vCrear,tareas:vTareas,reporte:vReporte,resumen:vResumen,historial:vHistorial,guia:vGuia}[S.tab]||vHoy;
   view.innerHTML=banner+topNotices()+fn();
   bind();P.hydrateBlobs(view);
   if(S.openLead)openLead(S.openLead,true);
@@ -1343,9 +1343,229 @@ function vResumenCerrado(x){
     </div></section>`;
 }
 
+// ---------- crear orden por voz (pestaña "Crear orden") ----------
+// El vendedor dicta la orden, la IA la arma, se revisa, se genera el PDF de taller
+// con la plantilla de la marca y se pasa a Órdenes para subirla como cualquier otra.
+const CO_MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const coFecha = (k)=>{if(!k||!/^\d{4}-\d{2}-\d{2}$/.test(k))return "";const [y,m,d]=k.split("-").map(Number);return d+" "+CO_MES[m-1]+" "+y+(k===today()?" (hoy)":k===addDays(today(),1)?" (mañana)":"")};
+function coState(){if(!S.co)S.co={txt:"",d:null,pdf:null,preview:null,pdfText:"",rec:null};return S.co}
+function coNextNo(){const ns=orders().map(o=>parseInt(String(o.orderNo||"").replace(/\D/g,""),10)).filter(n=>n>0&&n<100000);return String((ns.length?Math.max(...ns):0)+1).padStart(3,"0")}
+const coLines = (t)=>String(t||"").split("\n").map(x=>x.trim()).filter(Boolean);
+const coItems = (t)=>coLines(t).map(l=>{const i=l.lastIndexOf("|");return i<0?{desc:l,precio:0}:{desc:l.slice(0,i).trim(),precio:nz(l.slice(i+1).replace(/[$,\s]/g,""))}});
+const coTotal = (d)=>coItems(d.lineasTxt).reduce((a,x)=>a+x.precio,0);
+
+function vCrear(){
+  const st=coState(),d=st.d;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const f=(k,lbl,type,extra)=>`<div class="fld${extra&&extra.full?" full":""}"><label for="co_${k}">${lbl}</label>${type==="area"
+    ?`<textarea id="co_${k}" data-k="${k}" rows="${(extra&&extra.rows)||3}" placeholder="${esc((extra&&extra.ph)||"")}">${esc(d[k]??"")}</textarea>`
+    :type==="sel"?`<select id="co_${k}" data-k="${k}">${extra.opts.map(([v,n])=>`<option value="${esc(v)}" ${String(d[k])===v?"selected":""}>${esc(n)}</option>`).join("")}</select>`
+    :`<input id="co_${k}" data-k="${k}" type="${type||"text"}" value="${esc(d[k]??"")}"${type==="number"?' min="0" step="0.01"':""} placeholder="${esc((extra&&extra.ph)||"")}">`}</div>`;
+  const total=d?coTotal(d):0,cobrar=d?Math.max(0,total-nz(d.abonado)):0;
+  return `<section class="panel">
+    <div class="panel-h"><h2>Crear orden</h2><span class="muted">Habla y la IA arma la orden</span></div>
+    <p style="margin:0 0 10px">Dila de corrido, como se la dirías a producción: <b>cliente y teléfono</b>, qué lleva (cantidad y colores de rosas, papel, extras), <b>el texto de la tarjeta</b>, si <b>recoge en tienda o es a domicilio</b> (dirección y quién recibe), <b>fecha y hora</b>, precios, <b>cuánto pagó y cómo</b>, y por dónde llegó el cliente.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn pri co-mic${st.rec?" rec":""}" type="button" data-act="coMic">${st.rec?"⏹ Detener":"🎤 Toca y habla"}</button>
+      ${SR?"":`<span class="muted" style="font-size:.85rem">Si no te sale el micrófono aquí, toca el cuadro de abajo y usa el 🎤 del teclado.</span>`}
+    </div>
+    <textarea id="coTxt" rows="5" style="width:100%;margin-top:10px" placeholder="Ej: Cliente Laura Gómez, 305 555 1234. Cien rosas, cuarenta rojas, treinta amarillas y treinta rosadas, papel blanco, con tarjeta que diga… Recoge en tienda hoy a las 2 de la tarde. Son 160 dólares, paga cash al recoger. Llegó por Messenger.">${esc(st.txt)}</textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn pri" type="button" data-act="coAi">✨ ${d?"Actualizar la orden con lo dictado":"Armar la orden"}</button>
+      ${d||st.txt?`<button class="btn" type="button" data-act="coReset">Empezar de nuevo</button>`:""}
+    </div>
+    <span class="muted" id="coMsg" style="font-size:.85rem"></span>
+  </section>
+  ${d?`<section class="panel"><div class="panel-h"><h2>Revisa la orden</h2><span class="muted">Corrige lo que haga falta</span></div>
+    <form class="f" id="coForm" onsubmit="return false">
+      ${f("no","Número de orden")}
+      ${BRANDS_SELL.length>1?f("brand","Marca","sel",{opts:BRANDS_SELL.map(b=>[b,b])}):""}
+      ${f("cliente","Cliente")}${f("telefono","Teléfono","tel")}
+      ${f("titulo","Producto (título de la orden)","text",{full:true,ph:"100 rosas — 40 rojas + 30 amarillas + 30 rosadas"})}
+      ${f("detallesTxt","Detalles (uno por línea)","area",{full:true,ph:"40 rojas · 30 amarillas · 30 rosadas\nPapel blanco\nCon tarjeta"})}
+      ${f("tarjeta","Texto de la tarjeta (vacío = sin tarjeta)","area",{full:true,rows:5})}
+      ${f("entrega","Entrega","sel",{opts:[["recoge","Recoge en tienda"],["domicilio","Entrega a domicilio"]]})}
+      ${f("recibe_nombre",d.entrega==="domicilio"?"Quién recibe":"Nombre de quien recoge")}
+      ${d.entrega==="domicilio"?f("recibe_telefono","Teléfono de quien recibe","tel")+f("direccion","Dirección","text",{full:true}):""}
+      ${f("fecha","Fecha","date")}${f("hora","Hora","text",{ph:"2:00 pm"})}
+      ${f("lineasTxt","Desglose (una línea por cosa: descripción | precio)","area",{full:true,ph:"100 rosas tricolor | 160\nDelivery | 20"})}
+      <div class="fld"><label>Total</label><b class="num" id="coTot" style="font-size:1.2rem">${money(total)}</b></div>
+      ${f("abonado","Ya pagó (USD)","number")}${f("metodo","Cómo paga","text",{ph:"CASH, Zelle, tarjeta"})}
+      ${f("canal","Canal","text",{ph:"Meta Ads → Messenger"})}
+      <div class="sep lbl">Para el conteo del portal</div>
+      ${f("nat","Rosas naturales","number")}${f("dye","Rosas tinturadas","number")}
+      ${f("extrasTxt","Extras (separados por coma)")}${f("extrasAmt","Valor de los extras","number")}${f("deliveryAmt","Delivery (USD)","number")}
+      <div class="full muted">Por cobrar: <b id="coCob">${money(cobrar)}</b></div>
+    </form>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn pri" type="button" data-act="coPdf">📄 Ver PDF de la orden</button>
+      ${st.pdf?`<button class="btn" type="button" data-act="coDl">⬇ Descargar PDF</button><button class="btn pri" type="button" data-act="coSubir">Pasar a Órdenes para subirla</button>`:""}
+    </div>
+    ${st.preview?`<div class="drop" style="margin-top:10px"><img src="${st.preview}" alt="Vista previa del PDF de la orden"></div>`:""}
+  </section>`:""}`;
+}
+
+async function coAi(){
+  const st=coState(),msg=document.getElementById("coMsg");
+  const txt=(document.getElementById("coTxt").value||"").trim();st.txt=txt;
+  if(!txt){msg.textContent="Primero dicta o escribe la orden.";return}
+  if(!S.sample){msg.textContent="La IA no está disponible ahora. Inténtalo en un rato.";return}
+  const brand=(st.d&&st.d.brand)||BRANDS_SELL[0];
+  msg.textContent="La IA está armando la orden…";
+  const prev=st.d?`\n\nORDEN ACTUAL (actualízala con lo nuevo del dictado; conserva lo que no cambie):\n${JSON.stringify({cliente:st.d.cliente,telefono:st.d.telefono,titulo:st.d.titulo,detalles:coLines(st.d.detallesTxt),tarjeta:st.d.tarjeta,entrega:st.d.entrega,recibe_nombre:st.d.recibe_nombre,direccion:st.d.direccion,fecha:st.d.fecha,hora:st.d.hora,lineas:coItems(st.d.lineasTxt),abonado:nz(st.d.abonado),metodo_pago:st.d.metodo,canal:st.d.canal})}`:"";
+  const prompt=`Eres el asistente de órdenes de ${brand}, una floristería en Miami. Un vendedor dictó una orden por voz; el dictado puede tener errores (palabras mal oídas, números en letras): corrígelos con sentido común, pero NO inventes datos que no dijo. Hoy es ${today()} (AAAA-MM-DD); convierte "hoy", "mañana", "el viernes", etc. a fecha.
+Responde SOLO un objeto JSON con estas claves:
+{"cliente": string|null, "telefono": string|null,
+"titulo": string (título corto del producto, ej. "100 rosas — 40 rojas + 30 amarillas + 30 rosadas"),
+"detalles": [string] (viñetas cortas: colores y cantidades, papel, moño, extras, "Con tarjeta"),
+"tarjeta": string|null (texto EXACTO de la tarjeta, en el idioma en que lo dictaron, con buena ortografía y puntuación; usa \\n entre saludo, cuerpo y despedida; null si no lleva tarjeta),
+"entrega": "recoge"|"domicilio", "recibe_nombre": string|null, "recibe_telefono": string|null, "direccion": string|null,
+"fecha": "AAAA-MM-DD"|null, "hora": string|null (ej. "2:00 pm"),
+"lineas": [{"desc": string, "precio": number}] (desglose de precios; el delivery va en su propia línea; si solo dijo el total, una sola línea con el producto),
+"abonado": number (lo que ya pagó; 0 si no ha pagado), "metodo_pago": string|null (ej. "CASH", "Zelle", "Tarjeta"),
+"canal": string|null (por dónde llegó el cliente, ej. "Meta Ads → Messenger", "WhatsApp", "Instagram", "Llamada"),
+"rosas_naturales": number, "rosas_tinturadas": number (azules, pintadas, etc.),
+"extras": [{"nombre": string, "precio": number}], "delivery": number}${prev}
+
+DICTADO:
+${txt.slice(0,6000)}`;
+  try{
+    const r=await S.sample.json(prompt,{modelTier:"default",cache:false});
+    if(!r||typeof r!=="object")throw new Error("vacío");
+    const o=st.d||{no:coNextNo(),brand};
+    const ex=Array.isArray(r.extras)?r.extras.filter(e=>e&&e.nombre):[];
+    st.d={...o,cliente:r.cliente||o.cliente||"",telefono:r.telefono||o.telefono||"",titulo:r.titulo||o.titulo||"",
+      detallesTxt:Array.isArray(r.detalles)?r.detalles.join("\n"):(o.detallesTxt||""),tarjeta:r.tarjeta||"",
+      entrega:r.entrega==="domicilio"?"domicilio":"recoge",recibe_nombre:r.recibe_nombre||"",recibe_telefono:r.recibe_telefono||"",direccion:r.direccion||"",
+      fecha:/^\d{4}-\d{2}-\d{2}$/.test(r.fecha||"")?r.fecha:(o.fecha||today()),hora:r.hora||"",
+      lineasTxt:Array.isArray(r.lineas)&&r.lineas.length?r.lineas.map(l=>`${l.desc} | ${nz(l.precio)}`).join("\n"):(o.lineasTxt||""),
+      abonado:nz(r.abonado),metodo:r.metodo_pago||"",canal:r.canal||"",
+      nat:Math.max(0,Math.round(nz(r.rosas_naturales))),dye:Math.max(0,Math.round(nz(r.rosas_tinturadas))),
+      extrasTxt:ex.map(e=>e.nombre).join(", "),extrasAmt:ex.reduce((a,e)=>a+nz(e.precio),0),deliveryAmt:nz(r.delivery)};
+    st.pdf=null;st.preview=null;render();
+    const m=document.getElementById("coMsg");if(m)m.textContent="Listo. Revisa los datos y toca “Ver PDF de la orden”.";
+  }catch(e){msg.textContent=e.code==="not_granted"?"La IA no está activada.":e.code==="rate_limited"?"Muchas solicitudes seguidas; intenta en un rato.":"No pude armar la orden. Intenta otra vez o dila más despacio."}
+}
+
+async function coBuildPdf(d){
+  if(!window.PDFLib)await loadScript("/portal/vendor/pdf-lib.min.js");
+  const {PDFDocument,StandardFonts,rgb}=window.PDFLib;
+  const doc=await PDFDocument.create();
+  doc.setTitle("Orden #"+d.no+" · "+(d.brand||BRANDS_SELL[0]));
+  let pg=doc.addPage([612,792]);
+  const F={tb:await doc.embedFont(StandardFonts.TimesRomanBold),ti:await doc.embedFont(StandardFonts.TimesRomanItalic),tr:await doc.embedFont(StandardFonts.TimesRoman),h:await doc.embedFont(StandardFonts.Helvetica),hb:await doc.embedFont(StandardFonts.HelveticaBold)};
+  const hex=(h)=>rgb(parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255);
+  const TH=CFG.orderTheme||{};
+  const C={ac:hex(TH.accent||"#1f3d2c"),mu:hex("#666666"),tx:hex("#1a1a1a"),red:hex("#b3261e"),box:hex(TH.box||"#f4f3ee"),ln:hex("#c9c9c9"),wh:hex("#ffffff")};
+  const W=612,M=40,R=W-M;let y=792-40;
+  const clean=(s)=>String(s??"").replace(/[→➜➡]/g,"->").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[^\x20-\x7E\xA0-\xFF—–…•€]/g,"").replace(/\s+/g," ").trim();
+  const wd=(s,f,z)=>f.widthOfTextAtSize(clean(s),z);
+  const t=(s,x,yy,f,z,c)=>{s=clean(s);if(s)pg.drawText(s,{x,y:yy,size:z,font:f,color:c||C.tx})};
+  const tr=(s,yy,f,z,c)=>t(s,R-wd(s,f,z),yy,f,z,c);
+  const sp=(s,x,yy,f,z,c,g)=>{for(const ch of clean(s)){pg.drawText(ch,{x,y:yy,size:z,font:f,color:c});x+=f.widthOfTextAtSize(ch,z)+g}};
+  const hl=(yy,th,c)=>pg.drawLine({start:{x:M,y:yy},end:{x:R,y:yy},thickness:th,color:c||C.ln});
+  const wrap=(s,f,z,max)=>{const out=[];let cur="";for(const w of clean(s).split(" ")){const n=cur?cur+" "+w:w;if(f.widthOfTextAtSize(n,z)>max&&cur){out.push(cur);cur=w}else cur=n}if(cur)out.push(cur);return out};
+  const need=(h)=>{if(y-h<34){pg=doc.addPage([612,792]);y=792-50}};
+  const sec=(s)=>{need(34);y-=4;sp(s,M,y,F.hb,9,C.ac,1.8);hl(y-5,.8);y-=21};
+  const brand=d.brand||BRANDS_SELL[0];
+  // encabezado
+  let top=y;
+  if(CFG.orderLogo){
+    try{const png=await doc.embedPng(await (await fetch(CFG.orderLogo)).arrayBuffer());const h=72,w=png.width*h/png.height;pg.drawImage(png,{x:M,y:top-h,width:w,height:h});sp("ORDEN DE TALLER",M,top-h-14,F.hb,9,C.mu,2.2);y=top-h-24}
+    catch(e){t(brand,M,top-22,F.tb,26,C.ac);sp("ORDEN DE TALLER",M,top-38,F.hb,9,C.mu,2.2);y=top-50}
+  }else{t(brand,M,top-22,F.tb,26,C.ac);sp("ORDEN DE TALLER",M,top-38,F.hb,9,C.mu,2.2);y=top-50}
+  tr("Orden",top-6,F.h,11);tr("#"+d.no,top-28,F.hb,20);tr("Recibida: "+coFecha(today()).replace(/ \(.*\)$/,""),top-44,F.h,10);
+  y=Math.min(y,top-52);pg.drawLine({start:{x:M,y},end:{x:R,y},thickness:3,color:C.ac});y-=16;
+  // producto
+  sec("PRODUCTO");
+  for(const l of wrap(d.titulo||"Orden",F.tb,17,R-M)){need(24);t(l,M,y,F.tb,17);y-=22}
+  y-=2;
+  for(const b of coLines(d.detallesTxt)){for(const [i,l] of wrap(b,F.tr,11,R-M-24).entries()){need(16);if(i===0)pg.drawCircle({x:M+9,y:y+3.5,size:1.8,color:C.tx});t(l,M+20,y,F.tr,11);y-=16}}
+  // tarjeta
+  if(String(d.tarjeta||"").trim()){
+    y-=4;sec("TARJETA — TEXTO PARA ESCRIBIR");
+    const rows=[];for(const p of String(d.tarjeta).split("\n")){if(!p.trim()){rows.push("");continue}rows.push(...wrap(p,F.ti,12,R-M-28))}
+    while(rows.length&&rows[rows.length-1]==="")rows.pop();
+    const h=rows.length*16+16;need(h+8);
+    pg.drawRectangle({x:M,y:y-h+12,width:R-M,height:h,color:C.box,borderColor:C.ac,borderWidth:1});
+    let yy=y-4;for(const l of rows){if(l)t(l,M+14,yy,F.ti,12);yy-=16}
+    y-=h+10;
+  }
+  // entrega
+  sec("ENTREGA");need(26);
+  t(d.entrega==="domicilio"?"ENTREGA A DOMICILIO":"RECOGE EN TIENDA",M,y,F.tb,17);y-=22;
+  const fld=(lbl,val)=>{need(34);sp(lbl,M,y,F.h,8,C.mu,1.2);t(val||"",M,y-14,F.tr,11.5);hl(y-22,.8,C.mu);y-=33};
+  if(d.entrega==="domicilio"){fld("QUIÉN RECIBE",[d.recibe_nombre,d.recibe_telefono].filter(Boolean).join(" · "));fld("DIRECCIÓN",d.direccion)}
+  else fld("NOMBRE DE QUIEN RECOGE",d.recibe_nombre);
+  fld("FECHA",coFecha(d.fecha));fld("HORA",d.hora);
+  // desglose
+  sec("DESGLOSE");
+  const items=coItems(d.lineasTxt),total=items.reduce((a,x)=>a+x.precio,0),ab=Math.min(nz(d.abonado),total),cob=Math.max(0,total-ab);
+  for(const it of items){const ls=wrap(it.desc,F.h,11,R-M-90);ls.forEach((l,i)=>{need(18);t(l,M,y,F.h,11);if(i===0)tr(money2(it.precio),y,F.h,11);y-=16});y-=2}
+  need(64);pg.drawLine({start:{x:M,y:y+8},end:{x:R,y:y+8},thickness:2,color:C.ac});y-=12;
+  t("TOTAL",M,y,F.hb,15);tr(money2(total),y,F.hb,15);y-=12;
+  if(ab>0){y-=8;t("ABONADO"+(d.metodo?" ("+d.metodo+")":""),M,y,F.h,11);tr("-"+money2(ab),y,F.h,11);y-=10}
+  pg.drawLine({start:{x:M,y},end:{x:R,y},thickness:2,color:C.ac});y-=24;
+  const cuando=d.entrega==="domicilio"?"al entregar":"al recoger";
+  if(cob>0){t("COBRAR AL ENTREGAR / RECOGER",M,y,F.hb,14,C.red);tr(money2(cob),y,F.hb,14,C.red)}else{t("PAGADO COMPLETO",M,y,F.hb,14,C.ac);tr(money2(0)+" por cobrar",y,F.hb,12,C.ac)}
+  y=Math.max(y-30,30);
+  const pill=cob>0?`COBRAR ${money2(cob)}${d.metodo?" · "+d.metodo.toUpperCase():""} ${cuando}`:"PAGADO";
+  const pw=wd(pill,F.hb,9)+pill.length*0.6+20;
+  pg.drawRectangle({x:M,y:y-6,width:pw,height:20,color:cob>0?C.red:C.ac});sp(pill,M+10,y,F.hb,9,C.wh,.6);
+  if(d.canal){const s="Canal: "+d.canal;t(s,(M+pw+R-wd("Vendedor: "+SHORT,F.h,9))/2-wd(s,F.h,9)/2,y,F.h,9,C.mu)}
+  tr("Vendedor: "+SHORT,y,F.h,9,C.mu);
+  return await doc.save();
+}
+const money2=(n)=>"$"+nz(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function bindCrear(){
+  const st=coState();
+  const ta=document.getElementById("coTxt");if(ta)ta.oninput=()=>{st.txt=ta.value};
+  const form=document.getElementById("coForm");
+  if(form)form.querySelectorAll("[data-k]").forEach(el=>{
+    el.oninput=el.onchange=(ev)=>{st.d[el.dataset.k]=el.value;
+      if(st.pdf){st.pdf=null;st.preview=null;view.querySelectorAll('[data-act="coDl"],[data-act="coSubir"]').forEach(x=>x.remove());const im=view.querySelector('img[alt="Vista previa del PDF de la orden"]');if(im)im.parentNode.remove()}
+      if(el.dataset.k==="entrega"&&ev.type==="change"){render();return}
+      const tt=coTotal(st.d),a=document.getElementById("coTot"),c=document.getElementById("coCob");if(a)a.textContent=money(tt);if(c)c.textContent=money(Math.max(0,tt-nz(st.d.abonado)))};
+  });
+  const on=(a,fn)=>{const b=view.querySelector(`[data-act="${a}"]`);if(b)b.onclick=fn};
+  on("coMic",()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(st.rec){try{st.rec.stop()}catch(e){}return}
+    if(!SR){toast("Este navegador no tiene dictado aquí. Toca el cuadro y usa el micrófono del teclado.");ta&&ta.focus();return}
+    const r=new SR();r.lang=CFG.voiceLang||"es-US";r.continuous=true;r.interimResults=true;
+    const base=ta.value.trim()?ta.value.trim()+" ":"";let fin="";
+    r.onresult=(e)=>{let tmp="";for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=x.trim()+" ";else tmp+=x}const el=document.getElementById("coTxt");if(el){el.value=(base+fin+tmp).trimStart();st.txt=el.value}};
+    r.onerror=(e)=>{toast(e.error==="not-allowed"||e.error==="service-not-allowed"?"Dale permiso al micrófono en el navegador y toca otra vez.":e.error==="no-speech"?"No te escuché. Toca y habla otra vez.":"El dictado se detuvo. Toca otra vez para seguir.")};
+    r.onend=()=>{st.rec=null;const el=document.getElementById("coTxt");if(el)st.txt=el.value;render()};
+    try{r.start();st.rec=r;render()}catch(e){toast("No se pudo abrir el micrófono.")}
+  });
+  on("coAi",async()=>{const b=view.querySelector('[data-act="coAi"]');b.disabled=true;if(st.rec){try{st.rec.stop()}catch(e){}}await coAi();b.disabled=false});
+  on("coReset",()=>{if(st.rec){try{st.rec.stop()}catch(e){}}S.co=null;render()});
+  on("coPdf",async()=>{
+    const d=st.d;if(!d.no||!String(d.no).trim()){toast("Pon el número de orden");return}
+    if(orders().some(o=>String(o.orderNo||"").toLowerCase()===String(d.no).replace(/^#/,"").toLowerCase())){toast("Ya hay una orden con el número "+d.no);return}
+    if(coTotal(d)<=0){toast("Pon los precios en el desglose");return}
+    const b=view.querySelector('[data-act="coPdf"]');b.disabled=true;b.textContent="Armando el PDF…";
+    try{st.pdf=await coBuildPdf(d);const r=await readPdf(new File([st.pdf],"orden.pdf",{type:"application/pdf"}));st.preview=r.preview;st.pdfText=r.text;render()}
+    catch(e){b.disabled=false;b.textContent="📄 Ver PDF de la orden";toast("No pude armar el PDF. Revisa los datos e intenta otra vez.")}
+  });
+  on("coDl",()=>{const u=URL.createObjectURL(new Blob([st.pdf],{type:"application/pdf"}));const a=document.createElement("a");a.href=u;a.download=`orden-${st.d.no}.pdf`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)});
+  on("coSubir",()=>{
+    const d=st.d,file=new File([st.pdf],`orden-${d.no}.pdf`,{type:"application/pdf"});
+    const notes=[String(d.tarjeta||"").trim()?"Tarjeta: "+String(d.tarjeta).replace(/\s*\n\s*/g," / "):"",d.entrega==="domicilio"?"Domicilio: "+[d.direccion,d.recibe_nombre].filter(Boolean).join(" · "):"Recoge en tienda",d.hora?"Hora: "+d.hora:"",d.canal?"Canal: "+d.canal:"",d.metodo?"Paga: "+d.metodo:""].filter(Boolean).join(" · ");
+    S.draft={p:"of",file,pdfImg:null,pdfText:st.pdfText,preview:st.preview,fileName:file.name,orderText:st.txt.slice(0,4000),orderNo:String(d.no).replace(/^#/,""),client:d.cliente||d.recibe_nombre||"",phone:d.telefono||"",brand:d.brand||BRANDS_SELL[0],product:d.titulo,
+      natQty:String(d.nat||0),dyeQty:String(d.dye||0),extrasTxt:d.extrasTxt||"",extrasAmt:String(d.extrasAmt||0),deliveryAmt:String(d.deliveryAmt||0),total:String(coTotal(d)),paid:String(Math.min(nz(d.abonado),coTotal(d))),deliveryDay:d.fecha||today(),notes:notes.slice(0,400),leadId:""};
+    S.co=null;S.tab="ordenes";render();
+    setTimeout(()=>{const f=document.getElementById("ofForm");if(f)f.scrollIntoView({behavior:"smooth",block:"start"})},80);
+    toast("Revisa los datos y toca “Subir orden”");
+  });
+}
+
 // ---------- binding ----------
 async function copy(text){try{await navigator.clipboard.writeText(text);toast("Copiado");return true}catch(e){toast("Selecciona el texto y cópialo a mano");return false}}
 function bind(){
+  if(S.tab==="crear")bindCrear();
   view.querySelectorAll("[data-lead]").forEach(e=>{if(e.tagName==="FORM")return;e.onclick=(ev)=>{if(ev.target.closest("input,button"))return;openLead(e.dataset.lead)};e.onkeydown=(ev)=>{if(ev.key==="Enter")openLead(e.dataset.lead)}});
   view.querySelectorAll("[data-openlead]").forEach(b=>b.onclick=()=>openLead(b.dataset.openlead));
   view.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>{S.tab=b.dataset.goto;render();window.scrollTo(0,0)});
@@ -1425,7 +1645,7 @@ render();
     if(S.importing||S.dragging)return;
     const a=document.activeElement;
     if(a&&(view.contains(a)||layer.contains(a))&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)){paintTabs();return}
-    if(layer.querySelector("#dofForm")||(S.tab==="ordenes"&&S.draft)){paintTabs();return}
+    if(layer.querySelector("#dofForm")||(S.tab==="ordenes"&&S.draft)||(S.tab==="crear"&&S.co&&(S.co.txt||S.co.d||S.co.rec))){paintTabs();return}
     render();checkinTick();
   };
   for(const c of cols){

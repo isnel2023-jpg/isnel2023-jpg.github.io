@@ -192,3 +192,7 @@ img{max-width:100%}
 .errmsg{color:var(--bad);font-weight:600}
 details.adv summary{cursor:pointer;font-weight:600;color:var(--muted)}
 iframe.pdfprev{width:100%;height:70vh;border:1px solid var(--line);border-radius:10px;background:#fff}
+
+.btn.co-mic{font-size:1.05rem;padding:12px 20px}
+.btn.co-mic.rec{background:#b3261e;border-color:#b3261e;color:#fff;animation:coPulse 1.2s ease-in-out infinite}
+@keyframes coPulse{50%{opacity:.7}}
