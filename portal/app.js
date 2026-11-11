@@ -22,6 +22,19 @@ const PT = CFG.portalTitle || ("Portal de "+(CFG.shortName||CFG.displayName));
 const PCT = (Math.round(COMMISSION*1000)/10)+"%";
 const BONUS = CFG.bonus && CFG.bonus.amount ? CFG.bonus : null;
 const bonusOf = (t)=>BONUS && t>=BONUS.goal ? BONUS.amount : 0;
+const SHOW_THEME = CONTENT.length>0 && CFG.contentTheme!==false;
+const PROPOSAL = CFG.monthlyProposal===true;
+const monthLast = (m)=>m+"-"+String(new Date(Date.UTC(+m.slice(0,4),+m.slice(5,7),0)).getUTCDate()).padStart(2,"0");
+const proposalFor = (m)=>Object.values(S.days).map(d=>d&&d.proposal).find(p=>p&&p.month===m&&p.sentAt);
+function proposalBanner(){const m=today().slice(0,7),last=monthLast(m);if(proposalFor(m)||today()<addDays(last,-4))return "";
+  return `<div class="banner">📝 <b>Propuesta de venta de ${fmtMonth(m)}:</b> entrégala a más tardar el ${fmtDay(last)}. Escríbela en <b>Resumen</b>.</div>`}
+function proposalPanel(){const m=today().slice(0,7),last=monthLast(m),p=proposalFor(m);
+  return `<section class="panel"><div class="panel-h"><h2>Propuesta de venta de ${fmtMonth(m)}</h2><span class="muted">Se entrega a más tardar el ${fmtDay(last)}</span></div>
+    <p style="margin:0 0 8px">Con tu experiencia vendiendo este mes, escribe tu propuesta para vender más: qué aprendiste de los clientes, qué funcionó, qué no funcionó, qué estrategias nuevas propones y qué necesitarías para lograrlo.</p>
+    ${p?`<div class="banner">✅ Enviada a Isnel ${fmtWhen(p.sentAt)}.</div><div style="white-space:pre-wrap;margin-top:8px">${esc(p.text)}</div>`
+      :`<textarea id="propTxt" rows="9" style="width:100%" placeholder="1. Lo que aprendí este mes…&#10;2. Lo que funcionó…&#10;3. Lo que no funcionó…&#10;4. Mi propuesta para vender más…&#10;5. Lo que necesito…">${esc(S.propDraft||"")}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn pri" type="button" data-act="sendProp">Enviar propuesta a Isnel</button></div>`}
+  </section>`}
 const NAME = CFG.displayName, SHORT = CFG.shortName||CFG.displayName;
 const fmtGoal = n=>"$"+Number(n).toLocaleString("en-US");
 const contentLine = (ct,mult)=>CONTENT.map(x=>`${x.n} ${ct[x.k]||0}/${x.goal*(mult||1)}`).join(" · ");
@@ -315,7 +328,7 @@ shiftBtn.onclick=async()=>{
     if(!shiftBtn.dataset.confirm){shiftBtn.dataset.confirm="1";shiftBtn.textContent="Toca otra vez para cerrar";setTimeout(()=>{delete shiftBtn.dataset.confirm;paintClock()},4000);return}
     delete shiftBtn.dataset.confirm;d.end=Date.now();await saveDay(d);toast("Turno cerrado. Revisa y envía tu reporte.");S.tab="reporte";render()
   }
-  else if(!d.start){d.start=Date.now();d.checkins=[...(d.checkins||[]),{t:Date.now(),slot:"inicio",text:"Empecé turno"}];await saveDay(d);toast("Turno iniciado."+(CONTENT.length?" Hoy toca: "+THEMES[dow(today())].w:""))}
+  else if(!d.start){d.start=Date.now();d.checkins=[...(d.checkins||[]),{t:Date.now(),slot:"inicio",text:"Empecé turno"}];await saveDay(d);toast("Turno iniciado."+(SHOW_THEME?" Hoy toca: "+THEMES[dow(today())].w:""))}
   paintClock();
 };
 setInterval(()=>{paintClock();checkinTick()},30000);
@@ -334,7 +347,7 @@ function checkinTick(){
 function progressText(){
   const k=today(),c=callsOn(k),d=dayDoc(k),ct=d.content||{};
   const ws=weekStart(k),wk=sumTotal(salesBetween(ws,addDays(ws,6)));
-  return `${CONTENT.length?`Tema de contenido de hoy: ${THEMES[dow(k)].w}. `:""}Llamadas nuevas ${c.nw}/${GOAL_NEW}, follow-ups ${c.fu}/${GOAL_FU}, chats con clientes en inglés ${c.chats}/${GOAL_CHAT} (aparte de las llamadas), ${LEGACY?`historias Gaby ${ct.gabyStories||0}/3, post Gaby ${ct.gabyPost||0}/1, historias Ruiz ${ct.ruizStories||0}/3, post Ruiz ${ct.ruizPost||0}/1, versículo ABBA ${ct.abbaVerse||0}/1, videos ABBA ${ct.abbaVideos||0}`:contentLine(ct)}. Ventas de la semana ${money(wk)} de una meta de ${fmtGoal(SALES_GOALS.week[0])} (meta alta ${fmtGoal(SALES_GOALS.week[1])}). Follow-ups pendientes ${fuQueue().length}, leads sin llamar ${newQueue().length}.`;
+  return `${SHOW_THEME?`Tema de contenido de hoy: ${THEMES[dow(k)].w}. `:""}Llamadas nuevas ${c.nw}/${GOAL_NEW}, follow-ups ${c.fu}/${GOAL_FU}, chats con clientes en inglés ${c.chats}/${GOAL_CHAT} (aparte de las llamadas), ${LEGACY?`historias Gaby ${ct.gabyStories||0}/3, post Gaby ${ct.gabyPost||0}/1, historias Ruiz ${ct.ruizStories||0}/3, post Ruiz ${ct.ruizPost||0}/1, versículo ABBA ${ct.abbaVerse||0}/1, videos ABBA ${ct.abbaVideos||0}`:contentLine(ct)}. Ventas de la semana ${money(wk)} de una meta de ${fmtGoal(SALES_GOALS.week[0])} (meta alta ${fmtGoal(SALES_GOALS.week[1])}). Follow-ups pendientes ${fuQueue().length}, leads sin llamar ${newQueue().length}.`;
 }
 function openCheckin(slot){
   ciOpen=true;
@@ -444,7 +457,8 @@ function vHoy(){
   const ws=weekStart(k),wk=sumTotal(salesBetween(ws,addDays(ws,6)));
   const ci=(d.checkins||[]).slice().sort((a,b)=>a.t-b.t);
   return `
-  ${CONTENT.length?`<section class="theme"><div class="day">${th.d}</div><div class="what">${dow(k)===0?th.w:"Contenido de hoy: "+th.w}</div><div class="how">${th.h}</div></section>`:""}
+  ${PROPOSAL?proposalBanner():""}
+  ${SHOW_THEME?`<section class="theme"><div class="day">${th.d}</div><div class="what">${dow(k)===0?th.w:"Contenido de hoy: "+th.w}</div><div class="how">${th.h}</div></section>`:""}
   <section class="panel">${salesMeter("Ventas de esta semana",wk,SALES_GOALS.week,`Semana del ${fmtDay(ws)} al ${fmtDay(addDays(ws,6))} · ${salesBetween(ws,addDays(ws,6)).length} órdenes`)}</section>
   <section class="summary">
     <div class="stat"><span class="lbl">Llamadas hoy</span><b>${c.nw+c.fu}</b><span class="muted">${c.ans} contestaron</span></div>
@@ -461,7 +475,7 @@ function vHoy(){
         ${goalRow("Follow-ups por llamada",c.fu,GOAL_FU,"Leads que ya contactaste antes · solo cuentan con “Ya lo llamé”")}
         ${goalRow("Chats con clientes en inglés",c.chats,GOAL_CHAT,`Se cuentan aparte, no suman a las llamadas · ${c.cn} nuevos · ${c.cf} follow-ups`)}
         ${CONTENT.map(x=>goalRow(x.n,ct[x.k]||0,x.goal,x.sub,x.k)).join("")}
-        ${CONTENT.length?goalRow("Mensajes ABBA respondidos",d.abbaAnswered||0,Math.max(1,d.abbaAnswered||0),"Toca + por cada lead de ABBA que respondas","abbaAnswered"):""}
+        ${SHOW_THEME?goalRow("Mensajes ABBA respondidos",d.abbaAnswered||0,Math.max(1,d.abbaAnswered||0),"Toca + por cada lead de ABBA que respondas","abbaAnswered"):""}
       </div>
       <div class="lock">Lo que marcas queda guardado y no se puede restar. Si te equivocas, avísale a Isnel.</div>
     </section>
@@ -1082,6 +1096,7 @@ function vResumen(){
       <div class="stat hl"><span class="lbl">Total a pagar</span><b>${money(BASE_PAY+comm+bonusOf(st.total))}</b><span class="muted">sueldo base${COMMISSION?" + "+PCT+" ganado":""}${BONUS?" + bono si llegas a la meta":""}</span></div>
     </div>
   </section>
+  ${PROPOSAL&&S.month===today().slice(0,7)?proposalPanel():""}
   ${monthsCompare()}
   <section class="panel">
     <div class="panel-h"><h2>Días del mes</h2></div>
@@ -1098,7 +1113,7 @@ function vGuia(){
       <li>Cada hora (5, 6, 7 y 8 p. m.) el portal te pide un check-in corto y la IA te dice qué priorizar.</li>
       <li><b>Deja el portal abierto todo el turno.</b> Si lo cierras, no te aparece el check-in y a Isnel le llega una alerta de que no lo hiciste. Si pasa, ábrelo y usa “Hacer check-in ahora”.</li>
       <li>Entra siempre con tu contraseña personal (no la compartas). Si sale un aviso rojo de “NO SE GUARDÓ”, avísale a Isnel de inmediato.</li>
-      ${CONTENT.length?`<li>Revisa el tema de contenido del día y publica según ese tema.</li>`:""}
+      ${SHOW_THEME?`<li>Revisa el tema de contenido del día y publica según ese tema.</li>`:""}
       <li>Registra o importa los leads. Llama cada lead máximo 2 veces el mismo día.</li>
       <li>Después de llamar a un lead toca <b>“Ya lo llamé”</b> y escoge cómo te fue. Solo eso suma a la meta de llamadas; agregar el lead no cuenta como llamada. El follow-up se agenda solo (día 1, 3 y 7). Si no le interesa, va a “No interesado / frío”.</li>
       <li>Los clientes en inglés se marcan con idioma “Inglés” y se contactan por chat: toca <b>“Le escribí por chat”</b>. Los chats se cuentan aparte, no suman a las llamadas.</li>
@@ -1127,7 +1142,7 @@ function vGuia(){
   </section>
   </div>
   <div class="grid2">
-  ${CONTENT.length?`<section class="panel"><h2>Plan de contenido semanal</h2>
+  ${SHOW_THEME?`<section class="panel"><h2>Plan de contenido semanal</h2>
     <table class="t"><tbody>${[1,2,3,4,5,6,0].map(i=>`<tr style="${i===t?"background:var(--accent-soft)":""}"><td><b>${THEMES[i].d}</b></td><td>${THEMES[i].w}</td></tr>`).join("")}</tbody></table>
   </section>`:""}
   ${BRANDS_SELL.includes("Gaby Flowers")?`<section class="panel"><h2>La base de 900 leads de Gaby</h2>
@@ -1341,6 +1356,13 @@ function bind(){
     d.contentLog=[...(d.contentLog||[]),{t:Date.now(),k:key}];
     await saveDay(d);
   });
+  const pt=document.getElementById("propTxt");if(pt)pt.oninput=()=>{S.propDraft=pt.value};
+  view.querySelectorAll('[data-act="sendProp"]').forEach(b=>b.onclick=async()=>{
+    const txt=(document.getElementById("propTxt")||{}).value||"";if(txt.trim().length<40){toast("Escribe tu propuesta completa antes de enviarla.");return}
+    const m=today().slice(0,7);b.disabled=true;b.textContent="Enviando…";
+    try{await P.mcp.callTool("Gmail","send_message",{to:[ADMIN_EMAIL],subject:`📝 Propuesta de venta de ${fmtMonth(m)} · ${NAME} · ${PT}`,body:`Propuesta de venta de ${NAME} (${PT}) para ${fmtMonth(m)}:\n\n${txt.trim()}\n\nEnviada desde el portal ${fmtWhen(Date.now())}.`})}
+    catch(e){b.disabled=false;b.textContent="Enviar propuesta a Isnel";toast("No se pudo enviar. Revisa tu internet e inténtalo otra vez.");return}
+    const d={...dayDoc(today())};d.proposal={month:m,text:txt.trim(),sentAt:Date.now()};S.propDraft="";await saveDay(d);toast("Propuesta enviada a Isnel")});
   view.querySelectorAll('[data-act="newLead"]').forEach(b=>b.onclick=()=>{S.tab="leads";S.showAdd=true;render();setTimeout(()=>{const i=document.getElementById("lfName");i&&i.focus()},50)});
   view.querySelectorAll('[data-act="toggleAdd"]').forEach(b=>b.onclick=()=>{S.showAdd=!S.showAdd;S.showImport=false;render()});
   view.querySelectorAll('[data-act="toggleImport"]').forEach(b=>b.onclick=()=>{if(S.importing)return;S.showImport=!S.showImport;S.showAdd=false;render()});
