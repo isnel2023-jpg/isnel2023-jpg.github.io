@@ -268,9 +268,9 @@ function inRange(k,a,b){return !!k&&k>=a&&k<=b}
 // Extras añadidos después (s.addons): cada uno suma en ventas el día en que se añadió.
 const addSum=arr=>arr.reduce((x,e)=>x+(e.amount||0),0);
 function addonSlice(s,adds,base){
-  const ex=adds.filter(e=>e.kind!=="delivery"),dl=adds.filter(e=>e.kind==="delivery");
+  const ex=adds.filter(e=>e.kind!=="delivery"&&e.kind!=="ajuste"),dl=adds.filter(e=>e.kind==="delivery");
   if(base){const tot=s.total-addSum((s.addons||[]).filter(e=>!adds.includes(e)));return adds.length||tot!==s.total?{...s,total:tot,extras:[...(s.extras||[]),...ex.map(e=>({name:e.concept}))],extrasAmt:(s.extrasAmt||0)+addSum(ex),deliveryAmt:(s.deliveryAmt||0)+addSum(dl)}:s}
-  return {...s,_addonOnly:true,_full:s.total,saleDay:adds[0].day,total:addSum(adds),natQty:0,dyeQty:0,extras:ex.map(e=>({name:e.concept})),extrasAmt:addSum(ex),deliveryAmt:addSum(dl),product:"EXTRA añadido: "+adds.map(e=>e.concept+" "+money(e.amount)).join(", ")};
+  return {...s,_addonOnly:true,_full:s.total,saleDay:adds[0].day,total:addSum(adds),natQty:0,dyeQty:0,extras:ex.map(e=>({name:e.concept})),extrasAmt:addSum(ex),deliveryAmt:addSum(dl),product:(adds.every(e=>e.kind==="ajuste")?"AJUSTE: ":"EXTRA añadido: ")+adds.map(e=>e.concept+" "+money(e.amount)).join(", ")};
 }
 function salesBetween(a,b){
   const out=[];
@@ -632,10 +632,11 @@ function orderRow(s){
     <div class="s">${esc(s.brand)}${s.product?" · "+esc(s.product):""} · entrega ${s.deliveryDay?relDay(s.deliveryDay):"sin fecha"}${s.delivered?" · entregada":""}</div>
     ${orderLine(s)?`<div class="s">${esc(orderLine(s))}</div>`:""}
     <div class="s" style="white-space:normal"><b>Total ${money(s.total)}</b> · ${pend?`pagó ${money(s.paid)} · falta ${money(s.total-s.paid)}`:`pagó ${money(s.paid)} completo · pagada ${relDay(s.paidDay)}${comm?` · +${money(comm)} comisión`:""}`}${(s.payments||[]).length>1?` · pagos: ${(s.payments||[]).map(p=>money(p.amount)+" "+relDay(dayKey(p.t))).join(", ")}`:""}</div>
-    ${(s.addons||[]).length?`<div class="s" style="white-space:normal">Extras añadidos: ${(s.addons||[]).map(e=>`${esc(e.concept)} ${money(e.amount)} (${relDay(e.day)}${e.paidNow||e.settledDay?", pagado":", por cobrar"})`).join(" · ")}</div>`:""}</div>
+    ${(s.addons||[]).filter(e=>e.kind!=="ajuste").length?`<div class="s" style="white-space:normal">Extras añadidos: ${(s.addons||[]).filter(e=>e.kind!=="ajuste").map(e=>`${esc(e.concept)} ${money(e.amount)} (${relDay(e.day)}${e.paidNow||e.settledDay?", pagado":", por cobrar"})`).join(" · ")}</div>`:""}${(s.addons||[]).filter(e=>e.kind==="ajuste").length?`<div class="s" style="white-space:normal;color:var(--bad)">Ajustes: ${(s.addons||[]).filter(e=>e.kind==="ajuste").map(e=>`${esc(e.concept)} −${money(-e.amount)} (${relDay(e.day)})`).join(" · ")}${(s.payments||[]).some(p=>p.refund)?` · devuelto al cliente ${money(-(s.payments||[]).filter(p=>p.refund).reduce((a,p)=>a+p.amount,0))}`:""}</div>`:""}</div>
     ${s.status==="cancelada"?`<div class="s" style="white-space:normal;color:var(--bad)"><b>Cancelada ${s.cancelDay?relDay(s.cancelDay):""}</b>${s.cancelReason?" · "+esc(s.cancelReason):""} · se restó ${money(s.total)} de las ventas${s.paid?` · había pagado ${money(s.paid)}`:""}</div>`:""}
     <div class="acts">${s.status==="cancelada"?`<span class="pill bad">Cancelada</span>`:`${pend?`<span class="pill warn">Por cobrar</span><button class="btn sm" type="button" data-pay="${s.id}">Registrar pago</button>`:`<span class="pill on">Pagada</span>`}
     <button class="btn sm" type="button" data-addon="${s.id}">+ Añadir extra</button>
+    <button class="btn sm" type="button" data-ajuste="${s.id}">− Restar dinero</button>
     ${s.delivered?"":`<button class="btn sm ghost" type="button" data-deliv="${s.id}">Marcar entregada</button>`}`}</div></div>`;
 }
 function productionText(k){
@@ -646,7 +647,8 @@ function productionText(k){
     if(s.product)lines.push(`   Pedido: ${s.product}`);
     if(s.natQty||s.dyeQty)lines.push(`   Rosas: ${s.natQty||0} naturales · ${s.dyeQty||0} tinturadas`);
     if((s.extras||[]).length)lines.push(`   Extras: ${s.extras.map(e=>e.name).join(", ")}`);
-    if((s.addons||[]).filter(e=>e.kind!=="delivery").length)lines.push(`   Extras añadidos después: ${s.addons.filter(e=>e.kind!=="delivery").map(e=>e.concept).join(", ")}`);
+    if((s.addons||[]).filter(e=>e.kind!=="delivery"&&e.kind!=="ajuste").length)lines.push(`   Extras añadidos después: ${s.addons.filter(e=>e.kind!=="delivery"&&e.kind!=="ajuste").map(e=>e.concept).join(", ")}`);
+    if((s.addons||[]).some(e=>e.kind==="ajuste"))lines.push(`   OJO, ajustes: ${s.addons.filter(e=>e.kind==="ajuste").map(e=>e.concept).join(", ")}`);
     if(s.notes)lines.push(`   Detalles: ${s.notes}`);
     lines.push(`   Total ${money(s.total)} · Pagado ${money(s.paid)} · ${s.status==="pagada"?"PAGADA":"POR COBRAR "+money(s.total-s.paid)}`);
     lines.push(``);
@@ -1562,6 +1564,47 @@ function bindCrear(){
   });
 }
 
+// ---------- restar dinero a una orden (errores, devoluciones, descuentos) ----------
+// Se guarda como un "ajuste": un extra con monto negativo (kind "ajuste"). Resta del total,
+// de las ventas del día en que se hace y de la comisión. Si el cliente ya había pagado más
+// que el nuevo total, se registra la devolución como un pago negativo (refund).
+// Siempre pide el código de Isnel (el servidor lo exige para cualquier cambio de total).
+const AJ_TIPOS = ["Error en la orden","Devolución","Descuento","Producto dañado o faltante","Entrega tarde","Otro"];
+function ajusteModal(s){
+  if(!s)return;
+  layer.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="ajT"><div class="card2">
+    <h2 id="ajT">Restar dinero · orden ${esc(ordNo(s))} · ${esc(s.client)}</h2>
+    <p class="muted" style="margin:0">Para errores, devoluciones o descuentos sobre una orden que ya existe. Se resta del total de la orden y de las ventas de <b>hoy</b>${COMMISSION?", y también de la comisión":""}. Necesita el código de Isnel.</p>
+    <p class="muted" style="margin:0">Total actual ${money(s.total)} · pagó ${money(s.paid)}${s.total>s.paid?" · falta "+money(s.total-s.paid):" · pagada completa"}.</p>
+    <div class="fld"><label for="ajK">Motivo</label><select id="ajK">${AJ_TIPOS.map(x=>`<option>${x}</option>`).join("")}</select></div>
+    <div class="fld"><label for="ajC">Qué pasó</label><input id="ajC" placeholder="Ej: faltaron 20 rosas, se le descuentan"></div>
+    <div class="fld"><label for="ajA">Monto a restar (USD)</label><input id="ajA" type="number" min="0" step="0.01" max="${s.total}" placeholder="20"></div>
+    <div id="ajRes" class="banner" style="background:var(--sunk);color:var(--ink)">Escribe el monto para ver cómo queda la orden.</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" type="button" id="ajNo">Cancelar</button><button class="btn pri" type="button" id="ajOk">Restar y pedir código</button></div></div></div>`;
+  const $=(id)=>document.getElementById(id);
+  const calc=()=>{const amt=Math.min(nz($("ajA").value),s.total),nt=s.total-amt,refund=Math.max(0,s.paid-nt);return {amt,nt,refund,np:s.paid-refund}};
+  const paint=()=>{const c=calc();if(c.amt<=0){$("ajRes").textContent="Escribe el monto para ver cómo queda la orden.";return}
+    $("ajRes").innerHTML=`Nuevo total <b>${money(c.nt)}</b> (antes ${money(s.total)}) · ${c.refund>0?`<b style="color:var(--bad)">hay que devolverle ${money(c.refund)} al cliente</b>`:c.np>=c.nt?"queda pagada completa":`falta cobrar <b>${money(c.nt-c.np)}</b>`}`};
+  $("ajA").oninput=paint;
+  $("ajNo").onclick=()=>{layer.innerHTML=""};
+  $("ajOk").onclick=async()=>{
+    const tipo=$("ajK").value,desc=$("ajC").value.trim(),c=calc();
+    if(!desc){$("ajC").focus();toast("Cuenta qué pasó");return}
+    if(c.amt<=0){$("ajA").focus();return}
+    if(nz($("ajA").value)>s.total){toast("No puedes restar más que el total de la orden");$("ajA").focus();return}
+    layer.innerHTML="";
+    const k=today(),t=Date.now(),sep=!!s.paidDay;
+    const e={t,day:k,concept:`${tipo}: ${desc}`,kind:"ajuste",reason:tipo,amount:-c.amt,paidNow:sep,sep,settledDay:sep?k:null};
+    const n={...s,total:c.nt,addons:[...(s.addons||[]),e],log:[...(s.log||[]),{t,text:`Ajuste: ${tipo} · ${desc} · −${money(c.amt)} · total ${money(c.nt)}${c.refund>0?` · devolución al cliente ${money(c.refund)}`:""}`}]};
+    if(c.refund>0){n.paid=c.np;n.payments=[...(s.payments||[]),{t,amount:-c.refund,refund:true}]}
+    if(n.paid>=n.total){n.status="pagada";n.paidDay=s.paidDay||k}else n.status="pendiente";
+    S.sales[n.id]=n;render();const ok=await save("sales",n);
+    if(ok){toast(`Ajuste guardado · orden ahora en ${money(n.total)}${c.refund>0?" · devolver "+money(c.refund):n.status==="pagada"?"":" · falta "+money(n.total-n.paid)}`);
+      try{await P.mcp.callTool("Gmail","send_message",{to:[ADMIN_EMAIL],subject:`${PORTAL_NAME} · Ajuste aplicado a la orden ${ordNo(n)} (${n.client}) −${money(c.amt)}`,
+        body:[`Se aplicó el ajuste que autorizaste con tu código.`,``,`Orden: ${ordNo(n)} · ${n.client}${n.phone?" · "+n.phone:""} · ${n.brand}`,`Motivo: ${tipo}`,`Qué pasó: ${desc}`,`Monto restado: ${money(c.amt)}`,`Total: ${money(s.total)} → ${money(n.total)}`,c.refund>0?`DEVOLVER AL CLIENTE: ${money(c.refund)}`:`Pagado ${money(n.paid)}${n.status==="pagada"?" · pagada completa":" · falta "+money(n.total-n.paid)}`,`Cuándo: ${fmtWhen(t)}`,``,`Al final de este correo el servidor anota quién lo hizo.`].join("\n")})}catch(x){}}
+  };
+}
+
 // ---------- binding ----------
 async function copy(text){try{await navigator.clipboard.writeText(text);toast("Copiado");return true}catch(e){toast("Selecciona el texto y cópialo a mano");return false}}
 function bind(){
@@ -1593,6 +1636,7 @@ function bind(){
   view.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>payModal(S.sales[b.dataset.pay]));
   view.querySelectorAll("[data-viewfile]").forEach(b=>b.onclick=()=>viewFile(S.sales[b.dataset.viewfile]));
   view.querySelectorAll("[data-addon]").forEach(b=>b.onclick=()=>addonModal(S.sales[b.dataset.addon]));
+  view.querySelectorAll("[data-ajuste]").forEach(b=>b.onclick=()=>ajusteModal(S.sales[b.dataset.ajuste]));
   view.querySelectorAll("[data-paidfull]").forEach(b=>b.onclick=()=>{const s=S.sales[b.dataset.paidfull];if(s)markPaidFull(s)});
   view.querySelectorAll("[data-snooze]").forEach(b=>b.onclick=async()=>{const s=S.sales[b.dataset.snooze];if(!s)return;const n={...s,snoozeDay:today(),log:[...(s.log||[]),{t:Date.now(),text:"Aún sin pago completo"}]};S.sales[n.id]=n;render();await save("sales",n);toast("Te lo vuelvo a preguntar mañana")});
   view.querySelectorAll("[data-deliv]").forEach(b=>b.onclick=async()=>{const s=S.sales[b.dataset.deliv];if(!s)return;const n={...s,delivered:true,deliveredDay:today(),log:[...(s.log||[]),{t:Date.now(),text:"Entregada"}]};S.sales[n.id]=n;render();await save("sales",n);toast(n.status==="pagada"?"Entregada":"Entregada · sigue por cobrar "+money(n.total-n.paid))});
