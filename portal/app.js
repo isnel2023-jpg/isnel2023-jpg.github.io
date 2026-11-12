@@ -1509,10 +1509,12 @@ async function coBuildPdf(d){
   const need=()=>{};
   const sec=(s)=>{need(34);y-=4;sp(s,M,y,F.hb,9,C.ac,1.8);hl(y-5,.8);y-=21};
   const brand=d.brand||BRANDS_SELL[0];
+  const logo=(CFG.orderLogos||{})[brand]||(brand===BRANDS_SELL[0]?CFG.orderLogo:null);
+  const seller=(P&&P.me&&P.me.role==="admin")?(P.me.name||"Isnel"):SHORT;
   // encabezado
   let top=y;
-  if(CFG.orderLogo){
-    try{const png=await doc.embedPng(await (await fetch(CFG.orderLogo)).arrayBuffer());const h=72,w=png.width*h/png.height;pg.drawImage(png,{x:M,y:top-h,width:w,height:h});sp("ORDEN DE TALLER",M,top-h-14,F.hb,9,C.mu,2.2);y=top-h-24}
+  if(logo){
+    try{const png=await doc.embedPng(await (await fetch(logo)).arrayBuffer());const h=72,w=png.width*h/png.height;pg.drawImage(png,{x:M,y:top-h,width:w,height:h});sp("ORDEN DE TALLER",M,top-h-14,F.hb,9,C.mu,2.2);y=top-h-24}
     catch(e){t(brand,M,top-22,F.tb,26,C.ac);sp("ORDEN DE TALLER",M,top-38,F.hb,9,C.mu,2.2);y=top-50}
   }else{t(brand,M,top-22,F.tb,26,C.ac);sp("ORDEN DE TALLER",M,top-38,F.hb,9,C.mu,2.2);y=top-50}
   tr("Orden",top-6,F.h,11);tr("#"+d.no,top-28,F.hb,20);tr("Recibida: "+coFecha(today()).replace(/ \(.*\)$/,""),top-44,F.h,10);
@@ -1563,8 +1565,8 @@ async function coBuildPdf(d){
   const pill=cob>0?`COBRAR ${money2(cob)}${d.metodo?" · "+d.metodo.toUpperCase():""} ${cuando}`:"PAGADO";
   const pw=wd(pill,F.hb,9)+pill.length*0.6+20;
   pg.drawRectangle({x:M,y:y-6,width:pw,height:20,color:cob>0?C.red:C.ac});sp(pill,M+10,y,F.hb,9,C.wh,.6);
-  if(d.canal){const s="Canal: "+d.canal;t(s,(M+pw+R-wd("Vendedor: "+SHORT,F.h,9))/2-wd(s,F.h,9)/2,y,F.h,9,C.mu)}
-  tr("Vendedor: "+SHORT,y,F.h,9,C.mu);
+  if(d.canal){const s="Canal: "+d.canal;t(s,(M+pw+R-wd("Vendedor: "+seller,F.h,9))/2-wd(s,F.h,9)/2,y,F.h,9,C.mu)}
+  tr("Vendedor: "+seller,y,F.h,9,C.mu);
   // una sola hoja carta: si no cabe, se reduce todo en proporción
   const bottom=Math.max(0,y-26),h=H-bottom,sc=Math.min(1,792/h);
   const out=await PDFDocument.create();out.setTitle("Orden #"+d.no+" · "+brand);
