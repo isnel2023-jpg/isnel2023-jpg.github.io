@@ -150,7 +150,7 @@
   function workerForm(w, portalId) {
     const c = w ? Object.assign({ tz: "America/Bogota", tzLabel: "Colombia", tzOffsetHours: -5, commission: 0.02, basePay: 300, commissionBrands: [], salesGoals: { week: [5000, 7500], month: [20000, 30000] }, goals: { newCalls: 50, followUps: 50, chats: 50 }, shiftStartHour: 16, shiftEndHour: 20, checkHours: [17, 18, 19, 20], workDays: [1, 2, 3, 4, 5], content: [], docsLinks: [], jobs: { startCheck: true, checkins: true, daily: true, weekly2: true } }, w.config) : { tz: "America/Bogota", tzLabel: "Colombia", tzOffsetHours: -5, commission: 0.02, basePay: 300, brands: ["Gaby Flowers", "ABBA Roses"], commissionBrands: ["Gaby Flowers"], salesGoals: { week: [5000, 7500], month: [20000, 30000] }, goals: { newCalls: 50, followUps: 50, chats: 50 }, shiftStartHour: 16, shiftEndHour: 20, checkHours: [17, 18, 19, 20], workDays: [1, 2, 3, 4, 5], content: [], docsLinks: [], jobs: { startCheck: true, checkins: true, daily: true, weekly2: true, gaby15: false } };
     const box = document.getElementById("wForm");
-    const contentTxt = (c.content || []).map((x) => `${x.k} | ${x.n} | ${x.goal}${x.sub ? " | " + x.sub : ""}`).join("\n");
+    const contentTxt = (c.content || []).map((x) => `${x.k} | ${x.n} | ${x.goal} | ${x.sub || ""}${x.from || x.to ? " | " + (x.from || "") + " | " + (x.to || "") : ""}`.replace(/ \| $/, "")).join("\n");
     const docsTxt = (c.docsLinks || []).map((x) => `${x.t} | ${x.url} | ${x.s || ""}`).join("\n");
     box.innerHTML = `<form class="f panel" id="wf" style="background:var(--sunk)">
       <h3 class="full">${w ? "Metas y ajustes de " + esc(w.name) : "Nuevo colaborador · " + esc((W.find((x) => x.id === portalId) || {}).name || "")}</h3>
@@ -169,7 +169,7 @@
       <div class="fld"><label for="fW0">Ventas semana: base / alta</label><div style="display:flex;gap:6px"><input id="fW0" type="number" min="0" value="${c.salesGoals.week[0]}"><input id="fW1" type="number" min="0" value="${c.salesGoals.week[1]}"></div></div>
       <div class="fld"><label for="fM0">Ventas mes: base / alta</label><div style="display:flex;gap:6px"><input id="fM0" type="number" min="0" value="${c.salesGoals.month[0]}"><input id="fM1" type="number" min="0" value="${c.salesGoals.month[1]}"></div></div>
       <div class="fld"><label for="fGn">Llamadas nuevas / follow-ups / chats al día</label><div style="display:flex;gap:6px"><input id="fGn" type="number" min="0" value="${c.goals.newCalls}"><input id="fGf" type="number" min="0" value="${c.goals.followUps}"><input id="fGc" type="number" min="0" value="${c.goals.chats}"></div></div>
-      <div class="fld full"><label for="fCt">Metas de contenido (una por línea: clave | nombre | meta diaria | nota)</label><textarea id="fCt" rows="5" placeholder="gabyStories | Historias Gaby Flowers | 3">${esc(contentTxt)}</textarea></div>
+      <div class="fld full"><label for="fCt">Tareas personales (una por línea: clave | nombre | meta diaria | nota | desde AAAA-MM-DD | hasta AAAA-MM-DD)</label><textarea id="fCt" rows="7" placeholder="gabyStories | Historias Gaby Flowers | 3">${esc(contentTxt)}</textarea></div>
       <div class="fld full"><label for="fDl">Documentos en la Guía (una por línea: título | https://… | descripción)</label><textarea id="fDl" rows="3">${esc(docsTxt)}</textarea></div>
       <div class="sep lbl">Correos automáticos para ti</div>
       ${[["startCheck", "¿Empezó turno?"], ["checkins", "Check-ins por hora"], ["daily", "Cierre del día"], ["weekly2", "Corte semanal de comisión (PDF, domingos)"]].map(([k, l]) => `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="fj_${k}" ${c.jobs && c.jobs[k] ? "checked" : ""}> ${l}</label>`).join("")}
@@ -182,7 +182,7 @@
       e.preventDefault();
       const tz = TZS.find((t) => t.at === undefined && t[0] === g("fTz").value) || TZS[0];
       const list = (s) => s.split(",").map((x) => x.trim()).filter(Boolean);
-      const content = g("fCt").value.split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((p) => p[0] && p[1]).map(([k, n, goal, sub]) => ({ k: k.replace(/[^\w]/g, "").slice(0, 30), n, goal: Math.max(0, parseInt(goal, 10) || 1), ...(sub ? { sub } : {}) }));
+      const content = g("fCt").value.split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((p) => p[0] && p[1]).map(([k, n, goal, sub, from, to]) => ({ k: k.replace(/[^\w]/g, "").slice(0, 30), n, goal: Math.max(0, parseInt(goal, 10) || 1), ...(sub ? { sub } : {}), ...(/^\d{4}-\d{2}-\d{2}$/.test(from || "") ? { from } : {}), ...(/^\d{4}-\d{2}-\d{2}$/.test(to || "") ? { to } : {}) }));
       const docsLinks = g("fDl").value.split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((p) => p[0] && /^https:\/\//.test(p[1] || "")).map(([t, url, s]) => ({ t, url, s: s || "" }));
       const n = (id) => Number(g(id).value) || 0;
       const config = {

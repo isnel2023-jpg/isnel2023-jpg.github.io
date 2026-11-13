@@ -13,7 +13,7 @@ const STAGES = {
   vendido:{n:"Vendido",c:"on"}, frio:{n:"No interesado / frío",c:"bad"}
 };
 const PRIORITY = {pendiente_pago:0, interesado:1, contactado:2, sin_respuesta:3, nuevo:4, frio:9, vendido:9};
-const CONTENT = CFG.content;
+const CONTENT = (CFG.content||[]).filter(x=>{const k=new Date(Date.now()+(CFG.tzOffsetHours||0)*3600e3).toISOString().slice(0,10);return (!x.from||x.from<=k)&&(!x.to||x.to>=k)}); // tareas vigentes hoy
 const GOAL_NEW = CFG.goals.newCalls, GOAL_FU = CFG.goals.followUps, GOAL_CHAT = CFG.goals.chats;
 const LEGACY = CFG.legacyTexts===true;
 const ME = CFG.__member||null, LEGO = CFG.legacyOwner||null;
