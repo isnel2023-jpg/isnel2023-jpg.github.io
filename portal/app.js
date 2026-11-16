@@ -308,7 +308,7 @@ function newQueue(){
 }
 function tasksDue(){const end=atHour(addDays(today(),1),0);return Object.values(S.tasks).filter(t=>!t.done&&t.due&&t.due<end)}
 function confirmQueue(){const k=today();return orders().filter(s=>s.status!=="pagada"&&s.deliveryDay&&s.deliveryDay<=k&&s.snoozeDay!==k).sort((a,b)=>a.deliveryDay.localeCompare(b.deliveryDay))}
-function ordersFor(k){return orders().filter(s=>s.deliveryDay===k).sort((a,b)=>a.created-b.created)}
+function ordersFor(k){return orders().filter(s=>s.deliveryDay===k&&!s.delivered).sort((a,b)=>a.created-b.created)} // ya entregadas no van a producción
 function openTasksFor(id){return Object.values(S.tasks).filter(t=>!t.done&&t.leadId===id).length}
 function weeklySentFor(ws){const sun=addDays(ws,6);return dayDoc(sun).weeklySent||null}
 
@@ -380,7 +380,7 @@ function openCheckin(slot){
 }
 
 // ---------- tabs ----------
-const TABS=[["hoy","Hoy"],["leads","Leads"],["ordenes","Órdenes"],...(CFG.orderCreator?[["crear","Crear orden"]]:[]),["tareas","Tareas"],["reporte","Reporte"],["resumen","Resumen"],["historial","Historial"],["guia","Guía"]];
+const TABS=[["hoy","Hoy"],["leads","Leads"],["ordenes","Órdenes"],...(CFG.orderCreator?[["crear","Crear orden"]]:[]),["reporte","Reporte"],["resumen","Resumen"],["historial","Historial"],["guia","Guía"]];
 function paintTabs(){
   const k=today();
   const badges={hoy:fuQueue().length,ordenes:confirmQueue().length,tareas:tasksDue().length,reporte:(dow(k)===0&&!weeklySentFor(weekStart(k)))?1:0,historial:Object.keys(H.alerts).length};
@@ -418,10 +418,11 @@ function goalRow(name,val,goal,sub,key){
 function salesMeter(title,val,goals,sub){
   const top=goals[1]*1.0;const pct=v=>Math.min(100,v/top*100);
   const hitBase=val>=goals[0],hitTop=val>=goals[1];
-  const status=hitTop?`<span class="pill on">Meta alta lograda</span>`:hitBase?`<span class="pill on">Meta base lograda · faltan ${money(goals[1]-val)} para la alta</span>`:`<span class="pill warn">Faltan ${money(goals[0]-val)} para la meta base</span>`;
+  const one=goals[0]>=goals[1];
+  const status=one?(hitTop?`<span class="pill on">Meta lograda</span>`:`<span class="pill warn">Faltan ${money(goals[1]-val)} para la meta</span>`):hitTop?`<span class="pill on">Meta alta lograda</span>`:hitBase?`<span class="pill on">Meta base lograda · faltan ${money(goals[1]-val)} para la alta</span>`:`<span class="pill warn">Faltan ${money(goals[0]-val)} para la meta base</span>`;
   return `<div class="meter"><div class="head"><div><div class="lbl">${esc(title)}</div><div class="big">${money(val)}</div>${sub?`<div class="muted" style="font-size:.85rem">${sub}</div>`:""}</div>${status}</div>
-    <div class="track" role="img" aria-label="${esc(title)}: ${money(val)} de ${money(goals[0])} y ${money(goals[1])}"><div class="fill ${hitBase?"base":""}" style="width:${pct(val)}%"></div><div class="tick" style="left:${pct(goals[0])}%"></div><div class="tick" style="left:calc(100% - 2px)"></div></div>
-    <div class="ticks"><span style="left:${pct(goals[0])}%">Meta base<br><b class="num">${money(goals[0])}</b></span><span style="left:100%">Meta alta<br><b class="num">${money(goals[1])}</b></span></div></div>`;
+    <div class="track" role="img" aria-label="${esc(title)}: ${money(val)} de ${money(goals[0])} y ${money(goals[1])}"><div class="fill ${hitBase?"base":""}" style="width:${pct(val)}%"></div>${one?"":`<div class="tick" style="left:${pct(goals[0])}%"></div>`}<div class="tick" style="left:calc(100% - 2px)"></div></div>
+    <div class="ticks">${one?`<span style="left:100%">Meta<br><b class="num">${money(goals[1])}</b></span>`:`<span style="left:${pct(goals[0])}%">Meta base<br><b class="num">${money(goals[0])}</b></span><span style="left:100%">Meta alta<br><b class="num">${money(goals[1])}</b></span>`}</div></div>`;
 }
 // ---------- leads sin nombre: consecutivo "Cliente #N" por orden de creación ----------
 const NONAME=/^\s*(n\.?\s*n\.?|sin\s*nombre|no\s*name|-+|\.+|x+|\?+)\s*$/i;
@@ -485,7 +486,7 @@ function vHoy(){
       <div class="list">${fq.length?fq.slice(0,12).map(l=>leadRow(l,l.nextFU<Date.now()?"late":"due")).join("")+(fq.length>12?`<button class="more" type="button" data-goto="leads">Ver los ${fq.length} en el tablero</button>`:""):`<div class="empty">No hay follow-ups agendados para hoy.</div>`}</div>
       <span class="lbl">Leads sin llamar (${nq.length})</span>
       <div class="list">${nq.length?nq.slice(0,12).map(l=>leadRow(l)).join("")+(nq.length>12?`<button class="more" type="button" data-goto="leads">Ver los ${nq.length} en el tablero</button>`:""):`<div class="empty">No hay leads pendientes de llamar. Agrega o importa la base desde Leads.</div>`}</div>
-      ${td.length?`<span class="lbl">Tareas para hoy (${td.length})</span><div class="list">${td.map(taskRow).join("")}</div>`:""}
+
     </section>
   </div>
   <section class="panel">
@@ -1073,7 +1074,7 @@ function vResumen(){
   <section class="panel">
     <div class="panel-h"><h2>Ventas de ${fmtMonth(m)}</h2><select id="mSel" aria-label="Mes">${months.map(x=>`<option value="${x}" ${x===m?"selected":""}>${fmtMonth(x)}</option>`).join("")}</select></div>
     ${salesMeter("Ventas del mes",st.total,SALES_GOALS.month,`${sold.length} órdenes · ticket promedio ${money(st.ticket)}`)}
-    <div class="scroll"><table class="t"><thead><tr><th>Semana</th><th class="r">Vendido</th><th>Meta (${fmtGoal(SALES_GOALS.week[0])} / ${fmtGoal(SALES_GOALS.week[1])})</th><th>Reporte</th></tr></thead><tbody>${wrows}</tbody></table></div>
+    <div class="scroll"><table class="t"><thead><tr><th>Semana</th><th class="r">Vendido</th><th>Meta (${SALES_GOALS.week[0]>=SALES_GOALS.week[1]?fmtGoal(SALES_GOALS.week[1]):fmtGoal(SALES_GOALS.week[0])+" / "+fmtGoal(SALES_GOALS.week[1])})</th><th>Reporte</th></tr></thead><tbody>${wrows}</tbody></table></div>
   </section>
   <section class="panel">
     <div class="panel-h"><h2>Qué se vendió</h2><span class="muted">${fmtMonth(m)}</span></div>
@@ -1129,7 +1130,7 @@ function vGuia(){
   <section class="panel"><h2>Metas de ventas</h2>
     <table class="t"><thead><tr><th></th><th class="r">Semana</th><th class="r">Mes</th></tr></thead><tbody>
     <tr><td>Meta base</td><td class="r">${fmtGoal(SALES_GOALS.week[0])}</td><td class="r">${fmtGoal(SALES_GOALS.month[0])}</td></tr>
-    <tr><td>Meta alta</td><td class="r">${fmtGoal(SALES_GOALS.week[1])}</td><td class="r">${fmtGoal(SALES_GOALS.month[1])}</td></tr></tbody></table>
+    ${SALES_GOALS.week[0]>=SALES_GOALS.week[1]&&SALES_GOALS.month[0]>=SALES_GOALS.month[1]?"":`<tr><td>Meta alta</td><td class="r">${fmtGoal(SALES_GOALS.week[1])}</td><td class="r">${fmtGoal(SALES_GOALS.month[1])}</td></tr>`}</tbody></table>
     <p class="muted" style="margin:0;font-size:.85rem">Se cuenta el total de cada orden subida, en la semana de lunes a domingo.</p>
   </section>
   <section class="panel"><h2>Metas diarias</h2>
@@ -1206,7 +1207,7 @@ function openLead(id,keep){
       <div class="fld"><label for="dlNote">Nota rápida</label><div style="display:flex;gap:6px"><input id="dlNote" placeholder="Quiere rosas amarillas, entrega el viernes"><button class="btn sm" type="button" data-act="addNote">Guardar</button></div></div>
       <div class="fld"><label for="dlNext">Próximo follow-up (hora Colombia)</label><div style="display:flex;gap:6px"><input id="dlNext" type="datetime-local" value="${msToLocalInput(l.nextFU)}"><button class="btn sm" type="button" data-act="setNext">Agendar</button></div>
         <div class="chips" style="margin-top:4px"><button class="chip" type="button" data-quick="2h">En 2 horas</button><button class="chip" type="button" data-quick="tom">Mañana 4 p. m.</button><button class="chip" type="button" data-quick="3d">En 3 días</button></div></div>
-      <div class="fld"><label for="dlTask">Tarea para este lead</label><div style="display:flex;gap:6px;flex-wrap:wrap"><input id="dlTask" placeholder="Mandarle fotos de ramos amarillos" style="flex:1;min-width:160px"><input id="dlTaskDue" type="datetime-local" value="${msToLocalInput(atHour(addDays(today(),1),16))}" style="width:auto" aria-label="Fecha de la tarea"><button class="btn sm" type="button" data-act="addTask">Agregar</button></div></div>
+      
       <div class="fld"><label for="dlStage">Etapa</label><select id="dlStage">${Object.entries(STAGES).map(([k2,v])=>`<option value="${k2}" ${l.stage===k2?"selected":""}>${v.n}</option>`).join("")}</select></div>
       ${S.sample?`<div><button class="btn sm" type="button" data-act="aiMsg">Redactar WhatsApp con IA</button><div id="aiOut" style="margin-top:8px"></div></div>`:""}
       <div><span class="lbl">Historial</span><div class="hist" style="margin-top:6px">${hist.length?hist.map(h=>`<div><span class="when">${fmtWhen(h.t)}</span><span>${esc(h.text)}</span></div>`).join(""):`<span class="muted">Sin actividad todavía.</span>`}</div></div>
@@ -1257,7 +1258,7 @@ function bindDrawer(l){
   const q=(s)=>layer.querySelector(s);
   q('[data-act="addNote"]').onclick=async()=>{const v=q("#dlNote").value.trim();if(!v)return;const n={...l,history:[...(l.history||[]),{t:Date.now(),day:today(),kind:"note",text:v}],notes:(l.notes?l.notes+" · ":"")+v};S.leads[n.id]=n;q("#dlNote").blur();render();await save("leads",n);toast("Nota guardada")};
   q('[data-act="setNext"]').onclick=async()=>{const ms=localInputToMs(q("#dlNext").value);if(!ms)return;q("#dlNext").blur();await setNext(l,ms)};
-  q('[data-act="addTask"]').onclick=async()=>{const v=q("#dlTask").value.trim();if(!v)return;const t={id:uid(),title:v,due:localInputToMs(q("#dlTaskDue").value),leadId:l.id,done:false,created:Date.now()};S.tasks[t.id]=t;q("#dlTask").blur();render();await save("tasks",t);toast("Tarea agregada")};
+  if(q('[data-act="addTask"]'))q('[data-act="addTask"]').onclick=async()=>{const v=q("#dlTask").value.trim();if(!v)return;const t={id:uid(),title:v,due:localInputToMs(q("#dlTaskDue").value),leadId:l.id,done:false,created:Date.now()};S.tasks[t.id]=t;q("#dlTask").blur();render();await save("tasks",t);toast("Tarea agregada")};
   layer.querySelectorAll("[data-quick]").forEach(b=>b.onclick=()=>{const t=b.dataset.quick;setNext(l,t==="2h"?Date.now()+2*3600e3:t==="tom"?atHour(addDays(today(),1),16):atHour(addDays(today(),3),16))});
   q("#dlStage").onchange=async(e)=>{e.target.blur();await changeStage(l,e.target.value)};
   layer.querySelectorAll("[data-copytxt]").forEach(b=>b.onclick=()=>copy(b.dataset.copytxt));
