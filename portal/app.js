@@ -1129,7 +1129,7 @@ function vGuia(){
   <div class="grid2">
   <section class="panel"><h2>Metas de ventas</h2>
     <table class="t"><thead><tr><th></th><th class="r">Semana</th><th class="r">Mes</th></tr></thead><tbody>
-    <tr><td>Meta base</td><td class="r">${fmtGoal(SALES_GOALS.week[0])}</td><td class="r">${fmtGoal(SALES_GOALS.month[0])}</td></tr>
+    <tr><td>${SALES_GOALS.week[0]>=SALES_GOALS.week[1]&&SALES_GOALS.month[0]>=SALES_GOALS.month[1]?"Meta":"Meta base"}</td><td class="r">${fmtGoal(SALES_GOALS.week[0])}</td><td class="r">${fmtGoal(SALES_GOALS.month[0])}</td></tr>
     ${SALES_GOALS.week[0]>=SALES_GOALS.week[1]&&SALES_GOALS.month[0]>=SALES_GOALS.month[1]?"":`<tr><td>Meta alta</td><td class="r">${fmtGoal(SALES_GOALS.week[1])}</td><td class="r">${fmtGoal(SALES_GOALS.month[1])}</td></tr>`}</tbody></table>
     <p class="muted" style="margin:0;font-size:.85rem">Se cuenta el total de cada orden subida, en la semana de lunes a domingo.</p>
   </section>
