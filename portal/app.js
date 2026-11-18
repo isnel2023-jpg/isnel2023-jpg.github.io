@@ -463,7 +463,7 @@ function vHoy(){
   <section class="panel">${salesMeter("Ventas de esta semana",wk,SALES_GOALS.week,`Semana del ${fmtDay(ws)} al ${fmtDay(addDays(ws,6))} · ${salesBetween(ws,addDays(ws,6)).length} órdenes`)}</section>
   <section class="summary">
     <div class="stat"><span class="lbl">Llamadas hoy</span><b>${c.nw+c.fu}</b><span class="muted">${c.ans} contestaron</span></div>
-    <div class="stat"><span class="lbl">Chats hoy (inglés)</span><b>${c.chats}/${GOAL_CHAT}</b><span class="muted">${c.cans} respondieron</span></div>
+    <div class="stat"><span class="lbl">${esc(CFG.chatStat||"Chats hoy (inglés)")}</span><b>${c.chats}/${GOAL_CHAT}</b><span class="muted">${c.cans} respondieron</span></div>
     <div class="stat"><span class="lbl">Vendido hoy</span><b>${money(sumTotal(created))}</b><span class="muted">${created.filter(s=>!s._addonOnly).length} orden${created.filter(s=>!s._addonOnly).length===1?"":"es"}${created.some(s=>s._addonOnly)?" + extras":""}</span></div>
     ${COMMISSION?`<div class="stat hl"><span class="lbl">Comisión ganada hoy</span><b>${money(comm)}</b><span class="muted">pagos completos de hoy</span></div>`:""}
     <div class="stat"><span class="lbl">Entregas mañana</span><b>${tom.length}</b><span class="muted">${tom.filter(s=>s.status!=="pagada").length} por cobrar</span></div>
@@ -472,9 +472,9 @@ function vHoy(){
     <section class="panel">
       <div class="panel-h"><h2>Metas de hoy</h2><span class="muted">${fmtDay(k)}</span></div>
       <div class="goals">
-        ${goalRow("Llamadas a leads nuevos",c.nw,GOAL_NEW,"Solo cuentan las que marcas con “Ya lo llamé” · incluye la base antigua · máximo 2 llamadas por lead al día")}
-        ${goalRow("Follow-ups por llamada",c.fu,GOAL_FU,"Leads que ya contactaste antes · solo cuentan con “Ya lo llamé”")}
-        ${goalRow("Chats con clientes en inglés",c.chats,GOAL_CHAT,`Se cuentan aparte, no suman a las llamadas · ${c.cn} nuevos · ${c.cf} follow-ups`)}
+        ${GOAL_NEW?goalRow("Llamadas a leads nuevos",c.nw,GOAL_NEW,"Solo cuentan las que marcas con “Ya lo llamé” · incluye la base antigua · máximo 2 llamadas por lead al día"):""}
+        ${GOAL_FU?goalRow("Follow-ups por llamada",c.fu,GOAL_FU,"Leads que ya contactaste antes · solo cuentan con “Ya lo llamé”"):""}
+        ${GOAL_CHAT?goalRow(CFG.chatLabel||"Chats con clientes en inglés",c.chats,GOAL_CHAT,CFG.chatSub||`Se cuentan aparte, no suman a las llamadas · ${c.cn} nuevos · ${c.cf} follow-ups`):""}
         ${CONTENT.map(x=>goalRow(x.n,ct[x.k]||0,x.goal,x.sub,x.k)).join("")}
         ${SHOW_THEME?goalRow("Mensajes ABBA respondidos",d.abbaAnswered||0,Math.max(1,d.abbaAnswered||0),"Toca + por cada lead de ABBA que respondas","abbaAnswered"):""}
       </div>
