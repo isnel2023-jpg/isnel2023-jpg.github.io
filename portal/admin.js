@@ -13,12 +13,12 @@
     let r; try { r = await api("/competencia"); } catch (e) { return; }
     if (!r || !r.active || !r.weeks || !r.weeks.length) return;
     const w = r.weeks[0], ps = w.people, top = Math.max(1, ...ps.map((p) => p.total));
-    const left = (() => { const d = w.end - Date.now(); if (d <= 0) return "cerrando…"; const h = Math.floor(d / 36e5); return h >= 24 ? `faltan ${Math.floor(h / 24)} d ${h % 24} h` : `faltan ${h} h`; })();
+    const left = (() => { const d = w.end - Date.now(); if (d <= 0) return "semana cerrada"; const h = Math.floor(d / 36e5); return h >= 24 ? `faltan ${Math.floor(h / 24)} d ${h % 24} h` : `faltan ${h} h`; })();
     const fd = (k) => k.slice(8, 10) + "/" + k.slice(5, 7);
     const hist = r.weeks.slice(1).map((x) => `<tr><td>${fd(x.startDay)} – ${fd(x.endDay)}</td><td>${x.winner ? "🏆 " + esc(x.winner) : x.tie ? "Empate" : "—"}</td>${x.people.map((p) => `<td class="r">${esc(p.name)} ${money(p.total)}</td>`).join("")}</tr>`).join("");
-    el.innerHTML = `<section class="panel comp"><div class="panel-h"><h2>🏆 ${esc(r.name)}</h2><span class="muted">Semana del ${fd(w.startDay)} al ${fd(w.endDay)} · cierra el sábado 3:00 p. m. (Miami) · ${left}</span></div>
+    el.innerHTML = `<section class="panel comp"><div class="panel-h"><h2>🏆 ${esc(r.name)}</h2><span class="muted">Lunes ${fd(w.startDay)} a sábado ${fd(w.endDay)} (hora Miami) · ${left}</span></div>
       <div class="comp-rows">${ps.map((p, i) => `<div class="comp-row"><span class="comp-pos">${ps[0].total === 0 ? "·" : ["🥇", "🥈", "🥉"][i] || i + 1}</span><span class="comp-name">${esc(p.name)}<small class="muted">${p.orders} orden${p.orders === 1 ? "" : "es"}</small></span><span class="comp-bar"><i style="width:${Math.round((p.total / top) * 100)}%"></i></span><b class="num">${money(p.total)}</b></div>`).join("")}</div>
-      <p class="muted" style="margin:0;font-size:.85rem">El sábado a las 3:00 p. m. te llega un correo con el ganador. Cuenta el dinero vendido (órdenes nuevas + extras − ajustes, sin canceladas).</p>
+      <p class="muted" style="margin:0;font-size:.85rem">El sábado a las 11:55 p. m. te llega un correo con el ganador. El domingo no cuenta. Cuenta el dinero vendido (órdenes nuevas + extras − ajustes, sin canceladas).</p>
       ${hist ? `<div class="scroll"><table class="t"><thead><tr><th>Semana</th><th>Ganador</th><th colspan="${ps.length}">Vendido</th></tr></thead><tbody>${hist}</tbody></table></div>` : ""}</section>`;
   }
   const post = (p, body, method) => api(p, { method: method || "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });

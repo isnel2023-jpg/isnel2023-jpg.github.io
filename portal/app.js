@@ -1668,7 +1668,7 @@ function ajusteModal(s){
 // ---------- tablero de la competencia semanal (Hoy) ----------
 // Lo calcula el servidor (/competencia) con las ventas de cada persona en todos sus portales.
 async function loadComp(){try{const r=await P.call("/competencia",{raw:true});S.comp=r&&r.active?r:null;const a=document.activeElement;if(S.tab==="hoy"&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!layer.innerHTML)render()}catch(e){}}
-function compLeft(ms){const d=ms-Date.now();if(d<=0)return "cerrando…";const h=Math.floor(d/36e5),dd=Math.floor(h/24);return dd?`faltan ${dd} d ${h%24} h`:`faltan ${h} h ${Math.floor(d%36e5/6e4)} min`}
+function compLeft(ms){const d=ms-Date.now();if(d<=0)return "semana cerrada";const h=Math.floor(d/36e5),dd=Math.floor(h/24);return dd?`faltan ${dd} d ${h%24} h`:`faltan ${h} h ${Math.floor(d%36e5/6e4)} min`}
 function compPanel(){
   const c=S.comp;if(!c||!c.weeks||!c.weeks.length)return "";
   const w=c.weeks[0],ps=w.people,top=Math.max(1,...ps.map(p=>p.total));
@@ -1681,11 +1681,11 @@ function compPanel(){
   }
   const prev=c.weeks.slice(1).find(x=>x.winner||x.tie);
   return `<section class="panel comp">
-    <div class="panel-h"><h2>🏆 ${esc(c.name)}</h2><span class="muted">Del sáb ${w.startDay.slice(8,10)}/${+w.startDay.slice(5,7)} 3:00 p. m. al sáb ${w.endDay.slice(8,10)}/${+w.endDay.slice(5,7)} 3:00 p. m. (Miami) · ${compLeft(w.end)}</span></div>
+    <div class="panel-h"><h2>🏆 ${esc(c.name)}</h2><span class="muted">Lunes ${+w.startDay.slice(8,10)}/${+w.startDay.slice(5,7)} a sábado ${+w.endDay.slice(8,10)}/${+w.endDay.slice(5,7)} (hora Miami) · ${Date.now()>=w.end?"semana cerrada":compLeft(w.end)}</span></div>
     ${c.prize?`<div>Premio: <b>${esc(c.prize)}</b></div>`:""}
     <div class="comp-rows">${ps.map((p,i)=>`<div class="comp-row${p.me?" me":""}"><span class="comp-pos">${lead.total===0?"·":["🥇","🥈","🥉"][i]||i+1}</span><span class="comp-name">${esc(p.name)}${p.me?" (tú)":""}<small class="muted">${p.orders} orden${p.orders===1?"":"es"}</small></span><span class="comp-bar"><i style="width:${Math.round(p.total/top*100)}%"></i></span><b class="num">${money(p.total)}</b></div>`).join("")}</div>
     ${msg?`<div class="comp-msg">${msg}</div>`:""}
-    <div class="muted" style="font-size:.8rem">Gana quien más <b>dinero</b> venda en la semana, no quien haga más órdenes. Suman las órdenes nuevas y los extras; restan los ajustes y las canceladas. Va de sábado a sábado, por eso puede no coincidir con “Ventas de esta semana”, que va de lunes a domingo.${prev?` · Semana pasada: ${prev.winner?esc(prev.winner)+" con "+money(prev.people[0].total):"empate"}`:""}</div>
+    <div class="muted" style="font-size:.8rem">Gana quien más <b>dinero</b> venda en la semana, no quien haga más órdenes. Suman las órdenes nuevas y los extras; restan los ajustes y las canceladas. Va de lunes a sábado: lo del domingo no cuenta para la competencia, pero sí para tus metas.${prev?` · Semana pasada: ${prev.winner?esc(prev.winner)+" con "+money(prev.people[0].total):"empate"}`:""}</div>
   </section>`;
 }
 
