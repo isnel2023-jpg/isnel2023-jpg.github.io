@@ -7,6 +7,20 @@
   const kb = (b) => (b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB");
   const when = (t) => new Date(t).toLocaleString("es", { dateStyle: "short", timeStyle: "short" });
   const api = (p, o) => Lion.call(p, Object.assign({ raw: true }, o || {}));
+  // tablero de la competencia semanal (lo calcula el servidor)
+  async function paintComp() {
+    const el = document.getElementById("aComp"); if (!el) return;
+    let r; try { r = await api("/competencia"); } catch (e) { return; }
+    if (!r || !r.active || !r.weeks || !r.weeks.length) return;
+    const w = r.weeks[0], ps = w.people, top = Math.max(1, ...ps.map((p) => p.total));
+    const left = (() => { const d = w.end - Date.now(); if (d <= 0) return "cerrando…"; const h = Math.floor(d / 36e5); return h >= 24 ? `faltan ${Math.floor(h / 24)} d ${h % 24} h` : `faltan ${h} h`; })();
+    const fd = (k) => k.slice(8, 10) + "/" + k.slice(5, 7);
+    const hist = r.weeks.slice(1).map((x) => `<tr><td>${fd(x.startDay)} – ${fd(x.endDay)}</td><td>${x.winner ? "🏆 " + esc(x.winner) : x.tie ? "Empate" : "—"}</td>${x.people.map((p) => `<td class="r">${esc(p.name)} ${money(p.total)}</td>`).join("")}</tr>`).join("");
+    el.innerHTML = `<section class="panel comp"><div class="panel-h"><h2>🏆 ${esc(r.name)}</h2><span class="muted">Semana del ${fd(w.startDay)} al ${fd(w.endDay)} · cierra el sábado 3:00 p. m. (Miami) · ${left}</span></div>
+      <div class="comp-rows">${ps.map((p, i) => `<div class="comp-row"><span class="comp-pos">${ps[0].total === 0 ? "·" : ["🥇", "🥈", "🥉"][i] || i + 1}</span><span class="comp-name">${esc(p.name)}<small class="muted">${p.orders} orden${p.orders === 1 ? "" : "es"}</small></span><span class="comp-bar"><i style="width:${Math.round((p.total / top) * 100)}%"></i></span><b class="num">${money(p.total)}</b></div>`).join("")}</div>
+      <p class="muted" style="margin:0;font-size:.85rem">El sábado a las 3:00 p. m. te llega un correo con el ganador. Cuenta el dinero vendido (órdenes nuevas + extras − ajustes, sin canceladas).</p>
+      ${hist ? `<div class="scroll"><table class="t"><thead><tr><th>Semana</th><th>Ganador</th><th colspan="${ps.length}">Vendido</th></tr></thead><tbody>${hist}</tbody></table></div>` : ""}</section>`;
+  }
   const post = (p, body, method) => api(p, { method: method || "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
   const JOB_NAMES = { start: "¿Empezó turno? (4:20 p. m.)", check17: "Check-in 5 p. m. (se revisa 5:25)", check18: "Check-in 6 p. m. (se revisa 6:25)", check19: "Check-in 7 p. m. (se revisa 7:25)", daily: "Cierre del día (8:40 p. m.)", weekly2: "Corte semanal de comisión (domingo 3 p. m. Miami)", gaby15: "Corte 15% Gaby Flowers (sábado 3 p. m. Miami)" };
   const TZS = [["America/Bogota", "Colombia", -5], ["America/New_York", "Miami", -5], ["America/Mexico_City", "México", -6], ["America/Lima", "Perú", -5], ["America/Caracas", "Venezuela", -4], ["America/Santo_Domingo", "Rep. Dominicana", -4], ["America/Chicago", "Houston", -6]];
@@ -38,6 +52,7 @@
         <div class="acts" style="flex-direction:row;flex-wrap:wrap"><button class="btn sm pri" type="button" data-openm="${esc(x.portal)}|${esc(x.id)}">Ver su portal</button><button class="btn sm" type="button" data-medit="${esc(x.id)}">Metas y ajustes</button>
         <button class="btn sm" type="button" data-mpw="${esc(x.id)}">Cambiar contraseña</button><button class="btn sm ghost" type="button" data-mact="${esc(x.id)}">${x.active ? "Desactivar" : "Activar"}</button></div></div>`; };
     body.innerHTML = `
+    <div id="aComp">${(setTimeout(paintComp, 0), "")}</div>
     <section class="panel"><div class="panel-h"><h2>Empresas y colaboradores</h2><button class="btn sm pri" type="button" data-newp>+ Nueva empresa</button></div>
       <p class="muted" style="margin:0">Cada empresa tiene su portal. Sus colaboradores comparten los leads y las órdenes; cada uno entra con su propia contraseña y tiene sus propias metas, turno y comisión.</p>
       ${workers.map((w) => { const ms = M.filter((x) => x.portal === w.id); return `<div class="list" style="gap:6px">

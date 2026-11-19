@@ -458,6 +458,7 @@ function vHoy(){
   const ws=weekStart(k),wk=sumTotal(salesBetween(ws,addDays(ws,6)));
   const ci=(d.checkins||[]).slice().sort((a,b)=>a.t-b.t);
   return `
+  ${compPanel()}
   ${PROPOSAL?proposalBanner():""}
   ${SHOW_THEME?`<section class="theme"><div class="day">${th.d}</div><div class="what">${dow(k)===0?th.w:"Contenido de hoy: "+th.w}</div><div class="how">${th.h}</div></section>`:""}
   <section class="panel">${salesMeter("Ventas de esta semana",wk,SALES_GOALS.week,`Semana del ${fmtDay(ws)} al ${fmtDay(addDays(ws,6))} · ${salesBetween(ws,addDays(ws,6)).length} órdenes`)}</section>
@@ -1664,6 +1665,30 @@ function ajusteModal(s){
   };
 }
 
+// ---------- tablero de la competencia semanal (Hoy) ----------
+// Lo calcula el servidor (/competencia) con las ventas de cada persona en todos sus portales.
+async function loadComp(){try{const r=await P.call("/competencia",{raw:true});S.comp=r&&r.active?r:null;const a=document.activeElement;if(S.tab==="hoy"&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!layer.innerHTML)render()}catch(e){}}
+function compLeft(ms){const d=ms-Date.now();if(d<=0)return "cerrando…";const h=Math.floor(d/36e5),dd=Math.floor(h/24);return dd?`faltan ${dd} d ${h%24} h`:`faltan ${h} h ${Math.floor(d%36e5/6e4)} min`}
+function compPanel(){
+  const c=S.comp;if(!c||!c.weeks||!c.weeks.length)return "";
+  const w=c.weeks[0],ps=w.people,top=Math.max(1,...ps.map(p=>p.total));
+  const me=ps.find(p=>p.me),lead=ps[0],second=ps[1];
+  let msg="";
+  if(second){
+    if(lead.total===second.total)msg=lead.total?"¡Van empatados!":"Nadie ha vendido todavía esta semana.";
+    else if(me)msg=lead.me?`🔥 Vas ganando por ${money(lead.total-second.total)}`:`Te faltan ${money(lead.total-me.total)} para alcanzar a ${esc(lead.name)}`;
+    else msg=`${esc(lead.name)} va ganando por ${money(lead.total-second.total)}`;
+  }
+  const prev=c.weeks.slice(1).find(x=>x.winner||x.tie);
+  return `<section class="panel comp">
+    <div class="panel-h"><h2>🏆 ${esc(c.name)}</h2><span class="muted">Cierra el sábado 3:00 p. m. (Miami) · ${compLeft(w.end)}</span></div>
+    ${c.prize?`<div>Premio: <b>${esc(c.prize)}</b></div>`:""}
+    <div class="comp-rows">${ps.map((p,i)=>`<div class="comp-row${p.me?" me":""}"><span class="comp-pos">${lead.total===0?"·":["🥇","🥈","🥉"][i]||i+1}</span><span class="comp-name">${esc(p.name)}${p.me?" (tú)":""}<small class="muted">${p.orders} orden${p.orders===1?"":"es"}</small></span><span class="comp-bar"><i style="width:${Math.round(p.total/top*100)}%"></i></span><b class="num">${money(p.total)}</b></div>`).join("")}</div>
+    ${msg?`<div class="comp-msg">${msg}</div>`:""}
+    <div class="muted" style="font-size:.8rem">Gana quien más <b>dinero</b> venda en la semana, no quien haga más órdenes. Suman las órdenes nuevas y los extras; restan los ajustes y las canceladas.${prev?` · Semana pasada: ${prev.winner?esc(prev.winner)+" con "+money(prev.people[0].total):"empate"}`:""}</div>
+  </section>`;
+}
+
 // ---------- binding ----------
 async function copy(text){try{await navigator.clipboard.writeText(text);toast("Copiado");return true}catch(e){toast("Selecciona el texto y cópialo a mano");return false}}
 function bind(){
@@ -1762,6 +1787,7 @@ render();
     },()=>{clearTimeout(timer);S.offline=true;render()});
   }
   bootHist(db);
+  loadComp();setInterval(loadComp,5*6e4);
   db.collection("months").onSnapshot(s=>{const m={};s.docs.forEach(d=>m[d.id]=d.data());S.months=m;if(S.tab==="resumen")render()},()=>{});
   try{await db.collection("visits").doc(today()).set({t:Date.now()})}
   catch(e){if(e.code==="unauthenticated")saveErr("Tu sesión terminó. Vuelve a entrar con tu contraseña.")}
