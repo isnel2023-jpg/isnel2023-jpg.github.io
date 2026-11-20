@@ -1362,7 +1362,7 @@ function coMissing(d){
   if(!String(d.cliente||"").trim())m.push("Nombre del cliente");
   if(String(d.telefono||"").replace(/\D/g,"").length<7)m.push("Teléfono del cliente");
   if(!items.length||items.some(x=>x.precio<=0))m.push("El precio de cada cosa en el desglose");
-  if(/rosa/.test(todo)&&nz(d.nat)+nz(d.dye)<=0)m.push("Cuántas rosas son naturales y cuántas tinturadas");
+  if(/\brosas?\b/.test(todo)&&nz(d.nat)+nz(d.dye)<=0)m.push("Cuántas rosas son naturales y cuántas tinturadas");
   if(!d.fecha)m.push(d.entrega==="domicilio"?"Fecha de entrega":"Fecha en que recoge");
   if(!String(d.hora||"").trim())m.push(d.entrega==="domicilio"?"Hora de entrega":"Hora en que recoge");
   if(d.entrega==="domicilio"){if(!String(d.direccion||"").trim())m.push("Dirección de entrega");if(!String(d.recibe_nombre||"").trim())m.push("Nombre de quien recibe")}
@@ -1383,7 +1383,7 @@ function vCrear(){
   const total=d?coTotal(d):0,cobrar=d?Math.max(0,total-nz(d.abonado)):0;
   return `<section class="panel">
     <div class="panel-h"><h2>Crear orden</h2><span class="muted">Habla y la IA arma la orden</span></div>
-    <p style="margin:0 0 10px">Dila de corrido, como se la dirías a producción: <b>cliente y teléfono</b>, qué lleva (cantidad y colores de rosas, papel, extras), <b>el texto de la tarjeta</b>, si <b>recoge en tienda o es a domicilio</b> (dirección y quién recibe), <b>fecha y hora</b>, precios, <b>cuánto pagó y cómo</b>, y por dónde llegó el cliente.</p>
+    <p style="margin:0 0 10px">Dila de corrido, como se la dirías a producción: <b>cliente y teléfono</b>, qué lleva (qué flores —rosas, peonías, lirios, girasoles…—, cuántas y de qué color, papel, extras), <b>el texto de la tarjeta</b>, si <b>recoge en tienda o es a domicilio</b> (dirección y quién recibe), <b>fecha y hora</b>, precios, <b>cuánto pagó y cómo</b>, y por dónde llegó el cliente.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <button class="btn pri co-mic${st.rec?" rec":""}" type="button" data-act="coMic">${st.rec?"⏹ Detener":"🎤 Toca y habla"}</button>
       ${SR?"":`<span class="muted" style="font-size:.85rem">Si no te sale el micrófono aquí, toca el cuadro de abajo y usa el 🎤 del teclado.</span>`}
@@ -1404,7 +1404,7 @@ function vCrear(){
       ${f("no","Número de orden")}
       ${BRANDS_SELL.length>1?f("brand","Marca","sel",{opts:BRANDS_SELL.map(b=>[b,b])}):""}
       ${f("cliente","Cliente")}${f("telefono","Teléfono","tel")}
-      ${f("titulo","Producto (título de la orden)","text",{full:true,ph:"100 rosas — 40 rojas + 30 amarillas + 30 rosadas"})}
+      ${f("titulo","Producto (título de la orden)","text",{full:true,ph:"100 rosas — 40 rojas + 30 amarillas + 30 rosadas · 20 peonías rosadas"})}
       ${f("detallesTxt","Detalles (uno por línea)","area",{full:true,ph:"40 rojas · 30 amarillas · 30 rosadas\nPapel blanco\nCon tarjeta"})}
       ${f("tarjeta","Texto de la tarjeta (vacío = sin tarjeta)","area",{full:true,rows:5})}
       ${f("cinta","Texto de la cinta personalizada (vacío = sin cinta)","area",{full:true,rows:2})}
@@ -1441,24 +1441,25 @@ async function coAi(){
 Arma la ORDEN DE TALLER de la tienda, con todo bien desglosado.
 
 REGLAS DEL DESGLOSE ("lineas"):
-- Una línea por CADA cosa que se cobra, cada una con su precio: las rosas (cantidad, color y si son naturales o tinturadas), y aparte cada extra (cinta personalizada, globo, peluche, letra, chocolates, etc.) y el delivery. Nunca juntes varias cosas en una sola línea.
-- Si las rosas son de varios colores con un solo precio, va en una sola línea (ej. "100 rosas naturales: 40 rojas + 30 amarillas + 30 rosadas"). Si naturales y tinturadas tienen precios distintos, van en líneas separadas.
+- Las flores pueden ser rosas u OTRAS (peonías, lirios, margaritas, girasoles, tulipanes, hortensias, orquídeas, claveles, etc.). Nunca supongas que son rosas si no lo dijo.
+- Una línea por CADA cosa que se cobra, cada una con su precio: las flores (tipo de flor, cantidad y color; si son rosas, también si son naturales o tinturadas), y aparte cada extra (cinta personalizada, globo, peluche, letra, chocolates, etc.) y el delivery. Nunca juntes varias cosas en una sola línea.
+- Si las flores son de varios colores con un solo precio, va en una sola línea (ej. "100 rosas naturales: 40 rojas + 30 amarillas + 30 rosadas"). Si naturales y tinturadas tienen precios distintos, van en líneas separadas.
 - Si el vendedor dijo solo el total y no cuánto vale cada cosa, NO lo repartas tú: pregúntalo en "faltan".
 - La suma de las líneas es el total de la orden.
 
 PREGUNTAS ("faltan"): una pregunta corta y clara (en español, de tú) por CADA dato obligatorio que no esté ni en el dictado ni en la orden actual. Obligatorios:
-nombre y teléfono del cliente · qué lleva (cantidad de rosas, colores, naturales o tinturadas) · precio de cada cosa · si es pick-up (recoge en tienda) o delivery · si es delivery: dirección completa y nombre y teléfono de quien recibe · fecha y hora (de recogida o de entrega) · cuánto pagó ya (puede ser $0) y cómo paga lo que falta · si lleva tarjeta: el texto exacto · si lleva cinta personalizada: el texto exacto de la cinta.
+nombre y teléfono del cliente · qué lleva (qué flores, cuántas y de qué color; SOLO si son rosas: si son naturales o tinturadas — a las peonías, lirios, girasoles y demás flores NO les preguntes eso) · precio de cada cosa · si es pick-up (recoge en tienda) o delivery · si es delivery: dirección completa y nombre y teléfono de quien recibe · fecha y hora (de recogida o de entrega) · cuánto pagó ya (puede ser $0) y cómo paga lo que falta · si lleva tarjeta: el texto exacto · si lleva cinta personalizada: el texto exacto de la cinta.
 Si un dato ya está, no lo preguntes. Si está todo, "faltan": [].
 
 Responde SOLO un objeto JSON con estas claves:
 {"cliente": string|null, "telefono": string|null,
-"titulo": string (título corto como en la orden de taller, ej. "100 rosas — 40 rojas + 30 amarillas + 30 rosadas"),
+"titulo": string (título corto como en la orden de taller, ej. "100 rosas — 40 rojas + 30 amarillas + 30 rosadas" o "20 peonías rosadas"),
 "detalles": [string] (viñetas como en la orden de taller: colores y cantidades "40 rojas · 30 amarillas · 30 rosadas", papel ("Papel blanco"), moño, extras, "Con tarjeta (texto abajo — está en inglés, copiar tal cual)" si la tarjeta va en inglés, "Con cinta personalizada (texto abajo)"),
 "tarjeta_lleva": boolean, "tarjeta": string|null (texto EXACTO de la tarjeta, en el idioma en que lo dictaron, con buena ortografía y puntuación; usa \\n entre saludo, cuerpo y despedida),
 "cinta_lleva": boolean, "cinta": string|null (texto EXACTO de la cinta personalizada),
 "entrega": "recoge"|"domicilio", "recibe_nombre": string|null, "recibe_telefono": string|null, "direccion": string|null,
 "fecha": "AAAA-MM-DD"|null, "hora": string|null (ej. "2:00 pm"),
-"lineas": [{"desc": string, "tipo": "rosas_naturales"|"rosas_tinturadas"|"extra"|"delivery", "cantidad": number (cantidad de rosas o de unidades), "precio": number (precio TOTAL de esa línea)}],
+"lineas": [{"desc": string, "tipo": "rosas_naturales"|"rosas_tinturadas"|"otras_flores"|"extra"|"delivery", "cantidad": number (cantidad de flores o de unidades), "precio": number (precio TOTAL de esa línea)}] (peonías, lirios, girasoles, etc. van con tipo "otras_flores"),
 "pago_dicho": boolean (true si el vendedor dijo cuánto pagó ya, aunque sea $0), "abonado": number,
 "metodo_abono": string|null (cómo pagó lo que YA pagó, ej. "Zelle"; null si no ha pagado nada),
 "metodo_pago": string|null (cómo va a pagar LO QUE FALTA, ej. "CASH", "Zelle", "Tarjeta"; null si ya pagó todo),
@@ -1473,7 +1474,7 @@ ${txt.slice(0,8000)}`;
     const o=st.d||{no:coNextNo(),brand};
     const L=(Array.isArray(r.lineas)?r.lineas:[]).filter(l=>l&&l.desc);
     const sumT=(t)=>L.filter(l=>l.tipo===t).reduce((a,l)=>a+nz(l.precio),0),cntT=(t)=>L.filter(l=>l.tipo===t).reduce((a,l)=>a+Math.round(nz(l.cantidad)),0);
-    const lineTxt=(l)=>{const q=Math.round(nz(l.cantidad)),p=nz(l.precio);const unit=/^rosas_/.test(l.tipo)&&q>1&&p>0&&!/c\/u/.test(l.desc)?` (${money2(p/q)} c/u)`:"";return `${String(l.desc).replace(/\|/g,"/")}${unit} | ${p}`};
+    const lineTxt=(l)=>{const q=Math.round(nz(l.cantidad)),p=nz(l.precio);const unit=/^(rosas_|otras_flores)/.test(l.tipo)&&q>1&&p>0&&!/c\/u/.test(l.desc)?` (${money2(p/q)} c/u)`:"";return `${String(l.desc).replace(/\|/g,"/")}${unit} | ${p}`};
     const ex=L.filter(l=>l.tipo==="extra");
     st.d={...o,cliente:r.cliente||o.cliente||"",telefono:r.telefono||o.telefono||"",titulo:r.titulo||o.titulo||"",
       detallesTxt:Array.isArray(r.detalles)&&r.detalles.length?r.detalles.join("\n"):(o.detallesTxt||""),
