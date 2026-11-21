@@ -22,7 +22,7 @@
       ${hist ? `<div class="scroll"><table class="t"><thead><tr><th>Semana</th><th>Ganador</th><th colspan="${ps.length}">Vendido</th></tr></thead><tbody>${hist}</tbody></table></div>` : ""}</section>`;
   }
   const post = (p, body, method) => api(p, { method: method || "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  const JOB_NAMES = { start: "¿Empezó turno? (4:20 p. m.)", check17: "Check-in 5 p. m. (se revisa 5:25)", check18: "Check-in 6 p. m. (se revisa 6:25)", check19: "Check-in 7 p. m. (se revisa 7:25)", daily: "Cierre del día (8:40 p. m.)", weekly2: "Corte semanal de comisión (domingo 3 p. m. Miami)", gaby15: "Corte 15% Gaby Flowers (sábado 3 p. m. Miami)" };
+  const JOB_NAMES = { start: "¿Empezó turno? (4:20 p. m.)", check17: "Check-in 5 p. m. (se revisa 5:25)", check18: "Check-in 6 p. m. (se revisa 6:25)", check19: "Check-in 7 p. m. (se revisa 7:25)", daily: "Cierre del día (8:40 p. m.)", weekly2: "Corte semanal de comisión (domingo 3 p. m. Miami)", gaby15: "Corte 15% Gaby Flowers (sábado 5 p. m. Miami)" };
   const TZS = [["America/Bogota", "Colombia", -5], ["America/New_York", "Miami", -5], ["America/Mexico_City", "México", -6], ["America/Lima", "Perú", -5], ["America/Caracas", "Venezuela", -4], ["America/Santo_Domingo", "Rep. Dominicana", -4], ["America/Chicago", "Houston", -6]];
   let W = [], M = [], root, msgEl;
 
@@ -143,7 +143,7 @@
       ${w ? "" : `<div class="fld"><label for="pI">Dirección (minúsculas y guiones)</label><input id="pI" required pattern="[a-z0-9-]{2,40}" placeholder="gaby-flowers"></div>`}
       <div class="fld"><label for="pT">Título del portal</label><input id="pT" maxlength="80" value="${esc(c.portalTitle || "")}" placeholder="Portal Gaby Flowers"></div>
       <div class="fld"><label for="pB">Marcas que se venden aquí</label><input id="pB" value="${esc((c.brands || []).join(", "))}"></div>
-      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="pG" ${c.jobs && c.jobs.gaby15 ? "checked" : ""}> Corte del 15% Gaby Flowers por correo (sábados 3 p. m.)</label>
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="pG" ${c.jobs && c.jobs.gaby15 ? "checked" : ""}> Corte del 15% Gaby Flowers por correo (sábados 5 p. m.)</label>
       <div class="full" style="display:flex;gap:8px"><button class="btn pri" type="submit">${w ? "Guardar" : "Crear empresa"}</button><button class="btn" type="button" id="pfX">Cancelar</button></div>
     </form>`;
     const g = (id) => document.getElementById(id);
