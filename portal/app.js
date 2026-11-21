@@ -1372,7 +1372,8 @@ function coMissing(d){
     if(tot-nz(d.abonado)>0&&!String(d.metodo||"").trim())m.push("Cómo y cuándo va a pagar lo que falta");
     return m;
   }
-  if(!items.length||items.some(x=>x.precio<=0))m.push("El precio de cada cosa en el desglose");
+  if(!items.length||tot<=0)m.push("El precio en el desglose");
+  else if(coLines(d.lineasTxt).some(l=>!l.includes("|")))m.push("Cada línea del desglose necesita su precio después de “|” (pon 0 si es un obsequio)");
   if(/\brosas?\b/.test(todo)&&nz(d.nat)+nz(d.dye)<=0)m.push("Cuántas rosas son naturales y cuántas tinturadas");
   if(!d.fecha)m.push(d.entrega==="domicilio"?"Fecha de entrega":"Fecha en que recoge");
   if(!String(d.hora||"").trim())m.push(d.entrega==="domicilio"?"Hora de entrega":"Hora en que recoge");
@@ -1432,7 +1433,7 @@ function vCrear(){
       ${d.entrega==="domicilio"?f("recibe_telefono","Teléfono de quien recibe","tel")+f("direccion","Dirección","text",{full:true}):""}
       ${f("fecha","Fecha","date")}${f("hora","Hora","text",{ph:"2:00 pm"})}
 `}
-      ${d.tipo==="evento"?f("lineasTxt","Desglose (puede ser una sola línea con el paquete; lo incluido sin precio va con 0)","area",{full:true,rows:4,ph:"Decoración completa del evento | 2100"}):f("lineasTxt","Desglose (una línea por cada cosa: descripción | precio)","area",{full:true,rows:5,ph:"100 rosas rojas naturales ($1.50 c/u) | 150\nCinta personalizada | 15\nDelivery | 20"})}
+      ${d.tipo==="evento"?f("lineasTxt","Desglose (puede ser una sola línea con el paquete; lo incluido sin precio va con 0)","area",{full:true,rows:4,ph:"Decoración completa del evento | 2100"}):f("lineasTxt","Desglose (una línea por cada cosa: descripción | precio)","area",{full:true,rows:5,ph:"100 rosas rojas naturales ($1.50 c/u) | 150\nCinta personalizada | 15\nMariposas (obsequio) | 0\nDelivery | 20"})}
       <div class="fld"><label>Total</label><b class="num" id="coTot" style="font-size:1.2rem">${money(total)}</b></div>
       ${f("abonado","Ya pagó (USD)","number")}${f("metodoAbono","Cómo pagó eso","text",{ph:"Zelle"})}${f("metodo","Cómo paga lo que falta","text",{ph:"CASH al recoger"})}
       ${f("canal","Canal","text",{ph:"Meta Ads → Messenger"})}
@@ -1469,6 +1470,7 @@ REGLAS DEL DESGLOSE ("lineas"):
 - Una línea por CADA cosa que se cobra, cada una con su precio: las flores (tipo de flor, cantidad y color; si son rosas, también si son naturales o tinturadas), y aparte cada extra (cinta personalizada, globo, peluche, letra, chocolates, etc.) y el delivery. Nunca juntes varias cosas en una sola línea.
 - Si las flores son de varios colores con un solo precio, va en una sola línea (ej. "100 rosas naturales: 40 rojas + 30 amarillas + 30 rosadas"). Si naturales y tinturadas tienen precios distintos, van en líneas separadas.
 - Si el vendedor dijo solo el total y no cuánto vale cada cosa, NO lo repartas tú: pregúntalo en "faltan".
+- Los OBSEQUIOS (algo que se regala, va de cortesía, gratis o incluido: ej. mariposas, una tarjeta, un chocolate) van en su propia línea con precio 0 y la palabra "(obsequio)" en la descripción. NO preguntes el precio de un obsequio.
 - La suma de las líneas es el total de la orden.
 
 PREGUNTAS ("faltan"): una pregunta corta y clara (en español, de tú) por CADA dato obligatorio que no esté ni en el dictado ni en la orden actual. Si es evento, usa los obligatorios del evento (arriba). Si es de flores, los obligatorios son:
@@ -1595,7 +1597,7 @@ async function coBuildPdf(d){
   // desglose
   sec("DESGLOSE");
   const items=coItems(d.lineasTxt),total=items.reduce((a,x)=>a+x.precio,0),ab=Math.min(nz(d.abonado),total),cob=Math.max(0,total-ab);
-  for(const it of items){const ls=wrap(it.desc,F.h,11,R-M-90);ls.forEach((l,i)=>{need(18);t(l,M,y,F.h,11);if(i===0)tr(it.precio?money2(it.precio):"Incluido",y,F.h,11);y-=16});y-=2}
+  for(const it of items){const ls=wrap(it.desc,F.h,11,R-M-90);ls.forEach((l,i)=>{need(18);t(l,M,y,F.h,11);if(i===0)tr(it.precio?money2(it.precio):(EV?"Incluido":"Obsequio"),y,F.h,11);y-=16});y-=2}
   need(nz(d.abonado)>0?80:62);pg.drawLine({start:{x:M,y:y+8},end:{x:R,y:y+8},thickness:2,color:C.ac});y-=12;
   t("TOTAL",M,y,F.hb,15);tr(money2(total),y,F.hb,15);y-=12;
   if(ab>0){y-=8;t("YA PAGÓ"+(d.metodoAbono?" ("+d.metodoAbono+")":""),M,y,F.h,11);tr("-"+money2(ab),y,F.h,11);y-=10}
@@ -1646,7 +1648,12 @@ function bindCrear(){
     const d=st.d;if(!d.no||!String(d.no).trim()){toast("Pon el número de orden");return}
     if(Object.values(S.sales).some(o=>String(o.orderNo||"").toLowerCase()===String(d.no).replace(/^#/,"").toLowerCase())){toast("Ya hay una orden con el número "+d.no);return}
     const miss=coMissing(d);if(miss.length){render();toast("Falta: "+miss[0]);return}
-    if((d.faltan||[]).length){toast("Primero contesta lo que pregunta la IA y toca “Actualizar la orden”");return}
+    if((d.faltan||[]).length){
+      const b0=view.querySelector('[data-act="coPdf"]');if(b0){b0.disabled=true;b0.textContent="Revisando con la IA…"}
+      await coAi();
+      if((st.d.faltan||[]).length||coMissing(st.d).length){toast("Todavía falta: "+((st.d.faltan||[])[0]||coMissing(st.d)[0]));return}
+      return view.querySelector('[data-act="coPdf"]')?.click();
+    }
     const b=view.querySelector('[data-act="coPdf"]');b.disabled=true;b.textContent="Armando el PDF…";
     try{st.pdf=await coBuildPdf(d);const r=await readPdf(new File([st.pdf],"orden.pdf",{type:"application/pdf"}));st.preview=r.preview;st.pdfText=r.text;render()}
     catch(e){b.disabled=false;b.textContent="📄 Ver PDF de la orden";toast("No pude armar el PDF. Revisa los datos e intenta otra vez.")}
