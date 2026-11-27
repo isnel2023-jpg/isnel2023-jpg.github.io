@@ -459,6 +459,7 @@ function vHoy(){
   const ci=(d.checkins||[]).slice().sort((a,b)=>a.t-b.t);
   return `
   ${compPanel()}
+  ${ctPanel()}
   ${PROPOSAL?proposalBanner():""}
   ${SHOW_THEME?`<section class="theme"><div class="day">${th.d}</div><div class="what">${dow(k)===0?th.w:"Contenido de hoy: "+th.w}</div><div class="how">${th.h}</div></section>`:""}
   <section class="panel">${salesMeter("Ventas de esta semana",wk,SALES_GOALS.week,`Semana del ${fmtDay(ws)} al ${fmtDay(addDays(ws,6))} · ${salesBetween(ws,addDays(ws,6)).length} órdenes`)}</section>
@@ -1737,6 +1738,38 @@ function compPanel(){
   </section>`;
 }
 
+// ---------- contenido (Trello vía n8n) y calendario rotativo de publicaciones ----------
+// Posts: lunes, miércoles, viernes y domingo en las 4 cuentas, cada una a una hora distinta,
+// y la hora de cada cuenta cambia de un día a otro y de una semana a la siguiente.
+// Historias: lunes a sábado, 3 por cuenta: 8–9 a. m., 12–1 p. m. y 5–6 p. m. (hora Miami).
+const CT_URL="https://n8n.n8nainueva.com/webhook/contenido-metricas";
+// Cuentas activas (TikTok, Instagram y Facebook de cada una). Lion Systems se enciende cuando tenga sus redes.
+const CT_EMP=[["GABY","Gaby Flowers"],["ABBA","ABBA Roses"],["RUIZ","Ruiz Creationz"]];
+const CT_SLOTS=["8:00 a. m.","12:00 p. m.","5:00 p. m.","7:00 p. m."];
+const CT_POST_DAYS=[1,3,5,0];
+const CT_GOALS={postsSemana:CT_POST_DAYS.length*CT_EMP.length,historiasDia:3*CT_EMP.length};
+function ctPlan(k){
+  const d=new Date(k+"T12:00:00Z"),dow=d.getUTCDay(),di=CT_POST_DAYS.indexOf(dow);
+  const mon=new Date(d);mon.setUTCDate(d.getUTCDate()-((dow+6)%7));const w=Math.floor(mon.getTime()/6048e5);
+  const posts=di<0?[]:CT_EMP.map(([c,n],i)=>({c,n,hora:CT_SLOTS[(i+w+di)%CT_SLOTS.length]})).sort((a,b)=>CT_SLOTS.indexOf(a.hora)-CT_SLOTS.indexOf(b.hora));
+  return {dow,posts,historias:dow===0?[]:["8–9 a. m.","12–1 p. m.","5–6 p. m."]};
+}
+async function loadCt(){try{const r=await fetch(CT_URL,{cache:"no-store"});S.ct=await r.json();const a=document.activeElement;if(S.tab==="hoy"&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!layer.innerHTML)render()}catch(e){S.ct=null}}
+function ctPanel(){
+  const role=CFG.contentRole;if(!role)return "";
+  const k=today(),p=ctPlan(k),r=S.ct||{},s=r.santi||{},j=r.jacqueline||{};
+  const bar=(v,g)=>`<b class="num">${v||0}/${g}</b> <span class="pill ${(v||0)>=g?"on":"warn"}">${Math.min(100,Math.round((v||0)/g*100))}%</span>`;
+  const metas=role==="crea"
+    ?`${p.historias.length?`<div>Historias creadas hoy: ${bar(s.historias_hoy,CT_GOALS.historiasDia)}</div>`:""}<div>Posts creados esta semana: ${bar(s.posts_semana,CT_GOALS.postsSemana)}</div>`
+    :`${p.historias.length?`<div>Historias programadas hoy: ${bar(j.historias_programadas_hoy,CT_GOALS.historiasDia)}</div>`:""}${p.posts.length?`<div>Posts programados hoy: ${bar(j.posts_programados_hoy,p.posts.length)}</div>`:""}<div class="muted">Publicados esta semana: ${j.posteados_semana||0}</div>`;
+  return `<section class="panel"><div class="panel-h"><h2>📲 Contenido de hoy</h2><span class="muted">${role==="crea"?"Tú creas el contenido":"Tú programas y subes el contenido"}</span></div>
+    ${p.posts.length?`<div><b>Posts de hoy (hora Miami):</b> ${p.posts.map(x=>`${esc(x.n)} ${x.hora}`).join(" · ")}</div>`:`<div class="muted">Hoy no hay posts (se publica lunes, miércoles, viernes y domingo).</div>`}
+    ${p.historias.length?`<div><b>Historias (hora Miami):</b> 3 por cuenta, de 8 a 9 a. m., de 12 a 1 p. m. y de 5 a 6 p. m. · ${CT_GOALS.historiasDia} en total</div>`:`<div class="muted">Los domingos no hay historias.</div>`}
+    <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">${S.ct?metas:`<span class="muted">Cargando tus números de Trello…</span>`}</div>
+    <div class="muted" style="font-size:.8rem"><a href="https://trello.com/b/j40ktBFt" target="_blank" rel="noopener">Tablero Posts</a> · <a href="https://trello.com/b/iPV0GS8a" target="_blank" rel="noopener">Tablero Historias</a></div>
+  </section>`;
+}
+
 // ---------- binding ----------
 async function copy(text){try{await navigator.clipboard.writeText(text);toast("Copiado");return true}catch(e){toast("Selecciona el texto y cópialo a mano");return false}}
 function bind(){
@@ -1836,6 +1869,7 @@ render();
   }
   bootHist(db);
   loadComp();setInterval(loadComp,5*6e4);
+  if(CFG.contentRole){loadCt();setInterval(loadCt,10*6e4)}
   db.collection("months").onSnapshot(s=>{const m={};s.docs.forEach(d=>m[d.id]=d.data());S.months=m;if(S.tab==="resumen")render()},()=>{});
   try{await db.collection("visits").doc(today()).set({t:Date.now()})}
   catch(e){if(e.code==="unauthenticated")saveErr("Tu sesión terminó. Vuelve a entrar con tu contraseña.")}

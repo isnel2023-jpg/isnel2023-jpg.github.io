@@ -62,6 +62,9 @@
         ${ms.map(mrow).join("") || `<div class="empty" style="margin-left:14px">Sin colaboradores todavía. Solo entra el administrador.</div>`}</div>`; }).join("")}
       <div id="wForm"></div>
     </section>
+    <section class="panel"><div class="panel-h"><h2>📲 Contenido (Trello)</h2><button class="btn sm" type="button" id="ctRef">Actualizar</button></div>
+      <p class="muted" style="margin:0">Santi crea · Jackeline programa · Isnel y Valery aprueban Abba y Lion. Datos en vivo de los tableros Posts e Historias.</p>
+      <div id="ctCal"></div><div id="ctOut"><div class="empty">Cargando…</div></div></section>
     <section class="panel"><div class="panel-h"><h2>Administradores</h2></div>
       <div class="list">${W.filter((w) => w.role === "admin").map((w) => `<div class="row"><div class="main"><div class="t">${esc(w.name)} <span class="pill acc">admin</span></div></div><div class="acts" style="flex-direction:row"><button class="btn sm" type="button" data-pw="${esc(w.id)}">Cambiar contraseña</button></div></div>`).join("")}</div>
     </section>
@@ -86,7 +89,8 @@
     <section class="panel"><div class="panel-h"><h2>Registro de actividad</h2><select id="auW" aria-label="Filtrar"><option value="">Todas las empresas</option>${workers.map((w) => `<option value="${esc(w.id)}">${esc(w.name)}</option>`).join("")}</select></div>
       <p class="muted" style="margin:0">Quién hizo qué, cuándo y desde dónde. Nadie puede borrar este registro.</p><div id="auOut"><div class="empty">Cargando…</div></div></section>`;
     bind();
-    archives(); storage(); auditLog();
+    archives(); storage(); auditLog(); contenido(); ctCalendar();
+    const cr = document.getElementById("ctRef"); if (cr) cr.onclick = contenido;
   }
   const me = () => Lion.me;
   function prevMonth() { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 1); return d.toISOString().slice(0, 7); }
@@ -277,6 +281,53 @@
         try { await Lion.call("/admin/archives/" + encodeURIComponent(b.dataset.rm), { raw: true, method: "DELETE" }); archives(); } catch (e) { flash(e.message, true); }
       }));
     } catch (e) { out.innerHTML = `<p class="errmsg">${esc(e.message)}</p>`; }
+  }
+  // ---- contenido: calendario rotativo (mismo cálculo que el portal de cada colaborador) ----
+  const CT_URL = "https://n8n.n8nainueva.com/webhook/contenido-metricas";
+  // cuentas activas (TikTok, Instagram y Facebook de cada una); Lion Systems se agrega cuando tenga sus redes
+  const CT_EMP = [["GABY", "Gaby Flowers"], ["ABBA", "ABBA Roses"], ["RUIZ", "Ruiz Creationz"]];
+  const CT_SLOTS = ["8:00 a. m.", "12:00 p. m.", "5:00 p. m.", "7:00 p. m."], CT_POST_DAYS = [1, 3, 5, 0];
+  const CT_GOALS = { postsSemana: CT_POST_DAYS.length * CT_EMP.length, historiasDia: 3 * CT_EMP.length };
+  const DOWN = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  function ctSlot(k, i) { const d = new Date(k + "T12:00:00Z"), dow = d.getUTCDay(), di = CT_POST_DAYS.indexOf(dow); if (di < 0) return null; const mon = new Date(d); mon.setUTCDate(d.getUTCDate() - ((dow + 6) % 7)); return CT_SLOTS[(i + Math.floor(mon.getTime() / 6048e5) + di) % CT_SLOTS.length]; }
+  function ctCalendar() {
+    const el = document.getElementById("ctCal"); if (!el) return;
+    const t = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), base = new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()));
+    const days = []; for (let i = 0; i < 14 && days.length < 8; i++) { const d = new Date(base); d.setUTCDate(base.getUTCDate() + i); const k = d.toISOString().slice(0, 10); if (CT_POST_DAYS.includes(d.getUTCDay())) days.push(k); }
+    el.innerHTML = `<div class="scroll"><table class="t"><thead><tr><th>Posts (hora Miami)</th>${CT_EMP.map(([, n]) => `<th>${esc(n)}</th>`).join("")}</tr></thead><tbody>${days.map((k) => `<tr><td>${DOWN[new Date(k + "T12:00:00Z").getUTCDay()]} ${k.slice(8, 10)}/${k.slice(5, 7)}</td>${CT_EMP.map((_, i) => `<td class="mono">${ctSlot(k, i)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+      <p class="muted" style="margin:4px 0 0">Historias: lunes a sábado, 3 por cuenta: de 8 a 9 a. m., de 12 a 1 p. m. y de 5 a 6 p. m. (hora Miami). Cada cuenta publica en TikTok, Instagram y Facebook. Las horas de los posts rotan: ninguna cuenta repite hora el mismo día y cada semana cambian.</p>`;
+  }
+  async function contenido() {
+    const out = document.getElementById("ctOut"); if (!out) return;
+    out.innerHTML = `<div class="empty">Cargando…</div>`;
+    try {
+      const r = await (await fetch(CT_URL, { cache: "no-store" })).json();
+      const m = { ...(r.metas || {}), santi_historias_dia: CT_GOALS.historiasDia, santi_posts_semana: CT_GOALS.postsSemana, jacqueline_historias_dia: CT_GOALS.historiasDia }, s = r.santi || {}, j = r.jacqueline || {}, p = r.pendientes || {};
+      const bar = (v, g) => { const pct = g ? Math.min(100, Math.round((v / g) * 100)) : 0; return `<span class="mono">${v}${g ? " / " + g : ""}</span> <span class="pill ${g && v >= g ? "on" : g ? "warn" : ""}">${g ? pct + "%" : "—"}</span>`; };
+      const row = (a, b) => `<tr><td>${a}</td><td class="r">${b}</td></tr>`;
+      const bancos = Object.entries(r.bancos || {}).map(([e, b]) => `<tr><td>${esc(e)}</td><td class="r mono">${b.disponibles}</td><td class="r mono">${b.total}</td><td>${b.alerta ? '<span class="pill bad">bajo (&lt;' + (m.banco_minimo || 15) + ")</span>" : '<span class="pill on">ok</span>'}</td></tr>`).join("");
+      const emp = Object.entries(s.por_empresa_semana || {}).filter(([, n]) => n).map(([e, n]) => `${esc(e)} ${n}`).join(" · ") || "—";
+      out.innerHTML = `<div class="scroll"><table class="t"><thead><tr><th>Santi — creación</th><th class="r">Hoy / semana vs. meta</th></tr></thead><tbody>
+        ${row("Historias nuevas hoy", bar(s.historias_hoy || 0, m.santi_historias_dia))}
+        ${row("Historias esta semana", `<span class="mono">${s.historias_semana || 0}</span>`)}
+        ${row("Posts esta semana", bar(s.posts_semana || 0, m.santi_posts_semana))}
+        ${row("Por empresa (semana)", `<span class="muted">${emp}</span>`)}
+      </tbody></table>
+      <table class="t"><thead><tr><th>Jackeline — programación</th><th class="r">Cantidad</th></tr></thead><tbody>
+        ${row("Historias programadas hoy", bar(j.historias_programadas_hoy || 0, m.jacqueline_historias_dia))}
+        ${row("Historias programadas semana", `<span class="mono">${j.historias_programadas_semana || 0}</span>`)}
+        ${row("Posts programados hoy / semana", `<span class="mono">${j.posts_programados_hoy || 0} / ${j.posts_programados_semana || 0}</span>`)}
+        ${row("Publicados esta semana", `<span class="mono">${j.posteados_semana || 0}</span>`)}
+      </tbody></table>
+      <table class="t"><thead><tr><th>Pendientes</th><th class="r">Cantidad</th></tr></thead><tbody>
+        ${row("Esperan tu aprobación (Abba / Lion)", `<span class="mono">${(p.posts_por_aprobar || 0) + (p.historias_por_aprobar || 0)}</span> <span class="muted">posts ${p.posts_por_aprobar || 0} · historias ${p.historias_por_aprobar || 0}</span>`)}
+        ${row("Listos sin programar", `<span class="mono">${(p.posts_sin_programar || 0) + (p.historias_nuevas_sin_programar || 0)}</span>`)}
+        ${row("Posts programados a futuro", `<span class="mono">${p.posts_programados_futuro || 0}</span>`)}
+        ${row("Atrasadas (ya salieron y no se movieron)", p.atrasadas ? `<span class="pill bad">${p.atrasadas}</span>` : '<span class="mono">0</span>')}
+      </tbody></table>
+      <table class="t"><thead><tr><th>Banco de historias</th><th class="r">Disponibles</th><th class="r">Total</th><th>Estado</th></tr></thead><tbody>${bancos}</tbody></table></div>
+      <p class="muted" style="margin:6px 0 0">Actualizado ${esc(when(r.actualizado))} · <a href="https://trello.com/b/j40ktBFt" target="_blank" rel="noopener">Tablero Posts</a> · <a href="https://trello.com/b/iPV0GS8a" target="_blank" rel="noopener">Tablero Historias</a></p>`;
+    } catch (e) { out.innerHTML = `<p class="errmsg">No se pudo leer Trello: ${esc(e.message)}</p>`; }
   }
   async function storage() {
     const out = document.getElementById("stOut");
