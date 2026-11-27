@@ -1754,14 +1754,26 @@ function ctPlan(k){
   const posts=di<0?[]:CT_EMP.map(([c,n],i)=>({c,n,hora:CT_SLOTS[(i+w+di)%CT_SLOTS.length]})).sort((a,b)=>CT_SLOTS.indexOf(a.hora)-CT_SLOTS.indexOf(b.hora));
   return {dow,posts,historias:dow===0?[]:["8–9 a. m.","12–1 p. m.","5–6 p. m."]};
 }
+// Días adelantado: cuántos días seguidos (desde mañana) alcanza lo que está listo y sin publicar.
+// Historias: 3 por día de lunes a sábado. Posts: 1 por día de post (lunes, miércoles, viernes y domingo).
+const CT_AHEAD=7;
+const ctUse=(kind,k)=>{const dow=new Date(k+"T12:00:00Z").getUTCDay();return kind==="historias"?(dow===0?0:3):(CT_POST_DAYS.includes(dow)?1:0)};
+function ctDays(have,kind,k){let n=0,left=have;for(let i=1;i<=60;i++){const d=addDays(k,i),u=ctUse(kind,d);if(u>left)break;left-=u;n=i}return n}
+function ctNeed(have,kind,k){let need=0;for(let i=1;i<=CT_AHEAD;i++)need+=ctUse(kind,addDays(k,i));return Math.max(0,need-have)}
+function ctAhead(r,k){const a=r.adelanto||{};return CT_EMP.map(([c,n])=>{const x=a[c]||{historias:0,posts:0};return {c,n,h:x.historias||0,p:x.posts||0,dh:ctDays(x.historias||0,"historias",k),dp:ctDays(x.posts||0,"posts",k),nh:ctNeed(x.historias||0,"historias",k),np:ctNeed(x.posts||0,"posts",k)}})}
 async function loadCt(){try{const r=await fetch(CT_URL,{cache:"no-store"});S.ct=await r.json();const a=document.activeElement;if(S.tab==="hoy"&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!layer.innerHTML)render()}catch(e){S.ct=null}}
 function ctPanel(){
   const role=CFG.contentRole;if(!role)return "";
   const k=today(),p=ctPlan(k),r=S.ct||{},s=r.santi||{},j=r.jacqueline||{};
   const bar=(v,g)=>`<b class="num">${v||0}/${g}</b> <span class="pill ${(v||0)>=g?"on":"warn"}">${Math.min(100,Math.round((v||0)/g*100))}%</span>`;
+  const ah=ctAhead(r,k),defH=ah.reduce((x,y)=>x+y.nh,0),defP=ah.reduce((x,y)=>x+y.np,0);
+  const goalH=CT_GOALS.historiasDia+Math.ceil(defH/5),goalP=CT_GOALS.postsSemana+defP;
+  const aheadRows=`<div style="display:flex;flex-direction:column;gap:2px;font-size:.9rem">${ah.map(x=>`<div><b>${esc(x.n)}:</b> <span class="pill ${x.dh>=CT_AHEAD?"on":"warn"}">historias ${x.dh} d</span> <span class="pill ${x.dp>=CT_AHEAD?"on":"warn"}">posts ${x.dp} d</span>${x.nh||x.np?` <span class="muted">faltan ${x.nh} historias y ${x.np} posts para la semana</span>`:" ✅"}</div>`).join("")}</div>`;
   const metas=role==="crea"
-    ?`${p.historias.length?`<div>Historias creadas hoy: ${bar(s.historias_hoy,CT_GOALS.historiasDia)}</div>`:""}<div>Posts creados esta semana: ${bar(s.posts_semana,CT_GOALS.postsSemana)}</div>`
-    :`${p.historias.length?`<div>Historias programadas hoy: ${bar(j.historias_programadas_hoy,CT_GOALS.historiasDia)}</div>`:""}${p.posts.length?`<div>Posts programados hoy: ${bar(j.posts_programados_hoy,p.posts.length)}</div>`:""}<div class="muted">Publicados esta semana: ${j.posteados_semana||0}</div>`;
+    ?`<div><b>Meta: ir siempre ${CT_AHEAD} días adelantado en cada cuenta.</b></div>${aheadRows}
+      <div>Historias creadas hoy: ${bar(s.historias_hoy,goalH)} <span class="muted">${defH?`(${CT_GOALS.historiasDia} del día + ${Math.ceil(defH/5)} para ponerte al día)`:"(ya vas adelantado: solo reponer)"}</span></div>
+      <div>Posts creados esta semana: ${bar(s.posts_semana,goalP)} <span class="muted">${defP?`(${CT_GOALS.postsSemana} de la semana + ${defP} para ir adelantado)`:""}</span></div>`
+    :`${p.historias.length?`<div>Historias programadas hoy: ${bar(j.historias_programadas_hoy,CT_GOALS.historiasDia)}</div>`:""}${p.posts.length?`<div>Posts programados hoy: ${bar(j.posts_programados_hoy,p.posts.length)}</div>`:""}<div class="muted">Publicados esta semana: ${j.posteados_semana||0}</div>${aheadRows}`;
   return `<section class="panel"><div class="panel-h"><h2>📲 Contenido de hoy</h2><span class="muted">${role==="crea"?"Tú creas el contenido":"Tú programas y subes el contenido"}</span></div>
     ${p.posts.length?`<div><b>Posts de hoy (hora Miami):</b> ${p.posts.map(x=>`${esc(x.n)} ${x.hora}`).join(" · ")}</div>`:`<div class="muted">Hoy no hay posts (se publica lunes, miércoles, viernes y domingo).</div>`}
     ${p.historias.length?`<div><b>Historias (hora Miami):</b> 3 por cuenta, de 8 a 9 a. m., de 12 a 1 p. m. y de 5 a 6 p. m. · ${CT_GOALS.historiasDia} en total</div>`:`<div class="muted">Los domingos no hay historias.</div>`}

@@ -297,6 +297,15 @@
     el.innerHTML = `<div class="scroll"><table class="t"><thead><tr><th>Posts (hora Miami)</th>${CT_EMP.map(([, n]) => `<th>${esc(n)}</th>`).join("")}</tr></thead><tbody>${days.map((k) => `<tr><td>${DOWN[new Date(k + "T12:00:00Z").getUTCDay()]} ${k.slice(8, 10)}/${k.slice(5, 7)}</td>${CT_EMP.map((_, i) => `<td class="mono">${ctSlot(k, i)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
       <p class="muted" style="margin:4px 0 0">Historias: lunes a sábado, 3 por cuenta: de 8 a 9 a. m., de 12 a 1 p. m. y de 5 a 6 p. m. (hora Miami). Cada cuenta publica en TikTok, Instagram y Facebook. Las horas de los posts rotan: ninguna cuenta repite hora el mismo día y cada semana cambian.</p>`;
   }
+  const ctUse = (kind, k) => { const dow = new Date(k + "T12:00:00Z").getUTCDay(); return kind === "historias" ? (dow === 0 ? 0 : 3) : (CT_POST_DAYS.includes(dow) ? 1 : 0); };
+  const ctAdd = (k, n) => { const d = new Date(k + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  function ctDays(have, kind, k) { let n = 0, left = have; for (let i = 1; i <= 60; i++) { const u = ctUse(kind, ctAdd(k, i)); if (u > left) break; left -= u; n = i; } return n; }
+  function ctNeed(have, kind, k) { let need = 0; for (let i = 1; i <= 7; i++) need += ctUse(kind, ctAdd(k, i)); return Math.max(0, need - have); }
+  function ctAheadRows(r) {
+    const t = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), k = new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())).toISOString().slice(0, 10), a = r.adelanto || {};
+    return CT_EMP.map(([c, n]) => { const x = a[c] || {}, h = x.historias || 0, p = x.posts || 0, dh = ctDays(h, "historias", k), dp = ctDays(p, "posts", k), nh = ctNeed(h, "historias", k), np = ctNeed(p, "posts", k);
+      return `<tr><td>${esc(n)}</td><td class="r"><span class="pill ${dh >= 7 ? "on" : "warn"}">${dh} d</span> <span class="muted">${h} listas</span></td><td class="r"><span class="pill ${dp >= 7 ? "on" : "warn"}">${dp} d</span> <span class="muted">${p} listos</span></td><td>${nh || np ? `${nh} historias · ${np} posts` : "✅ al día"}</td></tr>`; }).join("");
+  }
   async function contenido() {
     const out = document.getElementById("ctOut"); if (!out) return;
     out.innerHTML = `<div class="empty">Cargando…</div>`;
@@ -319,6 +328,7 @@
         ${row("Posts programados hoy / semana", `<span class="mono">${j.posts_programados_hoy || 0} / ${j.posts_programados_semana || 0}</span>`)}
         ${row("Publicados esta semana", `<span class="mono">${j.posteados_semana || 0}</span>`)}
       </tbody></table>
+      <table class="t"><thead><tr><th>Adelanto (meta: 7 días)</th><th class="r">Historias</th><th class="r">Posts</th><th>Le falta a Santi para la semana</th></tr></thead><tbody>${ctAheadRows(r)}</tbody></table>
       <table class="t"><thead><tr><th>Pendientes</th><th class="r">Cantidad</th></tr></thead><tbody>
         ${row("Esperan tu aprobación (Abba / Lion)", `<span class="mono">${(p.posts_por_aprobar || 0) + (p.historias_por_aprobar || 0)}</span> <span class="muted">posts ${p.posts_por_aprobar || 0} · historias ${p.historias_por_aprobar || 0}</span>`)}
         ${row("Listos sin programar", `<span class="mono">${(p.posts_sin_programar || 0) + (p.historias_nuevas_sin_programar || 0)}</span>`)}
