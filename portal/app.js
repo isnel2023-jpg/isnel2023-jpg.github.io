@@ -1758,7 +1758,7 @@ function ctPlan(k){
 // Historias: 3 por día de lunes a sábado. Posts: 1 por día de post (lunes, miércoles, viernes y domingo).
 const CT_AHEAD=7;
 const ctUse=(kind,k)=>{const dow=new Date(k+"T12:00:00Z").getUTCDay();return kind==="historias"?(dow===0?0:3):(CT_POST_DAYS.includes(dow)?1:0)};
-function ctDays(have,kind,k){let n=0,left=have;for(let i=1;i<=60;i++){const d=addDays(k,i),u=ctUse(kind,d);if(u>left)break;left-=u;n=i}return n}
+function ctDays(have,kind,k){let n=0,left=have;for(let i=1;i<=60;i++){const d=addDays(k,i),u=ctUse(kind,d);if(u>left)break;left-=u;if(u)n=i}return n} // solo cuenta hasta el último día que de verdad queda cubierto
 function ctNeed(have,kind,k){let need=0;for(let i=1;i<=CT_AHEAD;i++)need+=ctUse(kind,addDays(k,i));return Math.max(0,need-have)}
 function ctAhead(r,k){const a=r.adelanto||{};return CT_EMP.map(([c,n])=>{const x=a[c]||{historias:0,posts:0};return {c,n,h:x.historias||0,p:x.posts||0,dh:ctDays(x.historias||0,"historias",k),dp:ctDays(x.posts||0,"posts",k),nh:ctNeed(x.historias||0,"historias",k),np:ctNeed(x.posts||0,"posts",k)}})}
 async function loadCt(){try{const r=await fetch(CT_URL,{cache:"no-store"});S.ct=await r.json();const a=document.activeElement;if(S.tab==="hoy"&&!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!layer.innerHTML)render()}catch(e){S.ct=null}}

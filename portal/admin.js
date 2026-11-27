@@ -299,7 +299,7 @@
   }
   const ctUse = (kind, k) => { const dow = new Date(k + "T12:00:00Z").getUTCDay(); return kind === "historias" ? (dow === 0 ? 0 : 3) : (CT_POST_DAYS.includes(dow) ? 1 : 0); };
   const ctAdd = (k, n) => { const d = new Date(k + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
-  function ctDays(have, kind, k) { let n = 0, left = have; for (let i = 1; i <= 60; i++) { const u = ctUse(kind, ctAdd(k, i)); if (u > left) break; left -= u; n = i; } return n; }
+  function ctDays(have, kind, k) { let n = 0, left = have; for (let i = 1; i <= 60; i++) { const u = ctUse(kind, ctAdd(k, i)); if (u > left) break; left -= u; if (u) n = i; } return n; }
   function ctNeed(have, kind, k) { let need = 0; for (let i = 1; i <= 7; i++) need += ctUse(kind, ctAdd(k, i)); return Math.max(0, need - have); }
   function ctAheadRows(r) {
     const t = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), k = new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())).toISOString().slice(0, 10), a = r.adelanto || {};
