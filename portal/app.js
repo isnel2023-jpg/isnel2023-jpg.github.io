@@ -1119,7 +1119,7 @@ function vGuia(){
       <li>Entra siempre con tu contraseña personal (no la compartas). Si sale un aviso rojo de “NO SE GUARDÓ”, avísale a Isnel de inmediato.</li>
       ${SHOW_THEME?`<li>Revisa el tema de contenido del día y publica según ese tema.</li>`:""}
       <li>Registra o importa los leads. Llama cada lead máximo 2 veces el mismo día.</li>
-      <li>Después de llamar a un lead toca <b>“Ya lo llamé”</b> y escoge cómo te fue. Solo eso suma a la meta de llamadas; agregar el lead no cuenta como llamada. El follow-up se agenda solo (día 1, 3 y 7). Si no le interesa, va a “No interesado / frío”.</li>
+      <li>Después de llamar a un lead toca <b>“Ya lo llamé”</b> y escoge cómo te fue. Solo eso suma a la meta de llamadas; agregar el lead no cuenta como llamada. El follow-up se agenda solo: días 1, 2, 3, 4 y 5, y después días 7, 14, 21 y 30. Si no le interesa, va a “No interesado / frío”.</li>
       <li>Los clientes en inglés se marcan con idioma “Inglés” y se contactan por chat: toca <b>“Le escribí por chat”</b>. Los chats se cuentan aparte, no suman a las llamadas.</li>
       <li>Cada venta: sube el PDF de la orden (el mismo que mandas a producción) con su <b>número de orden</b>. La IA llena todo; tú revisas y subes.</li>
       <li>Si no pagó todo, el día de la entrega el portal te pide confirmar el pago.${COMMISSION?" Ahí se gana la comisión.":""}</li>
@@ -1201,7 +1201,7 @@ function openLead(id,keep){
     <div class="drawer-b">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="num" style="font-size:1.1rem;user-select:all">${esc(l.phone||"Sin número")}</span>${l.phone?`<button class="btn sm" type="button" data-copytxt="${esc(l.phone)}">Copiar</button><a class="btn sm" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>`:""}</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="lbl">Idioma</span><select id="dlLang" aria-label="Idioma del cliente" style="border:1px solid var(--line);border-radius:8px;padding:4px 8px;background:var(--bg)">${Object.entries(LANGS).map(([k2,v])=>`<option value="${k2}" ${(l.lang||"es")===k2?"selected":""}>${v}</option>`).join("")}</select>${en?`<span class="pill warn">Cliente en inglés: contáctalo por chat</span>`:""}</div>
-      <div><span class="lbl">${isNew?`Primer contacto${en?"":` · llamada ${Math.min(todayNew+1,2)} de 2 hoy`}`:`Follow-up ${Math.min(l.fuStep,3)} de 3`}</span>
+      <div><span class="lbl">${isNew?`Primer contacto${en?"":` · llamada ${Math.min(todayNew+1,2)} de 2 hoy`}`:`Follow-up ${Math.min(l.fuStep,FU_N)} de ${FU_N}`}</span>
       ${en?chatBox+callBox:callBox+chatBox}
       <button class="btn ok" type="button" data-out="vendio" style="width:100%;margin-top:8px;justify-content:center">Vendí · subir orden</button></div>
       <div id="saleSlot"></div>
@@ -1223,8 +1223,8 @@ async function logCall(l,out,ch){
   const n={...l,history:[...(l.history||[])]};
   const prior=newCallsToday(l,k);
   n.history.push(chat
-    ?{t:now,day:k,kind:"chat",isNew,outcome:out,text:(isNew?"Chat (nuevo): ":`Chat follow-up ${Math.min(l.fuStep,3)}: `)+CHAT_TXT[out]}
-    :{t:now,day:k,kind:"call",isNew,outcome:out,text:(isNew?`Llamada ${prior+1} (nuevo): `:`Follow-up ${Math.min(l.fuStep,3)} por llamada: `)+OUT_TXT[out]});
+    ?{t:now,day:k,kind:"chat",isNew,outcome:out,text:(isNew?"Chat (nuevo): ":`Chat follow-up ${Math.min(l.fuStep,FU_N)}: `)+CHAT_TXT[out]}
+    :{t:now,day:k,kind:"call",isNew,outcome:out,text:(isNew?`Llamada ${prior+1} (nuevo): `:`Follow-up ${Math.min(l.fuStep,FU_N)} por llamada: `)+OUT_TXT[out]});
   let msg=chat?"Chat registrado":"Llamada registrada";
   if(out==="no_interesado"){n.stage="frio";n.nextFU=null;if(isNew)n.fuStep=1;msg="Movido a No interesado"}
   else if(out==="interesado"||out==="contesto"){
@@ -1237,15 +1237,17 @@ async function logCall(l,out,ch){
     else if(isNew){
       if(prior+1>=2){n.fuStep=1;n.nextFU=atHour(addDays(k,1),16);msg="2 llamadas hoy. Mándale WhatsApp; follow-up mañana"}
       else{n.nextFU=null;msg="Vuelve a llamarlo más tarde hoy"}
-    }else{advanceFU(n,k);msg=n.nextFU?"Sin respuesta. Siguiente follow-up: "+fmtWhen(n.nextFU):"3 follow-ups sin respuesta: pasa a frío"}
+    }else{advanceFU(n,k);msg=n.nextFU?"Sin respuesta. Siguiente follow-up: "+fmtWhen(n.nextFU):`Los ${FU_N} follow-ups sin respuesta: pasa a frío`}
   }
   S.leads[n.id]=n;render();await save("leads",n);toast(msg);
 }
+const FU_DAYS=[1,2,3,4,5,7,14,21,30], FU_N=FU_DAYS.length;
+function fuAnchor(n){const h=(n.history||[]).filter(x=>(x.kind==="call"||x.kind==="chat")&&x.day).sort((a,b)=>a.t-b.t)[0];return (h&&h.day)||n.createdDay||today()}
 function advanceFU(n,k){
-  const step=n.fuStep||1;
-  if(step===1){n.fuStep=2;const d=addDays(n.createdDay,3);n.nextFU=atHour(d<=k?addDays(k,2):d,16)}
-  else if(step===2){n.fuStep=3;const d=addDays(n.createdDay,7);n.nextFU=atHour(d<=k?addDays(k,4):d,16)}
-  else{n.fuStep=4;n.nextFU=null;if(!["pendiente_pago","vendido"].includes(n.stage))n.stage="frio"}
+  const step=n.fuStep||1; // follow-up que se acaba de hacer
+  if(step>=FU_N){n.fuStep=FU_N+1;n.nextFU=null;if(!["pendiente_pago","vendido"].includes(n.stage))n.stage="frio";return}
+  const gap=FU_DAYS[step]-FU_DAYS[step-1], cal=addDays(fuAnchor(n),FU_DAYS[step]), min=addDays(k,gap);
+  n.fuStep=step+1;n.nextFU=atHour(cal>min?cal:min,16);
 }
 function bindDrawer(l){
   layer.querySelectorAll("[data-close]").forEach(e=>e.onclick=closeLead);
